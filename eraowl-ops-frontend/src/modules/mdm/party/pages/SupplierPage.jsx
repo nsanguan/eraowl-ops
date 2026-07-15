@@ -311,6 +311,8 @@ export default function SupplierPage() {
           <div className="p-6">
             {headerTab === 'basic' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div><Fld label="Party Code" required><Inp value={existingSupplier?.party_code || ''} placeholder="--" className="bg-surface-container-high cursor-not-allowed" readOnly /></Fld></div>
+                <div><Fld label="Party Name" required><Inp value={existingSupplier?.party_name || ''} placeholder="--" className="bg-surface-container-high cursor-not-allowed" readOnly /></Fld></div>
                 <div><Fld label="Supplier Code" required><Inp value={form.supplier_code} onChange={v => updateForm({ supplier_code: v })} placeholder="e.g. SUP-001" /></Fld></div>
                 <div><Fld label="Currency"><Sel value={form.currency_code} onChange={v => updateForm({ currency_code: v })} options={CURRENCIES} label="-- Select --" /></Fld></div>
                 <div><Fld label="Payment Term (Days)"><Inp value={form.payment_term_days} onChange={v => updateForm({ payment_term_days: v })} type="number" placeholder="30" /></Fld></div>

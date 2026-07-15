@@ -213,7 +213,13 @@ class PartyService:
         return await self._paginate(Customer, page, page_size, filters)
 
     async def get_customer(self, entity_id: uuid.UUID):
-        return await self._get_by_id(Customer, entity_id)
+        c = await self._get_by_id(Customer, entity_id)
+        out = CustomerOut.model_validate(c)
+        party = await self._get_by_id(Party, c.party_id)
+        if party:
+            out.party_code = party.party_code
+            out.party_name = party.party_name
+        return out
 
     async def create_customer(self, data: CustomerCreate):
         return await self._create(Customer, data)

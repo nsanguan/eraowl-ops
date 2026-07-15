@@ -244,6 +244,8 @@ class CustomerOut(BaseModel):
     customer_id: uuid.UUID
     party_id: uuid.UUID
     party_role_id: Optional[uuid.UUID]
+    party_code: Optional[str] = None
+    party_name: Optional[str] = None
     customer_code: Optional[str]
     customer_class_code: Optional[str]
     credit_limit: Optional[float]

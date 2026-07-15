@@ -306,6 +306,8 @@ export default function CustomerPage() {
           <div className="p-6">
             {headerTab === 'basic' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div><Fld label="Party Code" required><Inp value={existingCustomer?.party_code || ''} placeholder="--" className="bg-surface-container-high cursor-not-allowed" readOnly /></Fld></div>
+                <div><Fld label="Party Name" required><Inp value={existingCustomer?.party_name || ''} placeholder="--" className="bg-surface-container-high cursor-not-allowed" readOnly /></Fld></div>
                 <div><Fld label="Customer Code" required><Inp value={form.customer_code} onChange={v => updateForm({ customer_code: v })} placeholder="e.g. CUS-001" /></Fld></div>
                 <div><Fld label="Customer Class"><Sel value={form.customer_class_code} onChange={v => updateForm({ customer_class_code: v })} options={CUSTOMER_CLASSES} /></Fld></div>
                 <div><Fld label="Credit Limit"><Inp value={form.credit_limit} onChange={v => updateForm({ credit_limit: v })} type="number" placeholder="0.00" /></Fld></div>
