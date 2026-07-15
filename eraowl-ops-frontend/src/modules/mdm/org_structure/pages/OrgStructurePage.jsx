@@ -12,58 +12,6 @@ const TABS = [
   { key: 'locators',      label: 'Locators',       endpoint: '/org_structure/locators',      idKey: 'locator_id',        nameField: 'locator_code' },
 ]
 
-  const lookupRender = (lookupName) => (row) => {
-    const val = row[Object.keys(LOOKUPS).find((k) => LOOKUPS[k].valueKey === lookupName) || '']
-    return resolveLabel(lookupName, row[lookupName])
-  }
-
-  const COLUMNS = {
-  corporates: [
-    { key: 'corp_code',  header: 'Code',   width: '140px' },
-    { key: 'corp_name',  header: 'Name',   width: '220px' },
-    { key: 'is_active',  header: 'Status', width: '100px',
-      render: (r) => r.is_active !== false
-        ? <span className="text-success text-xs font-semibold">Active</span>
-        : <span className="text-outline text-xs">Inactive</span>,
-    },
-  ],
-  companies: [
-    { key: 'company_code', header: 'Code',     width: '140px' },
-    { key: 'legal_name',   header: 'Name',     width: '220px' },
-    { key: 'corporate_id', header: 'Corporate', width: '160px', render: (r) => resolveLabel('corporate_id', r.corporate_id) },
-    { key: 'tax_id',       header: 'Tax ID',   width: '160px' },
-    { key: 'is_active',    header: 'Status',   width: '100px' },
-  ],
-  businessUnits: [
-    { key: 'bu_code',      header: 'Code',     width: '140px' },
-    { key: 'bu_name',      header: 'Name',     width: '220px' },
-    { key: 'company_id',   header: 'Company',  width: '140px', render: (r) => resolveLabel('company_id', r.company_id) },
-    { key: 'is_active',    header: 'Status',   width: '100px' },
-  ],
-  sites: [
-    { key: 'site_code',    header: 'Code',     width: '140px' },
-    { key: 'site_name',    header: 'Name',     width: '220px' },
-    { key: 'business_unit_id', header: 'BU',   width: '120px', render: (r) => resolveLabel('business_unit_id', r.business_unit_id) },
-    { key: 'is_active',    header: 'Status',   width: '100px' },
-  ],
-  warehouses: [
-    { key: 'warehouse_code', header: 'Code',   width: '140px' },
-    { key: 'warehouse_name', header: 'Name',   width: '220px' },
-    { key: 'site_id',        header: 'Site',   width: '120px', render: (r) => resolveLabel('site_id', r.site_id) },
-    { key: 'is_active',      header: 'Status', width: '100px' },
-  ],
-  locators: [
-    { key: 'locator_code', header: 'Code',     width: '140px' },
-    { key: 'zone',         header: 'Zone',     width: '80px'  },
-    { key: 'aisle',        header: 'Aisle',    width: '80px'  },
-    { key: 'rack',         header: 'Rack',     width: '80px'  },
-    { key: 'bin',          header: 'Bin',      width: '80px'  },
-    { key: 'is_active',    header: 'Status',   width: '100px' },
-  ],
-}
-
-const SIMPLE_COLUMNS = ['is_active']
-
 const LOOKUPS = {
   corporate_id:   { endpoint: '/org_structure/corporates',  valueKey: 'corporate_id',   labelKey: 'corp_code'  },
   company_id:     { endpoint: '/org_structure/companies',   valueKey: 'company_id',     labelKey: 'company_code'  },
@@ -129,6 +77,51 @@ export default function OrgStructurePage() {
     const match = list.find((item) => String(item[lk.valueKey]) === String(value))
     return match ? match[lk.labelKey] : value
   }
+
+  const COLUMNS = {
+  corporates: [
+    { key: 'corp_code',  header: 'Code',   width: '140px' },
+    { key: 'corp_name',  header: 'Name',   width: '220px' },
+    { key: 'is_active',  header: 'Status', width: '100px',
+      render: (r) => r.is_active !== false
+        ? <span className="text-success text-xs font-semibold">Active</span>
+        : <span className="text-outline text-xs">Inactive</span>,
+    },
+  ],
+  companies: [
+    { key: 'company_code', header: 'Code',     width: '140px' },
+    { key: 'legal_name',   header: 'Name',     width: '220px' },
+    { key: 'corporate_id', header: 'Corporate', width: '160px', render: (r) => resolveLabel('corporate_id', r.corporate_id) },
+    { key: 'tax_id',       header: 'Tax ID',   width: '160px' },
+    { key: 'is_active',    header: 'Status',   width: '100px' },
+  ],
+  businessUnits: [
+    { key: 'bu_code',      header: 'Code',     width: '140px' },
+    { key: 'bu_name',      header: 'Name',     width: '220px' },
+    { key: 'company_id',   header: 'Company',  width: '140px', render: (r) => resolveLabel('company_id', r.company_id) },
+    { key: 'is_active',    header: 'Status',   width: '100px' },
+  ],
+  sites: [
+    { key: 'site_code',    header: 'Code',     width: '140px' },
+    { key: 'site_name',    header: 'Name',     width: '220px' },
+    { key: 'business_unit_id', header: 'BU',   width: '120px', render: (r) => resolveLabel('business_unit_id', r.business_unit_id) },
+    { key: 'is_active',    header: 'Status',   width: '100px' },
+  ],
+  warehouses: [
+    { key: 'warehouse_code', header: 'Code',   width: '140px' },
+    { key: 'warehouse_name', header: 'Name',   width: '220px' },
+    { key: 'site_id',        header: 'Site',   width: '120px', render: (r) => resolveLabel('site_id', r.site_id) },
+    { key: 'is_active',      header: 'Status', width: '100px' },
+  ],
+  locators: [
+    { key: 'locator_code', header: 'Code',     width: '140px' },
+    { key: 'zone',         header: 'Zone',     width: '80px'  },
+    { key: 'aisle',        header: 'Aisle',    width: '80px'  },
+    { key: 'rack',         header: 'Rack',     width: '80px'  },
+    { key: 'bin',          header: 'Bin',      width: '80px'  },
+    { key: 'is_active',    header: 'Status',   width: '100px' },
+  ],
+}
 
   const tab = TABS.find((t) => t.key === activeTab)
   const fields = FIELDS[activeTab] || []
