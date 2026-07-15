@@ -12,7 +12,12 @@ const TABS = [
   { key: 'locators',      label: 'Locators',       endpoint: '/org_structure/locators',      idKey: 'locator_id',        nameField: 'locator_code' },
 ]
 
-const COLUMNS = {
+  const lookupRender = (lookupName) => (row) => {
+    const val = row[Object.keys(LOOKUPS).find((k) => LOOKUPS[k].valueKey === lookupName) || '']
+    return resolveLabel(lookupName, row[lookupName])
+  }
+
+  const COLUMNS = {
   corporates: [
     { key: 'corp_code',  header: 'Code',   width: '140px' },
     { key: 'corp_name',  header: 'Name',   width: '220px' },
@@ -25,24 +30,26 @@ const COLUMNS = {
   companies: [
     { key: 'company_code', header: 'Code',     width: '140px' },
     { key: 'legal_name',   header: 'Name',     width: '220px' },
+    { key: 'corporate_id', header: 'Corporate', width: '160px', render: (r) => resolveLabel('corporate_id', r.corporate_id) },
     { key: 'tax_id',       header: 'Tax ID',   width: '160px' },
     { key: 'is_active',    header: 'Status',   width: '100px' },
   ],
   businessUnits: [
     { key: 'bu_code',      header: 'Code',     width: '140px' },
     { key: 'bu_name',      header: 'Name',     width: '220px' },
-    { key: 'company_id',   header: 'Company',  width: '100px' },
+    { key: 'company_id',   header: 'Company',  width: '140px', render: (r) => resolveLabel('company_id', r.company_id) },
     { key: 'is_active',    header: 'Status',   width: '100px' },
   ],
   sites: [
     { key: 'site_code',    header: 'Code',     width: '140px' },
     { key: 'site_name',    header: 'Name',     width: '220px' },
+    { key: 'business_unit_id', header: 'BU',   width: '120px', render: (r) => resolveLabel('business_unit_id', r.business_unit_id) },
     { key: 'is_active',    header: 'Status',   width: '100px' },
   ],
   warehouses: [
     { key: 'warehouse_code', header: 'Code',   width: '140px' },
     { key: 'warehouse_name', header: 'Name',   width: '220px' },
-    { key: 'site_id',        header: 'Site',   width: '100px' },
+    { key: 'site_id',        header: 'Site',   width: '120px', render: (r) => resolveLabel('site_id', r.site_id) },
     { key: 'is_active',      header: 'Status', width: '100px' },
   ],
   locators: [
@@ -57,6 +64,14 @@ const COLUMNS = {
 
 const SIMPLE_COLUMNS = ['is_active']
 
+const LOOKUPS = {
+  corporate_id:   { endpoint: '/org_structure/corporates',  valueKey: 'corporate_id',   labelKey: 'corp_code'  },
+  company_id:     { endpoint: '/org_structure/companies',   valueKey: 'company_id',     labelKey: 'company_code'  },
+  business_unit_id: { endpoint: '/org_structure/business-units', valueKey: 'business_unit_id', labelKey: 'bu_code' },
+  site_id:        { endpoint: '/org_structure/sites',       valueKey: 'site_id',        labelKey: 'site_code'  },
+  warehouse_id:   { endpoint: '/org_structure/warehouses',  valueKey: 'warehouse_id',   labelKey: 'warehouse_code' },
+}
+
 const FIELDS = {
   corporates: [
     { key: 'corp_code', label: 'Code', required: true },
@@ -66,20 +81,23 @@ const FIELDS = {
     { key: 'company_code', label: 'Code', required: true },
     { key: 'legal_name',   label: 'Legal Name', required: true },
     { key: 'tax_id',       label: 'Tax ID' },
-    { key: 'corporate_id', label: 'Corporate ID' },
+    { key: 'corporate_id', label: 'Corporate', lookup: 'corporate_id' },
   ],
   businessUnits: [
     { key: 'bu_code', label: 'Code', required: true },
     { key: 'bu_name', label: 'Name', required: true },
-    { key: 'company_id', label: 'Company ID' },
+    { key: 'company_id', label: 'Company', lookup: 'company_id' },
   ],
   sites: [
     { key: 'site_code', label: 'Code', required: true },
     { key: 'site_name', label: 'Name', required: true },
+    { key: 'business_unit_id', label: 'Business Unit', lookup: 'business_unit_id' },
+    { key: 'address_id', label: 'Address ID' },
   ],
   warehouses: [
     { key: 'warehouse_code', label: 'Code', required: true },
     { key: 'warehouse_name', label: 'Name', required: true },
+    { key: 'site_id', label: 'Site', lookup: 'site_id' },
   ],
   locators: [
     { key: 'locator_code', label: 'Code', required: true },
@@ -100,7 +118,17 @@ export default function OrgStructurePage() {
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState(null)
   const [form, setForm] = useState({})
+  const [lookupData, setLookupData] = useState({})
   const searchTimeout = useRef({})
+
+  const resolveLabel = (lookupName, value) => {
+    if (!value || !lookupName) return value
+    const lk = LOOKUPS[lookupName]
+    if (!lk) return value
+    const list = lookupData[lk.endpoint] || []
+    const match = list.find((item) => String(item[lk.valueKey]) === String(value))
+    return match ? match[lk.labelKey] : value
+  }
 
   const tab = TABS.find((t) => t.key === activeTab)
   const fields = FIELDS[activeTab] || []
@@ -119,9 +147,28 @@ export default function OrgStructurePage() {
     }
   }, [])
 
+  const fetchLookups = useCallback(async (tabKey) => {
+    const cfg = TABS.find((t) => t.key === tabKey)
+    if (!cfg) return
+    const fkFields = (FIELDS[tabKey] || []).filter((f) => f.lookup)
+    const results = {}
+    for (const f of fkFields) {
+      const lk = LOOKUPS[f.lookup]
+      if (!lk || lookupData[lk.endpoint]) continue
+      try {
+        const { data: res } = await api.get(lk.endpoint, { params: { page: 1, page_size: 500 } })
+        results[lk.endpoint] = res.items || res.data || []
+      } catch {
+        results[lk.endpoint] = []
+      }
+    }
+    if (Object.keys(results).length > 0) setLookupData((prev) => ({ ...prev, ...results }))
+  }, [lookupData])
+
   useEffect(() => {
     if (!data[activeTab]) fetchData(activeTab)
-  }, [activeTab, data, fetchData])
+    fetchLookups(activeTab)
+  }, [activeTab, data, fetchData, fetchLookups])
 
   const handleSearch = (query) => {
     const key = activeTab
@@ -251,17 +298,36 @@ export default function OrgStructurePage() {
             </div>
             <form onSubmit={handleSave} className="p-5 space-y-4">
               {formError && <div className="bg-error-container text-error p-3 rounded-xl text-sm font-medium">{formError}</div>}
-              {fields.map((f) => (
-                <div key={f.key}>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-1.5">
-                    {f.label} {f.required && '*'}
-                  </label>
-                  <input type="text" value={form[f.key] || ''}
-                    onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
-                    required={f.required} />
-                </div>
-              ))}
+              {fields.map((f) => {
+                const isLookup = f.lookup && LOOKUPS[f.lookup]
+                const lk = isLookup ? LOOKUPS[f.lookup] : null
+                const options = lk ? (lookupData[lk.endpoint] || []) : []
+                return (
+                  <div key={f.key}>
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-1.5">
+                      {f.label} {f.required && '*'}
+                    </label>
+                    {isLookup ? (
+                      <select value={form[f.key] || ''}
+                        onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                        className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
+                        required={f.required}>
+                        <option value="">-- Select {f.label} --</option>
+                        {options.map((opt) => (
+                          <option key={opt[lk.valueKey]} value={opt[lk.valueKey]}>
+                            {opt[lk.labelKey]}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input type="text" value={form[f.key] || ''}
+                        onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                        className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
+                        required={f.required} />
+                    )}
+                  </div>
+                )
+              })}
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={closeModal}
                   className="neo-button px-5 py-2.5 text-sm font-semibold text-on-surface-variant">Cancel</button>
