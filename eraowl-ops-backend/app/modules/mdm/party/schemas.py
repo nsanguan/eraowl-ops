@@ -33,7 +33,7 @@ class AddressOut(BaseModel):
     address_line1: str
     address_line2: Optional[str]
     city: str
-    state_province: str
+    state_province: Optional[str]
     postal_code: str
     country_code: str
     latitude: Optional[float]

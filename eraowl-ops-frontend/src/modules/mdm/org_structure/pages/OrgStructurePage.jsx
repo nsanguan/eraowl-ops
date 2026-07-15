@@ -18,6 +18,7 @@ const LOOKUPS = {
   business_unit_id: { endpoint: '/org_structure/business-units', valueKey: 'business_unit_id', labelKey: 'bu_code' },
   site_id:        { endpoint: '/org_structure/sites',       valueKey: 'site_id',        labelKey: 'site_code'  },
   warehouse_id:   { endpoint: '/org_structure/warehouses',  valueKey: 'warehouse_id',   labelKey: 'warehouse_code' },
+  address_id:     { endpoint: '/party/addresses',           valueKey: 'address_id',     labelKey: 'address_line1' },
 }
 
 const FIELDS = {
@@ -40,7 +41,7 @@ const FIELDS = {
     { key: 'site_code', label: 'Code', required: true },
     { key: 'site_name', label: 'Name', required: true },
     { key: 'business_unit_id', label: 'Business Unit', lookup: 'business_unit_id' },
-    { key: 'address_id', label: 'Address ID' },
+    { key: 'address_id', label: 'Address', lookup: 'address_id' },
   ],
   warehouses: [
     { key: 'warehouse_code', label: 'Code', required: true },
@@ -105,6 +106,7 @@ export default function OrgStructurePage() {
     { key: 'site_code',    header: 'Code',     width: '140px' },
     { key: 'site_name',    header: 'Name',     width: '220px' },
     { key: 'business_unit_id', header: 'BU',   width: '120px', render: (r) => resolveLabel('business_unit_id', r.business_unit_id) },
+    { key: 'address_id',   header: 'Address',  width: '200px', render: (r) => resolveLabel('address_id', r.address_id) },
     { key: 'is_active',    header: 'Status',   width: '100px' },
   ],
   warehouses: [
