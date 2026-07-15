@@ -248,3 +248,22 @@ class TcaPartyView(BaseModel):
     supplier: Optional[SupplierOut] = None
     customer: Optional[CustomerOut] = None
     sites: list[TcaSiteView] = []
+
+
+class TreeNode(BaseModel):
+    node_id: str
+    node_type: str
+    label: str
+    children: list["TreeNode"] = []
+    entity: Optional[dict] = None
+
+
+class TreeResponse(BaseModel):
+    tree: list[TreeNode]
+
+
+class TreeUpdateRequest(BaseModel):
+    node_type: str
+    action: str  # 'update' | 'add' | 'delete'
+    entity: dict
+

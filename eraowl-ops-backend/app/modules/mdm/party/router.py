@@ -15,6 +15,7 @@ from app.modules.mdm.party.schemas import (
     SupplierOut, SupplierCreate, SupplierUpdate,
     CustomerOut, CustomerCreate, CustomerUpdate,
     CompositePartyCreate, TcaPartyView,
+    TreeResponse, TreeUpdateRequest,
 )
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
@@ -43,6 +44,27 @@ async def get_tca_view(
 ):
     svc = PartyService(db)
     return await svc.get_tca_view(party_id)
+
+
+# --- TCA Tree ---
+@router.get("/parties/{party_id}/tree", response_model=TreeResponse)
+async def get_party_tree(
+    party_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    svc = PartyService(db)
+    tree = await svc.get_party_tree(party_id)
+    return {"tree": tree}
+
+
+@router.post("/parties/{party_id}/tree/update-node", status_code=204)
+async def update_tree_node(
+    party_id: uuid.UUID,
+    data: TreeUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    svc = PartyService(db)
+    await svc.update_tree_node(party_id, data.node_type, data.action, data.entity)
 
 
 # --- Addresses ---

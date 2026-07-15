@@ -306,3 +306,155 @@ class PartyService:
             "customer": customer,
             "sites": tca_sites,
         }
+
+    # ── Tree View ──
+    async def get_party_tree(self, party_id: uuid.UUID) -> list[dict]:
+        party = await self._get_by_id(Party, party_id)
+
+        role_nodes = []
+        roles_result = await self.db.execute(
+            select(PartyRole).where(PartyRole.party_id == party_id, PartyRole.is_deleted == False)
+        )
+        roles = list(roles_result.scalars().all())
+        for r in roles:
+            role_nodes.append({
+                "node_id": f"role-{r.party_role_id}",
+                "node_type": "role_item",
+                "label": r.role_type,
+                "entity": {"party_role_id": str(r.party_id), "role_type": r.role_type},
+            })
+
+        site_nodes = []
+        sites_result = await self.db.execute(
+            select(PartySite).where(PartySite.party_id == party_id, PartySite.is_deleted == False)
+        )
+        sites = list(sites_result.scalars().all())
+        for ps in sites:
+            addr = None
+            if ps.address_id:
+                addr_result = await self.db.execute(select(Address).where(Address.address_id == ps.address_id))
+                addr = addr_result.scalar_one_or_none()
+
+            su_result = await self.db.execute(
+                select(PartySiteUse).where(PartySiteUse.party_site_id == ps.party_site_id, PartySiteUse.is_deleted == False)
+            )
+            site_uses = list(su_result.scalars().all())
+
+            use_nodes = []
+            for su in site_uses:
+                use_nodes.append({
+                    "node_id": f"use-{su.site_use_id}",
+                    "node_type": "site_use",
+                    "label": f"{su.site_use_type}{' ★' if su.is_primary else ''}",
+                    "entity": {
+                        "site_use_id": str(su.site_use_id),
+                        "site_use_type": su.site_use_type,
+                        "is_primary": su.is_primary,
+                    },
+                })
+
+            addr_label = f"{addr.address_line1}, {addr.city}" if addr else "No address"
+            site_nodes.append({
+                "node_id": f"site-{ps.party_site_id}",
+                "node_type": "site_item",
+                "label": ps.site_name or ps.party_site_number,
+                "entity": {
+                    "party_site_id": str(ps.party_site_id),
+                    "party_site_number": ps.party_site_number,
+                    "site_name": ps.site_name,
+                    "address": addr_label,
+                },
+                "children": use_nodes,
+            })
+
+        profile_node = {
+            "node_id": f"profile-{party.party_id}",
+            "node_type": "profile",
+            "label": f"{party.party_name} ({party.party_number})",
+            "entity": {
+                "party_id": str(party.party_id),
+                "party_name": party.party_name,
+                "party_number": party.party_number,
+                "party_type": party.party_type,
+                "tax_reference": party.tax_reference,
+            },
+        }
+
+        role_group = {
+            "node_id": f"roles-{party.party_id}",
+            "node_type": "role_group",
+            "label": f"Business Roles ({len(role_nodes)})",
+            "children": role_nodes,
+        }
+
+        site_group = {
+            "node_id": f"sites-{party.party_id}",
+            "node_type": "site_group",
+            "label": f"Sites & Addresses ({len(site_nodes)})",
+            "children": site_nodes,
+        }
+
+        return [profile_node, role_group, site_group]
+
+    async def update_tree_node(self, party_id: uuid.UUID, node_type: str, action: str, entity: dict) -> None:
+        party = await self._get_by_id(Party, party_id)
+
+        if node_type == "profile" and action == "update":
+            for field in ["party_name", "party_number", "party_type", "tax_reference"]:
+                if field in entity:
+                    setattr(party, field, entity[field])
+
+        elif node_type == "role_item" and action in ("add", "delete"):
+            if action == "add":
+                pr = PartyRole(party_id=party_id, role_type=entity.get("role_type", "UNKNOWN"))
+                self.db.add(pr)
+            elif action == "delete" and "party_role_id" in entity:
+                pr = await self._get_by_id(PartyRole, uuid.UUID(entity["party_role_id"]))
+                pr.is_deleted = True
+
+        elif node_type in ("site_item", "site_group") and action == "add":
+            from app.modules.mdm.party.models import Address as AddrModel
+            addr = AddrModel(
+                country=entity.get("country", ""),
+                address_line1=entity.get("address_line1", ""),
+                address_line2=entity.get("address_line2"),
+                city=entity.get("city", ""),
+                state=entity.get("state"),
+                postal_code=entity.get("postal_code"),
+            )
+            self.db.add(addr)
+            await self.db.flush()
+
+            ps = PartySite(
+                party_id=party_id,
+                address_id=addr.address_id,
+                party_site_number=entity.get("party_site_number", f"SITE-{addr.address_id.hex[:8].upper()}"),
+                site_name=entity.get("site_name"),
+            )
+            self.db.add(ps)
+
+        elif node_type == "site_item" and action == "delete":
+            if "party_site_id" in entity:
+                ps = await self._get_by_id(PartySite, uuid.UUID(entity["party_site_id"]))
+                ps.is_deleted = True
+
+        elif node_type == "site_use" and action == "add":
+            psu = PartySiteUse(
+                party_site_id=uuid.UUID(entity["party_site_id"]),
+                site_use_type=entity.get("site_use_type", "BILL_TO"),
+                is_primary=entity.get("is_primary", False),
+            )
+            self.db.add(psu)
+
+        elif node_type == "site_use" and action in ("update", "delete"):
+            if "site_use_id" in entity:
+                psu = await self._get_by_id(PartySiteUse, uuid.UUID(entity["site_use_id"]))
+                if action == "delete":
+                    psu.is_deleted = True
+                else:
+                    if "site_use_type" in entity:
+                        psu.site_use_type = entity["site_use_type"]
+                    if "is_primary" in entity:
+                        psu.is_primary = entity["is_primary"]
+
+        await self.db.commit()
