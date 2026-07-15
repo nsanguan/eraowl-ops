@@ -247,7 +247,7 @@ export default function OrgStructurePage() {
       const results = {}
       for (const [key, ep] of endpoints) {
         try {
-          const { data: res } = await api.get(ep, { params: { page: 1, page_size: 200 } })
+          const { data: res } = await api.get(ep, { params: { page: 1, page_size: 100 } })
           results[key] = res.items || res.data || []
         } catch { results[key] = [] }
       }
