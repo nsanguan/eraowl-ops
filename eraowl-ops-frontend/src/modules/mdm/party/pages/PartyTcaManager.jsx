@@ -48,49 +48,92 @@ export default function PartyTcaManager() {
   const [addSiteForm, setAddSiteForm] = useState({ country: 'Thailand', address_line1: '', city: '', site_name: '' })
   const [partyFilter, setPartyFilter] = useState('ALL')
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Guard against stale async responses
+  const fetchIdRef = useRef(0)
   const selectedNodeRef = useRef(null)
+  const abortRef = useRef(null)
 
   const fetchParties = useCallback(async () => {
     setLoading(true)
-    try { const { data } = await api.get('/party/parties', { params: { page: 1, page_size: 100 } }); setParties(data?.items || []) } catch {} finally { setLoading(false) }
+    try {
+      const { data } = await api.get('/party/parties', { params: { page: 1, page_size: 100 } })
+      console.log('Fetched parties:', data?.items?.length || 0, 'items')
+      setParties(data?.items || [])
+    } catch (err) {
+      console.error('Failed to fetch parties:', err)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   const fetchTree = useCallback(async (partyId, preserveNodeId) => {
     if (!partyId) return
+    const id = ++fetchIdRef.current
     setTreeLoading(true)
+    console.log(`[fetchTree #${id}] START for party ${partyId}, preserveNode=${preserveNodeId}`)
     try {
       const { data } = await api.get(`/party/parties/${partyId}/tree`)
+      // Ignore stale response from a previous/faster request
+      if (id !== fetchIdRef.current) {
+        console.log(`[fetchTree #${id}] STALE — skipping, latest is #${fetchIdRef.current}`)
+        return
+      }
+      console.log(`[fetchTree #${id}] SUCCESS — tree nodes:`, data?.tree?.length)
       setTreeData(data?.tree || [])
-      setSelectedNode((prev) => {
-        if (!prev) return null
-        if (preserveNodeId) {
-          const find = (nodes) => { for (const n of nodes) { if (n.node_id === preserveNodeId) return n; if (n.children) { const f = find(n.children); if (f) return f } } return null }
-          return find(data?.tree || []) || prev
+      if (preserveNodeId && selectedNodeRef.current) {
+        const find = (nodes) => {
+          for (const n of nodes) {
+            if (n.node_id === preserveNodeId) return n
+            if (n.children) { const f = find(n.children); if (f) return f }
+          }
+          return null
         }
-        return prev
-      })
-    } catch { setTreeData([]) } finally { setTreeLoading(false) }
+        const restored = find(data?.tree || [])
+        if (restored) {
+          console.log(`[fetchTree #${id}] Restored node: ${restored.node_id}`)
+          setSelectedNode(restored)
+        }
+      }
+    } catch (err) {
+      console.error(`[fetchTree #${id}] FAILED:`, err)
+      if (id === fetchIdRef.current) setTreeData([])
+    } finally {
+      if (id === fetchIdRef.current) setTreeLoading(false)
+    }
   }, [])
 
   useEffect(() => { fetchParties() }, [fetchParties])
 
-  // Party change: reset everything and fetch fresh
+  // Party change — resets only when party_id actually differs
   useEffect(() => {
-    if (selectedParty) {
-      setSelectedNode(null)
-      setExpanded({})
-      fetchTree(selectedParty.party_id)
-    }
+    if (!selectedParty) return
+    const partyId = selectedParty.party_id
+    console.log('Party changed to:', partyId)
+    setSelectedNode(null)
+    selectedNodeRef.current = null
+    setExpanded({})
+    fetchTree(partyId)
   }, [selectedParty?.party_id])
 
-  const handleTreeNodeSelect = (node) => { setSelectedNode(node); selectedNodeRef.current = node?.node_id }
+  const handleTreeNodeSelect = (node) => {
+    console.log('Tree node selected:', node?.node_id, node?.node_type)
+    setSelectedNode(node)
+    selectedNodeRef.current = node?.node_id || null
+  }
 
   const handleTreeSave = async (nodeType, action, entity) => {
     setSavingNode(true)
     try {
-      await api.post(`/party/parties/${selectedParty.party_id}/tree/update-node`, { node_type: nodeType, action, entity })
+      const { data } = await api.post(`/party/parties/${selectedParty.party_id}/tree/update-node`, { node_type: nodeType, action, entity })
+      console.log('Tree save OK:', nodeType, action, data)
       await fetchTree(selectedParty.party_id, selectedNodeRef.current)
-    } catch (err) { alert(err.response?.data?.detail?.message || 'Failed to update') } finally { setSavingNode(false) }
+    } catch (err) {
+      console.error('Tree save failed:', err)
+      alert(err.response?.data?.detail?.message || 'Failed to update')
+    } finally {
+      setSavingNode(false)
+    }
   }
 
   const handleTreeDelete = async (node) => {
@@ -103,19 +146,27 @@ export default function PartyTcaManager() {
     setSavingNode(true)
     try {
       await api.post(`/party/parties/${selectedParty.party_id}/tree/update-node`, { node_type: 'role_item', action: 'add', entity: { role_type: roleType } })
+      console.log('Role added:', roleType)
       await fetchTree(selectedParty.party_id, selectedNodeRef.current)
       setShowAddRole(false)
-    } catch (err) { alert(err.response?.data?.detail?.message || 'Failed to add role') } finally { setSavingNode(false) }
+    } catch (err) {
+      console.error('Add role failed:', err)
+      alert(err.response?.data?.detail?.message || 'Failed to add role')
+    } finally { setSavingNode(false) }
   }
 
   const handleAddSite = async () => {
     setSavingNode(true)
     try {
       await api.post(`/party/parties/${selectedParty.party_id}/tree/update-node`, { node_type: 'site_item', action: 'add', entity: addSiteForm })
+      console.log('Site added:', addSiteForm.site_name)
       await fetchTree(selectedParty.party_id, selectedNodeRef.current)
       setShowAddSite(false)
       setAddSiteForm({ country: 'Thailand', address_line1: '', city: '', site_name: '' })
-    } catch (err) { alert(err.response?.data?.detail?.message || 'Failed to add site') } finally { setSavingNode(false) }
+    } catch (err) {
+      console.error('Add site failed:', err)
+      alert(err.response?.data?.detail?.message || 'Failed to add site')
+    } finally { setSavingNode(false) }
   }
 
   const filteredParties = parties.filter((p) => {
