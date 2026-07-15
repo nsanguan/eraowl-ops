@@ -348,17 +348,54 @@ class PartyService:
     async def get_party_tree(self, party_id: uuid.UUID) -> list[dict]:
         party = await self._get_by_id(Party, party_id)
 
+        # Build role nodes with supplier/customer info
         role_nodes = []
         roles_result = await self.db.execute(
             select(PartyRole).where(PartyRole.party_id == party_id, PartyRole.is_deleted == False)
         )
         roles = list(roles_result.scalars().all())
+
+        # Get all party sites for this party (shared across roles)
+        ps_result = await self.db.execute(
+            select(PartySite).where(PartySite.party_id == party_id, PartySite.is_deleted == False)
+        )
+        party_sites = list(ps_result.scalars().all())
+
         for r in roles:
+            children = []
+            # Add party sites as children under SUPPLIER or CUSTOMER role
+            if r.role_type in ("SUPPLIER", "CUSTOMER"):
+                prefix = "supplier-site" if r.role_type == "SUPPLIER" else "customer-site"
+                for ps in party_sites:
+                    addr = None
+                    if ps.address_id:
+                        addr_result = await self.db.execute(select(Address).where(Address.address_id == ps.address_id))
+                        addr = addr_result.scalar_one_or_none()
+                    children.append({
+                        "node_id": f"{prefix}-{ps.party_site_id}",
+                        "node_type": "site_item",
+                        "label": ps.site_name or ps.party_site_number or "Site",
+                        "entity": {
+                            "party_site_id": str(ps.party_site_id),
+                            "party_site_number": ps.party_site_number,
+                            "site_name": ps.site_name,
+                            "address": {
+                                "country": addr.country if addr else "",
+                                "address_line1": addr.address_line1 if addr else "",
+                                "city": addr.city if addr else "",
+                                "state": addr.state if addr else "",
+                                "postal_code": addr.postal_code if addr else "",
+                            } if addr else None,
+                        },
+                        "children": [],
+                    })
+
             role_nodes.append({
                 "node_id": f"role-{r.party_role_id}",
                 "node_type": "role_item",
                 "label": r.role_type,
                 "entity": {"party_role_id": str(r.party_role_id), "role_type": r.role_type},
+                "children": children if children else [],
             })
 
         site_nodes = []

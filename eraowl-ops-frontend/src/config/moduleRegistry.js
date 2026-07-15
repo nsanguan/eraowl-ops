@@ -65,6 +65,8 @@ export const MODULE_REGISTRY = [
   { id: 'core', label: 'Core', icon: 'settings', path: '/core', area: 'admin', module: 'core', action: 'view', keywords: ['core', 'central', 'reference', 'identity'] },
   { id: 'items', label: 'Items', icon: 'inventory_2', path: '/items', area: 'mdm', module: 'item', action: 'view', keywords: ['item', 'product', 'material', 'goods', 'sku', 'catalog'] },
   { id: 'parties', label: 'Parties', icon: 'handshake', path: '/party', area: 'mdm', module: 'party', action: 'view', keywords: ['party', 'supplier', 'customer', 'vendor', 'contact'] },
+  { id: 'suppliers', label: 'Suppliers', icon: 'local_shipping', path: '/party/suppliers', area: 'mdm', module: 'party', action: 'view', keywords: ['supplier', 'vendor', 'procurement', 'sourcing'] },
+  { id: 'customers', label: 'Customers', icon: 'group', path: '/party/customers', area: 'mdm', module: 'party', action: 'view', keywords: ['customer', 'client', 'buyer', 'account'] },
   { id: 'tca', label: 'TCA Manager', icon: 'diversity_3', path: '/party/tca', area: 'mdm', module: 'party', action: 'view', keywords: ['tca', 'trading community', 'party', 'master data', 'hierarchy'] },
   { id: 'po', label: 'Purchase Orders', icon: 'shopping_cart', path: '/po', area: 'scm', module: 'po', action: 'view', keywords: ['po', 'purchase order', 'procurement', 'buy', 'requisition'] },
   { id: 'bom', label: 'Bill of Materials', icon: 'layers', path: '/bom', area: 'scm', module: 'bom', action: 'view', keywords: ['bom', 'bill of material', 'recipe', 'formula', 'component', 'assembly'] },

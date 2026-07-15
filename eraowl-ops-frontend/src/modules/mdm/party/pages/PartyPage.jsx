@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import api from '../../../../api/client'
 import { Plus } from 'lucide-react'
 import { InteractiveGrid } from '../../../../shared-ui-kit/components/ui/InteractiveGrid'
@@ -6,7 +7,6 @@ import { InteractiveGrid } from '../../../../shared-ui-kit/components/ui/Interac
 const TABS = [
   { key: 'addresses', label: 'Addresses',  endpoint: '/party/addresses',  idKey: 'address_id',   nameField: 'city'           },
   { key: 'parties',   label: 'Parties',    endpoint: '/party/parties',    idKey: 'party_id',     nameField: 'party_name'     },
-  { key: 'suppliers', label: 'Suppliers',  endpoint: '/party/suppliers',  idKey: 'supplier_id',   nameField: 'supplier_code'  },
   { key: 'customers', label: 'Customers',  endpoint: '/party/customers',  idKey: 'customer_id',   nameField: 'customer_code'  },
 ]
 
@@ -25,16 +25,6 @@ const COLUMNS = {
     { key: 'party_name', header: 'Name',      width: '220px' },
     { key: 'party_type', header: 'Type',      width: '130px' },
     { key: 'is_active',  header: 'Status',    width: '100px',
-      render: (r) => r.is_active !== false
-        ? <span className="text-success text-xs font-semibold">Active</span>
-        : <span className="text-outline text-xs">Inactive</span>,
-    },
-  ],
-  suppliers: [
-    { key: 'supplier_code',    header: 'Code',        width: '140px' },
-    { key: 'payment_term_days', header: 'Payment Terms', width: '140px' },
-    { key: 'currency_code',    header: 'Currency',    width: '100px' },
-    { key: 'is_active',        header: 'Status',      width: '100px',
       render: (r) => r.is_active !== false
         ? <span className="text-success text-xs font-semibold">Active</span>
         : <span className="text-outline text-xs">Inactive</span>,
@@ -66,11 +56,6 @@ const FIELDS = {
     { key: 'party_type', label: 'Party Type', required: true },
     { key: 'tax_id',     label: 'Tax ID' },
   ],
-  suppliers: [
-    { key: 'supplier_code',    label: 'Supplier Code',    required: true },
-    { key: 'currency_code',    label: 'Currency Code' },
-    { key: 'payment_term_days', label: 'Payment Term Days' },
-  ],
   customers: [
     { key: 'customer_code',    label: 'Customer Code',    required: true },
     { key: 'credit_limit',     label: 'Credit Limit' },
@@ -79,6 +64,7 @@ const FIELDS = {
 }
 
 export default function PartyPage() {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('addresses')
   const [data, setData] = useState({})
   const [loading, setLoading] = useState({})
@@ -205,12 +191,16 @@ export default function PartyPage() {
             <span className="material-symbols-outlined text-[18px]">
               {t.key === 'addresses' ? 'map' :
                t.key === 'parties' ? 'groups' :
-               t.key === 'suppliers' ? 'local_shipping' :
                'group'}
             </span>
             {t.label}
           </button>
         ))}
+        <button onClick={() => navigate('/party/suppliers')}
+          className="flex items-center gap-2 px-4 py-3 text-xs font-semibold whitespace-nowrap border-b-2 border-transparent text-on-surface-variant hover:text-on-surface hover:border-outline-variant transition-colors">
+          <span className="material-symbols-outlined text-[18px]">local_shipping</span>
+          Suppliers
+        </button>
       </div>
 
       {tab && (

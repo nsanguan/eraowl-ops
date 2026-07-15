@@ -10,7 +10,7 @@ function TreeNode({ node, depth = 0, selected, onSelect, onToggle, expanded }) {
   const isOpen = expanded[node.node_id]
   const isSelected = selected === node.node_id
   const padLeft = depth * 20
-  const iconMap = { profile: 'badge', role_group: 'assignment_ind', role_item: 'check_circle', site_group: 'location_on', site_item: 'pin_drop', site_use: 'flag' }
+  const iconMap = { profile: 'badge', role_group: 'assignment_ind', role_item: 'check_circle', site_group: 'location_on', site_item: 'pin_drop', site_use: 'flag', supplier_site: 'conveyor_belt', customer_site: 'store' }
   return (
     <div>
       <div onClick={() => { if (hasChildren) onToggle(node.node_id); onSelect(node) }}
@@ -198,6 +198,8 @@ export default function PartyTcaManager() {
     if (nt === 'role_item') return <RoleForm node={selectedNode} onDelete={handleTreeDelete} onCancel={() => setSelectedNode(null)} />
     if (nt === 'site_item') return <SiteForm node={selectedNode} onSave={handleTreeSave} onDelete={handleTreeDelete} onCancel={() => setSelectedNode(null)} />
     if (nt === 'site_use') return <SiteUseForm node={selectedNode} onSave={handleTreeSave} onDelete={handleTreeDelete} onCancel={() => setSelectedNode(null)} />
+    if (nt === 'supplier_site') return <SupplierSiteForm node={selectedNode} onSave={handleTreeSave} onDelete={handleTreeDelete} onCancel={() => setSelectedNode(null)} />
+    if (nt === 'customer_site') return <CustomerSiteForm node={selectedNode} onSave={handleTreeSave} onDelete={handleTreeDelete} onCancel={() => setSelectedNode(null)} />
     return <div className="text-sm text-outline p-4">Select a node to edit</div>
   }
 
@@ -416,6 +418,62 @@ function SiteUseForm({ node, onSave, onDelete, onCancel }) {
         <button onClick={() => { if (confirm('Remove this site use?')) onDelete(node) }} className="px-3 py-2 bg-error/10 text-error rounded-lg text-xs font-semibold hover:bg-error/20">Remove</button>
         <button onClick={onCancel} className="px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-outline">Close</button>
       </div>
+    </div>
+  )
+}
+
+function SupplierSiteForm({ node, onDelete, onCancel }) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3 p-3 rounded-xl border border-outline-variant bg-surface-container-lowest">
+        <span className="material-symbols-outlined text-[24px] text-primary">conveyor_belt</span>
+        <div className="flex-1">
+          <div className="text-sm font-semibold text-on-surface">{node.label}</div>
+          <div className="text-[10px] text-outline">Supplier Site</div>
+        </div>
+        {node.entity?.is_primary && <span className="px-2 py-1 text-[10px] font-semibold rounded-full bg-success/10 text-success">PRIMARY</span>}
+      </div>
+      {node.entity?.address && (
+        <div className="text-xs text-on-surface-variant space-y-1 p-3 bg-surface-container-low rounded-lg">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">Address</div>
+          <div>{node.entity.address.address_line1}</div>
+          <div>{node.entity.address.city}, {node.entity.address.state} {node.entity.address.postal_code}</div>
+          <div>{node.entity.address.country}</div>
+        </div>
+      )}
+      <button onClick={() => { if (confirm('Delete this supplier site?')) onDelete(node) }}
+        className="w-full px-3 py-2 bg-error/10 text-error rounded-lg text-xs font-semibold hover:bg-error/20 transition-colors flex items-center justify-center gap-2">
+        <span className="material-symbols-outlined text-[16px]">block</span> Delete Supplier Site
+      </button>
+      <button onClick={onCancel} className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-outline">Close</button>
+    </div>
+  )
+}
+
+function CustomerSiteForm({ node, onDelete, onCancel }) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3 p-3 rounded-xl border border-outline-variant bg-surface-container-lowest">
+        <span className="material-symbols-outlined text-[24px] text-primary">store</span>
+        <div className="flex-1">
+          <div className="text-sm font-semibold text-on-surface">{node.label}</div>
+          <div className="text-[10px] text-outline">Customer Site</div>
+        </div>
+        {node.entity?.is_primary && <span className="px-2 py-1 text-[10px] font-semibold rounded-full bg-success/10 text-success">PRIMARY</span>}
+      </div>
+      {node.entity?.address && (
+        <div className="text-xs text-on-surface-variant space-y-1 p-3 bg-surface-container-low rounded-lg">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">Address</div>
+          <div>{node.entity.address.address_line1}</div>
+          <div>{node.entity.address.city}, {node.entity.address.state} {node.entity.address.postal_code}</div>
+          <div>{node.entity.address.country}</div>
+        </div>
+      )}
+      <button onClick={() => { if (confirm('Delete this customer site?')) onDelete(node) }}
+        className="w-full px-3 py-2 bg-error/10 text-error rounded-lg text-xs font-semibold hover:bg-error/20 transition-colors flex items-center justify-center gap-2">
+        <span className="material-symbols-outlined text-[16px]">block</span> Delete Customer Site
+      </button>
+      <button onClick={onCancel} className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-outline">Close</button>
     </div>
   )
 }

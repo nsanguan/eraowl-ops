@@ -10,6 +10,8 @@ import ObjectsPage from './modules/admin/pages/ObjectsPage'
 import OrgStructurePage from './modules/mdm/org_structure/pages/OrgStructurePage'
 import PartyPage from './modules/mdm/party/pages/PartyPage'
 import PartyTcaManager from './modules/mdm/party/pages/PartyTcaManager'
+import SupplierPage from './modules/mdm/party/pages/SupplierPage'
+import CustomerPage from './modules/mdm/party/pages/CustomerPage'
 import ItemPage from './modules/mdm/item/pages/ItemPage'
 import BomPage from './modules/bom/pages/BomPage'
 import DashboardHome from './components/DashboardHome'
@@ -45,6 +47,10 @@ export default function App() {
           <Route path="/org-structure" element={<OrgStructurePage />} />
           <Route path="/party" element={<PartyPage />} />
           <Route path="/party/tca" element={<PartyTcaManager />} />
+          <Route path="/party/suppliers" element={<SupplierPage />} />
+          <Route path="/party/suppliers/:supplierId" element={<SupplierPage />} />
+          <Route path="/party/customers" element={<CustomerPage />} />
+          <Route path="/party/customers/:customerId" element={<CustomerPage />} />
           <Route path="/items" element={<ItemPage />} />
           <Route path="/bom" element={<BomPage />} />
           <Route path="/collaboration" element={<CollaborationDashboard />} />
