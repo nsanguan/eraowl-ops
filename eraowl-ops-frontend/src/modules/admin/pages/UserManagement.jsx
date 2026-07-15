@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import api from '../../../api/client'
 import { Plus, Download } from 'lucide-react'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
+import UserAssignmentModal from '../components/UserAssignmentModal'
 
 export default function UserManagement() {
   const [users, setUsers] = useState([])
@@ -12,6 +13,7 @@ export default function UserManagement() {
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState(null)
   const [selectedUserId, setSelectedUserId] = useState(null)
+  const [assignModalUser, setAssignModalUser] = useState(null)
   const [search, setSearch] = useState('')
   const searchTimeout = useRef(null)
 
@@ -217,10 +219,22 @@ export default function UserManagement() {
           <div className="flex items-center gap-2">
             <button onClick={() => { const u = users.find((u) => userId(u) === selectedUserId); if (u) openEditModal(u) }}
               className="neo-button px-3 py-1.5 text-xs font-semibold text-primary">Edit</button>
+            <button onClick={() => { const u = users.find((u) => userId(u) === selectedUserId); if (u) setAssignModalUser(u) }}
+              className="neo-button px-3 py-1.5 text-xs font-semibold text-primary flex items-center gap-1">
+              <span className="material-symbols-outlined text-[14px]">assignment_ind</span> Assign
+            </button>
             <button onClick={() => { const u = users.find((u) => userId(u) === selectedUserId); if (u) handleDelete(u) }}
               className="neo-button px-3 py-1.5 text-xs font-semibold text-error">Delete</button>
           </div>
         </div>
+      )}
+
+      {assignModalUser && (
+        <UserAssignmentModal
+          user={assignModalUser}
+          onClose={() => setAssignModalUser(null)}
+          onSaved={fetchUsers}
+        />
       )}
 
       {modalOpen && (
