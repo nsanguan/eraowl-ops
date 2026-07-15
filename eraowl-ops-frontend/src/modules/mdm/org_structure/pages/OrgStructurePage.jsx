@@ -140,28 +140,22 @@ export default function OrgStructurePage() {
     }
   }, [])
 
-  const fetchLookups = useCallback(async (tabKey) => {
-    const cfg = TABS.find((t) => t.key === tabKey)
-    if (!cfg) return
-    const fkFields = (FIELDS[tabKey] || []).filter((f) => f.lookup)
-    const results = {}
+  useEffect(() => {
+    const tabCfg = TABS.find((t) => t.key === activeTab)
+    if (!tabCfg) return
+    if (!data[activeTab]) fetchData(activeTab)
+    const fkFields = (FIELDS[activeTab] || []).filter((f) => f.lookup)
     for (const f of fkFields) {
       const lk = LOOKUPS[f.lookup]
-      if (!lk || lookupData[lk.endpoint]) continue
-      try {
-        const { data: res } = await api.get(lk.endpoint, { params: { page: 1, page_size: 500 } })
-        results[lk.endpoint] = res.items || res.data || []
-      } catch {
-        results[lk.endpoint] = []
-      }
+      if (!lk) continue
+      ;(async () => {
+        try {
+          const { data: res } = await api.get(lk.endpoint, { params: { page: 1, page_size: 500 } })
+          setLookupData((prev) => ({ ...prev, [lk.endpoint]: res.items || res.data || [] }))
+        } catch {}
+      })()
     }
-    if (Object.keys(results).length > 0) setLookupData((prev) => ({ ...prev, ...results }))
-  }, [lookupData])
-
-  useEffect(() => {
-    if (!data[activeTab]) fetchData(activeTab)
-    fetchLookups(activeTab)
-  }, [activeTab, data, fetchData, fetchLookups])
+  }, [activeTab])
 
   const handleSearch = (query) => {
     const key = activeTab
