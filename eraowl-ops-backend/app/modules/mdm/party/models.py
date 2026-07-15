@@ -54,10 +54,10 @@ class Party(SQLModel, table=True):
         sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     )
 
-    party_sites: list["PartySite"] = Relationship(back_populates="mdm")
-    party_roles: list["PartyRole"] = Relationship(back_populates="mdm")
-    supplier: Optional["Supplier"] = Relationship(back_populates="mdm")
-    customer: Optional["Customer"] = Relationship(back_populates="mdm")
+    party_sites: list["PartySite"] = Relationship(back_populates="party")
+    party_roles: list["PartyRole"] = Relationship(back_populates="party")
+    supplier: Optional["Supplier"] = Relationship(back_populates="party")
+    customer: Optional["Customer"] = Relationship(back_populates="party")
 
 
 class PartySite(SQLModel, table=True):

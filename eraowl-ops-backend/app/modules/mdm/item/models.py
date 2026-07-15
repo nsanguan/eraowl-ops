@@ -123,10 +123,10 @@ class Item(SQLModel, table=True):
     )
 
     primary_uom: Uom = Relationship(back_populates="primary_items")
-    category_assignments: list["ItemCategoryAssignment"] = Relationship(back_populates="mdm")
-    uom_conversions: list["UomConversion"] = Relationship(back_populates="mdm")
-    organizations: list["ItemOrganization"] = Relationship(back_populates="mdm")
-    supplier_xrefs: list["ItemSupplierXref"] = Relationship(back_populates="mdm")
+    category_assignments: list["ItemCategoryAssignment"] = Relationship(back_populates="item")
+    uom_conversions: list["UomConversion"] = Relationship(back_populates="item")
+    organizations: list["ItemOrganization"] = Relationship(back_populates="item")
+    supplier_xrefs: list["ItemSupplierXref"] = Relationship(back_populates="item")
 
 
 class ItemCategoryAssignment(SQLModel, table=True):

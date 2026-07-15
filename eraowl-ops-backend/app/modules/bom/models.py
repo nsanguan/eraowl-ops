@@ -55,4 +55,4 @@ class BomComponent(SQLModel, table=True):
         sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     )
 
-    bom_header: BomHeader = Relationship(back_populates="lines")
+    bom_header: BomHeader = Relationship(back_populates="components")
