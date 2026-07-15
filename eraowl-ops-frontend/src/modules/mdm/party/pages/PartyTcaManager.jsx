@@ -104,7 +104,7 @@ export default function PartyTcaManager() {
 
   return (
     <MasterDetailSplit
-      master={
+      masterContent={
         <div className="h-full flex flex-col">
           <div className="p-4 border-b border-outline-variant space-y-3">
             <h2 className="text-sm font-bold text-on-surface">Trading Community</h2>
@@ -145,7 +145,7 @@ export default function PartyTcaManager() {
           </div>
         </div>
       }
-      detail={
+      detailContent={
         <div className="h-full flex flex-col">
           {!selectedParty ? (
             <div className="flex items-center justify-center flex-1 text-outline text-sm">
