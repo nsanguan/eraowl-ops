@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import api from '../../../api/client'
 import { Plus } from 'lucide-react'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
+import RolePrivilegeMatrix from '../components/RolePrivilegeMatrix'
 
 export default function RoleManagement() {
   const [roles, setRoles] = useState([])
@@ -237,6 +238,8 @@ export default function RoleManagement() {
           </div>
         </div>
       )}
+
+      <RolePrivilegeMatrix />
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
