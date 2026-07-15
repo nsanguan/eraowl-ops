@@ -5,10 +5,12 @@ import os
 import uuid
 from datetime import datetime, timezone
 
+import redis.asyncio as aioredis
 from sqlalchemy import and_, delete, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
 from app.core.security import hash_password, verify_password
 from app.core.exceptions import AppError
 from app.shared.pagination import PaginatedResponse
@@ -386,6 +388,21 @@ class AdminService:
         await self.db.flush()
         await self.db.commit()
 
+    async def _invalidate_redis_for_role(self, role_id: uuid.UUID) -> None:
+        try:
+            redis_client = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
+            user_ids_result = await self.db.execute(
+                select(UserRole.user_id).where(UserRole.role_id == role_id)
+            )
+            user_ids = [str(row[0]) for row in user_ids_result.all()]
+            if user_ids:
+                key = f"perm_version:{role_id}"
+                await redis_client.set(key, datetime.now(timezone.utc).timestamp())
+                await redis_client.expire(key, 900)
+            await redis_client.aclose()
+        except Exception:
+            pass
+
     async def assign_permissions(
         self, role_id: uuid.UUID, privilege_ids: list[uuid.UUID]
     ) -> None:
@@ -401,6 +418,8 @@ class AdminService:
 
         await self.db.flush()
         await self._increment_permission_version(role_id)
+
+        await self._invalidate_redis_for_role(role_id)
 
         await self._write_audit_log(
             user_id=None,
