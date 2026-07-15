@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user
 from app.modules.po.dto.schemas import (
     CreatePoAmendmentRequest,
     CreatePoApprovalRequest,
@@ -42,7 +44,7 @@ from app.modules.po.services.crud import (
 )
 from app.modules.po.services.generic import GenericPoService
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 # ---------------------------------------------------------------------------
@@ -337,30 +339,55 @@ async def update_po_composite(po_id: uuid.UUID, data: UpdatePoCompositeRequest, 
 # ---------------------------------------------------------------------------
 
 @router.get("/generic/{table_name}")
-async def generic_list(table_name: str, db: AsyncSession = Depends(get_db)):
+async def generic_list(
+    table_name: str,
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+):
     svc = GenericPoService(db)
     return await svc.list_all(table_name)
 
 
 @router.post("/generic/{table_name}", status_code=status.HTTP_201_CREATED)
-async def generic_create(table_name: str, body: dict, db: AsyncSession = Depends(get_db)):
+async def generic_create(
+    table_name: str,
+    body: dict,
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+):
     svc = GenericPoService(db)
     return await svc.create(table_name, body)
 
 
 @router.get("/generic/{table_name}/{entity_id}")
-async def generic_get(table_name: str, entity_id: str, db: AsyncSession = Depends(get_db)):
+async def generic_get(
+    table_name: str,
+    entity_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+):
     svc = GenericPoService(db)
     return await svc.get_one(table_name, entity_id)
 
 
 @router.put("/generic/{table_name}/{entity_id}")
-async def generic_update(table_name: str, entity_id: str, body: dict, db: AsyncSession = Depends(get_db)):
+async def generic_update(
+    table_name: str,
+    entity_id: str,
+    body: dict,
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+):
     svc = GenericPoService(db)
     return await svc.update(table_name, entity_id, body)
 
 
 @router.delete("/generic/{table_name}/{entity_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def generic_delete(table_name: str, entity_id: str, db: AsyncSession = Depends(get_db)):
+async def generic_delete(
+    table_name: str,
+    entity_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+):
     svc = GenericPoService(db)
     await svc.delete(table_name, entity_id)

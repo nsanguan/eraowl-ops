@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.dependencies import get_current_user
 from app.shared.pagination import PaginatedResponse
 from app.modules.mdm.party.services import PartyService
 from app.modules.mdm.party.schemas import (
@@ -15,7 +16,7 @@ from app.modules.mdm.party.schemas import (
     CustomerOut, CustomerCreate, CustomerUpdate,
 )
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 def _build_paginated(items, total, page, page_size):

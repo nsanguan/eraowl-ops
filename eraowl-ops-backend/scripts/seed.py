@@ -2,7 +2,7 @@
 """Seed all modules with default data."""
 
 import asyncio
-import hashlib
+import os
 import uuid
 from datetime import date, datetime, timedelta, timezone
 
@@ -10,7 +10,10 @@ from passlib.context import CryptContext
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-DATABASE_URL = "postgresql+asyncpg://eraowlopsadmin:EraOwl2026@202.71.1.13:5435/eraowlops"
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql+asyncpg://eraowlopsadmin@202.71.1.13:5435/eraowlops",
+)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

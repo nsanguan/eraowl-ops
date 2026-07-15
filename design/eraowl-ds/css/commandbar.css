@@ -1,0 +1,453 @@
+/* ==========================================================================
+   Command Bar (Omni-Search) — EraOwl Design System (EODS)
+   Version: 1.0.0
+   Target: React 19 + FastAPI + Tailwind CSS 4
+   
+   CMD+K / Ctrl+K quick navigation command palette
+   ========================================================================== */
+
+/* ==========================================================================
+   Component Tokens
+   ========================================================================== */
+
+:root {
+  --eods-cmdbar-width: 560px;
+  --eods-cmdbar-max-height: 70vh;
+  --eods-cmdbar-radius: var(--radius-xl);
+  --eods-cmdbar-shadow: var(--shadow-2xl);
+  --eods-cmdbar-bg: var(--color-surface-overlay);
+  --eods-cmdbar-border: var(--border-color-default);
+  --eods-cmdbar-input-height: 3.5rem;
+  --eods-cmdbar-item-height: 3rem;
+  --eods-cmdbar-transition: var(--transition-fast);
+}
+
+/* ==========================================================================
+   Backdrop
+   ========================================================================== */
+
+.eods-cmdbar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal-backdrop);
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-base), visibility var(--transition-base);
+}
+
+.eods-cmdbar-backdrop--visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==========================================================================
+   Container
+   ========================================================================== */
+
+.eods-cmdbar {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -20px) scale(0.98);
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - var(--space-8));
+  max-width: var(--eods-cmdbar-width);
+  max-height: var(--eods-cmdbar-max-height);
+  background-color: var(--eods-cmdbar-bg);
+  border: 1px solid var(--eods-cmdbar-border);
+  border-radius: var(--eods-cmdbar-radius);
+  box-shadow: var(--eods-cmdbar-shadow);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-base), transform var(--transition-base), visibility var(--transition-base);
+  overflow: hidden;
+}
+
+.eods-cmdbar--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* ==========================================================================
+   Search Input Area
+   ========================================================================== */
+
+.eods-cmdbar__input-area {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--eods-cmdbar-border);
+  flex-shrink: 0;
+}
+
+.eods-cmdbar__input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-neutral-400);
+  flex-shrink: 0;
+}
+
+.eods-cmdbar__input-icon .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+.eods-cmdbar__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-sans);
+  color: var(--eods-text-primary);
+  outline: none;
+}
+
+.eods-cmdbar__input::placeholder {
+  color: var(--color-neutral-400);
+}
+
+.eods-cmdbar__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--color-neutral-400);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--eods-cmdbar-transition);
+}
+
+.eods-cmdbar__clear:hover {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-600);
+}
+
+.eods-cmdbar__clear .material-symbols-outlined {
+  font-size: 1rem;
+}
+
+.eods-cmdbar__kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 var(--space-1-5);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-500);
+  background-color: var(--color-neutral-100);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-sm);
+  line-height: 1;
+}
+
+/* ==========================================================================
+   Results List
+   ========================================================================== */
+
+.eods-cmdbar__results {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-2) 0;
+  min-height: 0;
+}
+
+.eods-cmdbar__results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.eods-cmdbar__results::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.eods-cmdbar__results::-webkit-scrollbar-thumb {
+  background-color: var(--color-neutral-300);
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   Group Header
+   ========================================================================== */
+
+.eods-cmdbar__group {
+  margin-bottom: var(--space-1);
+}
+
+.eods-cmdbar__group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+}
+
+.eods-cmdbar__group-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+}
+
+.eods-cmdbar__group-icon .material-symbols-outlined {
+  font-size: 0.875rem;
+}
+
+.eods-cmdbar__group-title {
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-400);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+
+/* ==========================================================================
+   Result Item
+   ========================================================================== */
+
+.eods-cmdbar__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  background: transparent;
+  color: var(--eods-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-sans);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--eods-cmdbar-transition);
+}
+
+.eods-cmdbar__item:hover,
+.eods-cmdbar__item--selected {
+  background-color: var(--color-primary-50);
+}
+
+.eods-cmdbar__item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-neutral-500);
+  flex-shrink: 0;
+}
+
+.eods-cmdbar__item-icon .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.eods-cmdbar__item--selected .eods-cmdbar__item-icon {
+  color: var(--color-primary-600);
+}
+
+.eods-cmdbar__item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.eods-cmdbar__item-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--eods-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eods-cmdbar__item--selected .eods-cmdbar__item-title {
+  color: var(--color-primary-700);
+}
+
+.eods-cmdbar__item-subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-400);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eods-cmdbar__item-action {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity var(--eods-cmdbar-transition);
+}
+
+.eods-cmdbar__item--selected .eods-cmdbar__item-action {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Empty State
+   ========================================================================== */
+
+.eods-cmdbar__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10) var(--space-5);
+  text-align: center;
+}
+
+.eods-cmdbar__empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: var(--space-3);
+  color: var(--color-neutral-300);
+}
+
+.eods-cmdbar__empty-icon .material-symbols-outlined {
+  font-size: 2rem;
+}
+
+.eods-cmdbar__empty-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-600);
+  margin: 0 0 var(--space-1);
+}
+
+.eods-cmdbar__empty-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-400);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.eods-cmdbar__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-5);
+  border-top: 1px solid var(--eods-cmdbar-border);
+  background-color: var(--color-neutral-50);
+  flex-shrink: 0;
+}
+
+.eods-cmdbar__footer-hints {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.eods-cmdbar__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-2xs);
+  color: var(--color-neutral-500);
+}
+
+.eods-cmdbar__hint kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 var(--space-1);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-600);
+  background-color: var(--color-surface-page);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-xs);
+}
+
+.eods-cmdbar__footer-count {
+  font-size: var(--font-size-2xs);
+  color: var(--color-neutral-400);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .eods-cmdbar {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: var(--eods-cmdbar-radius) var(--eods-cmdbar-radius) 0 0;
+    transform: translateY(100%);
+  }
+
+  .eods-cmdbar--visible {
+    transform: translateY(0);
+  }
+
+  .eods-cmdbar__input-area {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .eods-cmdbar__item {
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .eods-cmdbar__group-header {
+    padding: var(--space-2) var(--space-4);
+  }
+}
+
+/* ==========================================================================
+   Dark Mode
+   ========================================================================== */
+
+.dark {
+  --eods-cmdbar-bg: var(--color-neutral-800);
+  --eods-cmdbar-border: var(--color-neutral-700);
+}
+
+.dark .eods-cmdbar-backdrop {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.dark .eods-cmdbar__item:hover,
+.dark .eods-cmdbar__item--selected {
+  background-color: var(--color-neutral-700);
+}
+
+.dark .eods-cmdbar__footer {
+  background-color: var(--color-neutral-900);
+}
+
+.dark .eods-cmdbar__kbd {
+  background-color: var(--color-neutral-700);
+  border-color: var(--color-neutral-600);
+  color: var(--color-neutral-300);
+}
+
+.dark .eods-cmdbar__hint kbd {
+  background-color: var(--color-neutral-700);
+  border-color: var(--color-neutral-600);
+  color: var(--color-neutral-200);
+}

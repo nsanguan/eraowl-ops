@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.sql import func
 
 from app.modules.mdm.item.models import (
@@ -35,11 +35,28 @@ class ItemService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def _paginate(self, model, page: int, page_size: int, filters: dict | None = None):
+    async def _paginate(
+        self,
+        model,
+        page: int,
+        page_size: int,
+        filters: dict | None = None,
+        search_cols: list[str] | None = None,
+        search_term: str | None = None,
+    ):
         query = select(model).where(model.is_deleted == False)
         if filters:
             for col, val in filters.items():
-                query = query.where(getattr(model, col) == val)
+                if val is not None:
+                    query = query.where(getattr(model, col) == val)
+        if search_term and search_cols:
+            like_patterns = [
+                getattr(model, col).ilike(f"%{search_term}%")
+                for col in search_cols
+                if hasattr(model, col)
+            ]
+            if like_patterns:
+                query = query.where(or_(*like_patterns))
         count_q = select(func.count()).select_from(query.subquery())
         total = (await self.db.execute(count_q)).scalar() or 0
         rows = (await self.db.execute(query.offset((page - 1) * page_size).limit(page_size))).scalars().all()
@@ -75,8 +92,8 @@ class ItemService:
         await self.db.commit()
 
     # --- UOMs ---
-    async def list_uoms(self, page: int = 1, page_size: int = 20):
-        return await self._paginate(Uom, page, page_size)
+    async def list_uoms(self, page: int = 1, page_size: int = 20, search: str | None = None):
+        return await self._paginate(Uom, page, page_size, search_cols=["uom_code", "uom_name"], search_term=search)
 
     async def get_uom(self, entity_id: uuid.UUID):
         return await self._get_by_id(Uom, entity_id)
@@ -127,13 +144,19 @@ class ItemService:
         page_size: int = 20,
         category_set: str | None = None,
         parent_category_id: uuid.UUID | None = None,
+        search: str | None = None,
     ):
         filters = {}
         if category_set:
             filters["category_set"] = category_set
         if parent_category_id:
             filters["parent_category_id"] = parent_category_id
-        return await self._paginate(ItemCategory, page, page_size, filters or None)
+        return await self._paginate(
+            ItemCategory, page, page_size,
+            filters=filters or None,
+            search_cols=["category_code", "category_name"],
+            search_term=search,
+        )
 
     async def get_item_category(self, entity_id: uuid.UUID):
         return await self._get_by_id(ItemCategory, entity_id)
@@ -155,6 +178,7 @@ class ItemService:
         item_type: str | None = None,
         status: str | None = None,
         primary_uom_id: uuid.UUID | None = None,
+        search: str | None = None,
     ):
         filters = {}
         if item_type:
@@ -163,7 +187,12 @@ class ItemService:
             filters["status"] = status
         if primary_uom_id:
             filters["primary_uom_id"] = primary_uom_id
-        return await self._paginate(Item, page, page_size, filters or None)
+        return await self._paginate(
+            Item, page, page_size,
+            filters=filters or None,
+            search_cols=["item_code", "item_name"],
+            search_term=search,
+        )
 
     async def get_item(self, entity_id: uuid.UUID):
         return await self._get_by_id(Item, entity_id)

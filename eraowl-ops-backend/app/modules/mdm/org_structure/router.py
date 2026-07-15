@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.dependencies import get_current_user
 from app.shared.pagination import PaginatedResponse
 from app.modules.mdm.org_structure.services import OrgStructureService
 from app.modules.mdm.org_structure.schemas import (
@@ -14,7 +15,7 @@ from app.modules.mdm.org_structure.schemas import (
     OrgWarehouseLocatorOut, OrgWarehouseLocatorCreate, OrgWarehouseLocatorUpdate,
 )
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 # --- Corporates ---

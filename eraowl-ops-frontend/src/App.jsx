@@ -29,13 +29,15 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<div className="p-4">Welcome to EraOwl-OPS</div>} />
+          <Route path="/" element={<div className="p-4"><h1 className="text-2xl font-bold text-on-surface">Welcome to EraOwl-OPS</h1><p className="text-sm text-outline mt-2">Use the sidebar to navigate between modules, or press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-surface-container-high rounded border border-outline-variant">⌘K</kbd> for quick search.</p></div>} />
           <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/roles" element={<RoleManagement />} />
           <Route path="/org-structure" element={<OrgStructurePage />} />
           <Route path="/party" element={<PartyPage />} />
           <Route path="/items" element={<ItemPage />} />
           <Route path="/bom" element={<BomPage />} />
+          <Route path="/po" element={<div className="p-4"><h1 className="text-2xl font-bold text-on-surface">Purchase Orders</h1><p className="text-sm text-outline mt-2">Purchase order management coming soon.</p></div>} />
+          <Route path="/gl" element={<div className="p-4"><h1 className="text-2xl font-bold text-on-surface">General Ledger</h1><p className="text-sm text-outline mt-2">General ledger module coming soon.</p></div>} />
         </Route>
       </Routes>
     </BrowserRouter>

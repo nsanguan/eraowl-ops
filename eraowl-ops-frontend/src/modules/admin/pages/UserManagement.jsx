@@ -206,7 +206,6 @@ export default function UserManagement() {
         onDelete={(row) => handleDelete(row)}
         onAddRow={openCreateModal}
         addLabel="Add User"
-        searchable
         tableHeight="calc(100vh - 280px)"
       />
 

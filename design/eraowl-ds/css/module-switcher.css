@@ -1,0 +1,259 @@
+/* ==========================================================================
+   Module Switcher — EraOwl Design System (EODS)
+   Version: 1.0.0
+   Target: React 19 + FastAPI + Tailwind CSS 4
+   
+   Dropdown for switching between functional areas (Admin, MDM, Supply Chain, etc.)
+   ========================================================================== */
+
+/* ==========================================================================
+   Component Tokens
+   ========================================================================== */
+
+:root {
+  --eods-modsw-radius: var(--radius-lg);
+  --eods-modsw-bg: var(--color-surface-card);
+  --eods-modsw-border: var(--border-color-default);
+  --eods-modsw-hover-bg: var(--color-neutral-100);
+  --eods-modsw-active-bg: var(--color-primary-50);
+  --eods-modsw-active-border: var(--color-primary-500);
+  --eods-modsw-shadow: var(--shadow-lg);
+  --eods-modsw-transition: var(--transition-fast);
+  --eods-modsw-item-height: 3.5rem;
+}
+
+/* ==========================================================================
+   Trigger Button
+   ========================================================================== */
+
+.eods-modsw {
+  position: relative;
+  width: 100%;
+}
+
+.eods-modsw__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2-5) var(--space-3);
+  border: 1px solid var(--eods-modsw-border);
+  border-radius: var(--eods-modsw-radius);
+  background-color: var(--eods-modsw-bg);
+  cursor: pointer;
+  transition: all var(--eods-modsw-transition);
+  text-align: left;
+}
+
+.eods-modsw__trigger:hover {
+  background-color: var(--eods-modsw-hover-bg);
+  border-color: var(--color-neutral-300);
+}
+
+.eods-modsw__trigger[aria-expanded="true"] {
+  border-color: var(--color-primary-300);
+  box-shadow: var(--shadow-focus);
+}
+
+.eods-modsw__trigger-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.eods-modsw__trigger-icon .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.eods-modsw__trigger-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.eods-modsw__trigger-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--eods-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: var(--line-height-tight);
+}
+
+.eods-modsw__trigger-subtitle {
+  font-size: var(--font-size-2xs);
+  color: var(--color-neutral-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eods-modsw__trigger-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-neutral-400);
+  transition: transform var(--eods-modsw-transition);
+  flex-shrink: 0;
+}
+
+.eods-modsw__trigger-chevron .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.eods-modsw__trigger[aria-expanded="true"] .eods-modsw__trigger-chevron {
+  transform: rotate(180deg);
+}
+
+/* ==========================================================================
+   Dropdown Menu
+   ========================================================================== */
+
+.eods-modsw__menu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  right: 0;
+  z-index: var(--z-dropdown);
+  background-color: var(--eods-modsw-bg);
+  border: 1px solid var(--eods-modsw-border);
+  border-radius: var(--eods-modsw-radius);
+  box-shadow: var(--eods-modsw-shadow);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity var(--eods-modsw-transition), 
+              visibility var(--eods-modsw-transition), 
+              transform var(--eods-modsw-transition);
+}
+
+.eods-modsw__menu--open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Menu Item
+   ========================================================================== */
+
+.eods-modsw__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color var(--eods-modsw-transition);
+  text-align: left;
+}
+
+.eods-modsw__item:hover {
+  background-color: var(--eods-modsw-hover-bg);
+}
+
+.eods-modsw__item--active {
+  background-color: var(--eods-modsw-active-bg);
+}
+
+.eods-modsw__item--active:hover {
+  background-color: var(--color-primary-100);
+}
+
+.eods-modsw__item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.eods-modsw__item-icon .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.eods-modsw__item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.eods-modsw__item-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--eods-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: var(--line-height-tight);
+}
+
+.eods-modsw__item--active .eods-modsw__item-title {
+  color: var(--color-primary-700);
+}
+
+.eods-modsw__item-subtitle {
+  font-size: var(--font-size-2xs);
+  color: var(--color-neutral-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eods-modsw__item-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-500);
+  flex-shrink: 0;
+}
+
+.eods-modsw__item-check .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+/* ==========================================================================
+   Divider
+   ========================================================================== */
+
+.eods-modsw__divider {
+  height: 1px;
+  background-color: var(--eods-modsw-border);
+  margin: var(--space-1) var(--space-3);
+}
+
+/* ==========================================================================
+   Quick Access Section
+   ========================================================================== */
+
+.eods-modsw__section-title {
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-400);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  padding: var(--space-2) var(--space-3) var(--space-1);
+}
+
+/* ==========================================================================
+   Dark Mode
+   ========================================================================== */
+
+.dark {
+  --eods-modsw-bg: var(--color-neutral-800);
+  --eods-modsw-border: var(--color-neutral-700);
+  --eods-modsw-hover-bg: var(--color-neutral-700);
+  --eods-modsw-active-bg: rgba(37, 99, 235, 0.15);
+}
+
+.dark .eods-modsw__item--active:hover {
+  background-color: rgba(37, 99, 235, 0.25);
+}

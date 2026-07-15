@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.dependencies import check_privilege, get_current_user
 from app.shared.pagination import PaginatedResponse
 from app.modules.bom.services import BomService
 from app.modules.bom.schemas import (
@@ -15,7 +16,7 @@ from app.modules.bom.schemas import (
     BomExplodeItem,
 )
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 # --- Bom Headers ---
@@ -57,7 +58,11 @@ async def delete_bom_header(entity_id: uuid.UUID, db: AsyncSession = Depends(get
 
 
 @router.post("/bom-headers/{entity_id}/approve", response_model=BomHeaderOut)
-async def approve_bom(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def approve_bom(
+    entity_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "approve"),
+):
     svc = BomService(db)
     return await svc.approve_bom(entity_id)
 

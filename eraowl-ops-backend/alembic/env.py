@@ -20,6 +20,7 @@ from app.modules.mdm.org_structure import models as _org  # noqa: F401
 from app.modules.mdm.party import models as _party  # noqa: F401
 from app.modules.mdm.item import models as _item  # noqa: F401
 from app.modules.bom import models as _bom  # noqa: F401
+from app.modules.po import models as _po  # noqa: F401
 from app.modules.admin import models as _admin  # noqa: F401
 
 target_metadata = SQLModel.metadata

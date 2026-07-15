@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.dependencies import get_current_user
 from app.shared.pagination import PaginatedResponse
 from app.modules.mdm.item.services import ItemService
 from app.modules.mdm.item.schemas import (
@@ -29,7 +30,7 @@ from app.modules.mdm.item.schemas import (
     ItemSupplierXrefUpdate,
 )
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 # --- UOMs ---
@@ -37,10 +38,11 @@ router = APIRouter()
 async def list_uoms(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
+    search: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     svc = ItemService(db)
-    items, total = await svc.list_uoms(page, page_size)
+    items, total = await svc.list_uoms(page, page_size, search=search)
     total_pages = max(1, (total + page_size - 1) // page_size)
     return PaginatedResponse(items=items, total=total, page=page, page_size=page_size, total_pages=total_pages)
 
@@ -116,10 +118,11 @@ async def list_item_categories(
     page_size: int = Query(20, ge=1, le=100),
     category_set: str | None = Query(None),
     parent_category_id: uuid.UUID | None = Query(None),
+    search: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     svc = ItemService(db)
-    items, total = await svc.list_item_categories(page, page_size, category_set, parent_category_id)
+    items, total = await svc.list_item_categories(page, page_size, category_set, parent_category_id, search=search)
     total_pages = max(1, (total + page_size - 1) // page_size)
     return PaginatedResponse(items=items, total=total, page=page, page_size=page_size, total_pages=total_pages)
 
@@ -156,10 +159,11 @@ async def list_items(
     item_type: str | None = Query(None),
     status: str | None = Query(None),
     primary_uom_id: uuid.UUID | None = Query(None),
+    search: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     svc = ItemService(db)
-    items, total = await svc.list_items(page, page_size, item_type, status, primary_uom_id)
+    items, total = await svc.list_items(page, page_size, item_type, status, primary_uom_id, search=search)
     total_pages = max(1, (total + page_size - 1) // page_size)
     return PaginatedResponse(items=items, total=total, page=page, page_size=page_size, total_pages=total_pages)
 

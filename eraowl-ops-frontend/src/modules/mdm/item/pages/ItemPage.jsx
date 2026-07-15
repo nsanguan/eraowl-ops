@@ -77,12 +77,14 @@ export default function ItemPage() {
   const tab = TABS.find((t) => t.key === activeTab)
   const fields = FIELDS[activeTab] || []
 
-  const fetchData = useCallback(async (tabKey) => {
+  const fetchData = useCallback(async (tabKey, searchTerm = '') => {
     const cfg = TABS.find((t) => t.key === tabKey)
     if (!cfg) return
     setLoading((prev) => ({ ...prev, [tabKey]: true }))
     try {
-      const { data: res } = await api.get(cfg.endpoint, { params: { page: 1, page_size: 100 } })
+      const params = { page: 1, page_size: 100 }
+      if (searchTerm) params.search = searchTerm
+      const { data: res } = await api.get(cfg.endpoint, { params })
       setData((prev) => ({ ...prev, [tabKey]: res.items || res.data || [] }))
     } catch {
       setData((prev) => ({ ...prev, [tabKey]: [] }))
@@ -92,22 +94,19 @@ export default function ItemPage() {
   }, [])
 
   useEffect(() => {
-    if (!data[activeTab]) fetchData(activeTab)
+    if (!data[activeTab]) fetchData(activeTab, search[activeTab] || '')
   }, [activeTab, data, fetchData])
 
   const handleSearch = (query) => {
     const key = activeTab
     if (searchTimeout.current[key]) clearTimeout(searchTimeout.current[key])
     searchTimeout.current[key] = setTimeout(() => {
-      setSearch((prev) => ({ ...prev, [key]: query.toLowerCase() }))
+      setSearch((prev) => ({ ...prev, [key]: query }))
+      fetchData(key, query)
     }, 300)
   }
 
   const rawData = data[activeTab] || []
-  const searchTerm = search[activeTab] || ''
-  const filteredData = searchTerm
-    ? rawData.filter((row) => Object.values(row).some((v) => v != null && String(v).toLowerCase().includes(searchTerm)))
-    : rawData
 
   const entityId = (row) => tab ? row[tab.idKey] : null
 
@@ -200,7 +199,7 @@ export default function ItemPage() {
         <InteractiveGrid
           key={tab.key}
           columns={COLUMNS[tab.key]}
-          data={filteredData}
+          data={rawData}
           loading={loading[activeTab]}
           idKey={tab.idKey}
           searchable

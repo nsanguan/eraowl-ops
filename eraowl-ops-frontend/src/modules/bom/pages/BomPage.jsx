@@ -1,234 +1,326 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import api from '../../../api/client'
-import { Plus } from 'lucide-react'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
+import { MasterDetailSplit } from '../../../shared-ui-kit/components/ui/MasterDetailSplit'
+import { TreeGrid } from '../../../shared-ui-kit/components/ui/TreeGrid'
+import { StatusChip } from '../../../shared-ui-kit/components/ui/StatusChip'
+import PermissionGuard from '../../../components/PermissionGuard'
 
-const TABS = [
-  { key: 'bomHeaders', label: 'BOM Headers', endpoint: '/bom/bom-headers', idKey: 'bom_header_id', nameField: 'item_id'             },
-  { key: 'bomComponents',   label: 'BOM Components',   endpoint: '/bom/bom-components',   idKey: 'bom_component_id',   nameField: 'component_item_id' },
+const BOM_STATUS_MAP = {
+  'DRAFT': 'created',
+  'PENDING_APPROVAL': 'pending',
+  'ACTIVE': 'active',
+  'INACTIVE': 'cancelled',
+}
+
+const COLUMNS = [
+  { key: 'item_id', header: 'Item ID', width: '120px' },
+  { key: 'revision', header: 'Revision', width: '100px' },
+  { 
+    key: 'status', 
+    header: 'Status', 
+    width: '140px',
+    render: (row) => (
+      <StatusChip 
+        status={BOM_STATUS_MAP[row.status] || 'created'} 
+        label={row.status} 
+      />
+    )
+  },
+  { key: 'effective_date_from', header: 'Effective From', width: '130px' },
+  { key: 'effective_date_to', header: 'Effective To', width: '130px' },
 ]
 
-const COLUMNS = {
-  bomHeaders: [
-    { key: 'item_id',             header: 'Item ID',      width: '100px' },
-    { key: 'revision',            header: 'Revision',     width: '100px' },
-    { key: 'status',              header: 'Status',       width: '120px' },
-    { key: 'effective_date_from', header: 'Effective From', width: '140px' },
-    { key: 'is_active',           header: 'Status',       width: '100px',
-      render: (r) => r.is_active !== false
-        ? <span className="text-success text-xs font-semibold">Active</span>
-        : <span className="text-outline text-xs">Inactive</span>,
-    },
-  ],
-  bomLines: [
-    { key: 'bom_header_id',     header: 'BOM Header',     width: '120px' },
-    { key: 'component_item_id', header: 'Component Item', width: '140px' },
-    { key: 'quantity_per',      header: 'Quantity Per',   width: '110px' },
-    { key: 'uom_id',            header: 'UOM',            width: '90px'  },
-    { key: 'is_active',         header: 'Status',         width: '100px',
-      render: (r) => r.is_active !== false
-        ? <span className="text-success text-xs font-semibold">Active</span>
-        : <span className="text-outline text-xs">Inactive</span>,
-    },
-  ],
-}
-
-const FIELDS = {
-  bomHeaders: [
-    { key: 'item_id', label: 'Item ID', required: true },
-  ],
-  bomLines: [
-    { key: 'bom_header_id',     label: 'BOM Header ID',    required: true },
-    { key: 'component_item_id', label: 'Component Item ID', required: true },
-    { key: 'quantity_per',      label: 'Quantity Per' },
-    { key: 'uom_id',            label: 'UOM ID' },
-  ],
-}
-
 export default function BomPage() {
-  const [activeTab, setActiveTab] = useState('bomHeaders')
-  const [data, setData] = useState({})
-  const [loading, setLoading] = useState({})
-  const [search, setSearch] = useState({})
-  const [modalOpen, setModalOpen] = useState(false)
-  const [editingItem, setEditingItem] = useState(null)
-  const [saving, setSaving] = useState(false)
-  const [formError, setFormError] = useState(null)
-  const [form, setForm] = useState({})
-  const searchTimeout = useRef({})
+  const [bomHeaders, setBomHeaders] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [selectedBom, setSelectedBom] = useState(null)
+  const [explodedData, setExplodedData] = useState([])
+  const [exploding, setExploding] = useState(false)
+  const [approving, setApproving] = useState(false)
 
-  const tab = TABS.find((t) => t.key === activeTab)
-  const fields = FIELDS[activeTab] || []
-
-  const fetchData = useCallback(async (tabKey) => {
-    const cfg = TABS.find((t) => t.key === tabKey)
-    if (!cfg) return
-    setLoading((prev) => ({ ...prev, [tabKey]: true }))
+  const fetchBomHeaders = useCallback(async () => {
+    setLoading(true)
     try {
-      const { data: res } = await api.get(cfg.endpoint, { params: { page: 1, page_size: 100 } })
-      setData((prev) => ({ ...prev, [tabKey]: res.items || res.data || [] }))
-    } catch {
-      setData((prev) => ({ ...prev, [tabKey]: [] }))
+      const { data } = await api.get('/bom/bom-headers', { 
+        params: { page: 1, page_size: 100 } 
+      })
+      setBomHeaders(data.items || [])
+    } catch (err) {
+      console.error('Failed to fetch BOM headers:', err)
     } finally {
-      setLoading((prev) => ({ ...prev, [tabKey]: false }))
+      setLoading(false)
     }
   }, [])
 
-  useEffect(() => {
-    if (!data[activeTab]) fetchData(activeTab)
-  }, [activeTab, data, fetchData])
-
-  const handleSearch = (query) => {
-    const key = activeTab
-    if (searchTimeout.current[key]) clearTimeout(searchTimeout.current[key])
-    searchTimeout.current[key] = setTimeout(() => {
-      setSearch((prev) => ({ ...prev, [key]: query.toLowerCase() }))
-    }, 300)
-  }
-
-  const rawData = data[activeTab] || []
-  const searchTerm = search[activeTab] || ''
-  const filteredData = searchTerm
-    ? rawData.filter((row) => Object.values(row).some((v) => v != null && String(v).toLowerCase().includes(searchTerm)))
-    : rawData
-
-  const entityId = (row) => tab ? row[tab.idKey] : null
-
-  const openCreate = () => {
-    setEditingItem(null)
-    const init = {}
-    fields.forEach((f) => { init[f.key] = '' })
-    setForm(init)
-    setFormError(null)
-    setModalOpen(true)
-  }
-
-  const openEdit = (row) => {
-    setEditingItem(row)
-    const init = {}
-    fields.forEach((f) => { init[f.key] = row[f.key] != null ? String(row[f.key]) : '' })
-    setForm(init)
-    setFormError(null)
-    setModalOpen(true)
-  }
-
-  const closeModal = () => { setModalOpen(false); setEditingItem(null) }
-
-  const handleSave = async (e) => {
-    e.preventDefault()
-    setSaving(true)
-    setFormError(null)
+  const fetchExplodedView = useCallback(async (bomHeaderId) => {
+    if (!bomHeaderId) {
+      setExplodedData([])
+      return
+    }
+    
+    setExploding(true)
     try {
-      const payload = {}
-      fields.forEach((f) => {
-        if (form[f.key] !== '') payload[f.key] = form[f.key]
+      const { data } = await api.get(`/bom/bom-headers/${bomHeaderId}/explode`, {
+        params: { quantity: 1.0 }
       })
-      if (editingItem) {
-        await api.put(`${tab.endpoint}/${entityId(editingItem)}`, payload)
-      } else {
-        await api.post(tab.endpoint, payload)
-      }
-      closeModal()
-      fetchData(activeTab)
+      setExplodedData(data || [])
     } catch (err) {
-      setFormError(err.response?.data?.detail?.message || 'Failed to save')
+      console.error('Failed to explode BOM:', err)
+      setExplodedData([])
     } finally {
-      setSaving(false)
+      setExploding(false)
     }
-  }
+  }, [])
 
-  const handleDelete = async (row) => {
-    const name = row[tab.nameField] || entityId(row)
-    if (!window.confirm(`Delete "${name}"?`)) return
+  const handleApprove = async () => {
+    if (!selectedBom) return
+    
+    setApproving(true)
     try {
-      await api.delete(`${tab.endpoint}/${entityId(row)}`)
-      fetchData(activeTab)
+      await api.post(`/bom/bom-headers/${selectedBom.bom_header_id}/approve`)
+      await fetchBomHeaders()
+      
+      const { data } = await api.get(`/bom/bom-headers/${selectedBom.bom_header_id}`)
+      setSelectedBom(data)
     } catch (err) {
-      setFormError(err.response?.data?.detail?.message || 'Failed to delete')
+      console.error('Failed to approve BOM:', err)
+      alert(err.response?.data?.detail?.message || 'Failed to approve BOM')
+    } finally {
+      setApproving(false)
     }
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-on-surface">Bill of Materials</h1>
-          <p className="text-sm text-outline mt-1">Manage BOM headers and lines</p>
-        </div>
-        <button onClick={openCreate}
-          className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
-          <Plus size={15} /> Add {tab?.label}
-        </button>
-      </div>
+  const handleRowClick = useCallback((row) => {
+    setSelectedBom(row)
+    fetchExplodedView(row.bom_header_id)
+  }, [fetchExplodedView])
 
-      <div className="flex items-center gap-1 border-b border-outline-variant overflow-x-auto">
-        {TABS.map((t) => (
-          <button key={t.key} onClick={() => setActiveTab(t.key)}
-            className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold whitespace-nowrap border-b-2 transition-colors ${
-              activeTab === t.key
-                ? 'border-primary text-primary'
-                : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-outline-variant'
-            }`}>
-            <span className="material-symbols-outlined text-[18px]">
-              {t.key === 'bomHeaders' ? 'view_list' : 'format_list_bulleted'}
-            </span>
-            {t.label}
+  useEffect(() => {
+    fetchBomHeaders()
+  }, [fetchBomHeaders])
+
+  const convertToTreeNodes = (items, parentId = 'root') => {
+    if (!items || items.length === 0) return []
+    
+    return items.map((item, index) => {
+      const nodeId = `${parentId}-${item.component_item_id}-${index}`
+      const node = {
+        id: nodeId,
+        data: {
+          ...item,
+          level: item.level || 0,
+        },
+        children: item.children && item.children.length > 0 
+          ? convertToTreeNodes(item.children, nodeId)
+          : []
+      }
+      return node
+    })
+  }
+
+  const treeData = convertToTreeNodes(explodedData)
+
+  const treeColumns = [
+    {
+      id: 'item_code',
+      header: 'Item Code',
+      width: '120px',
+      render: (row) => row.item_code || '-'
+    },
+    {
+      id: 'quantity_per',
+      header: 'Quantity',
+      width: '100px',
+      align: 'right',
+      render: (row) => (
+        <span className="font-mono">{row.quantity_per?.toFixed(2) || '0.00'}</span>
+      )
+    },
+    {
+      id: 'uom_code',
+      header: 'UOM',
+      width: '80px',
+      render: (row) => row.uom_code || '-'
+    },
+    {
+      id: 'level',
+      header: 'Level',
+      width: '80px',
+      align: 'center',
+      render: (row) => (
+        <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-xs font-semibold">
+          L{row.level}
+        </span>
+      )
+    },
+  ]
+
+  const masterContent = (
+    <InteractiveGrid
+      columns={COLUMNS}
+      data={bomHeaders}
+      loading={loading}
+      idKey="bom_header_id"
+      searchable
+      onRowClick={handleRowClick}
+      tableHeight="calc(100vh - 280px)"
+    />
+  )
+
+  const detailHeader = (
+    <div className="flex items-center justify-between px-4 py-3 bg-surface-container-low border-b border-outline-variant">
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-semibold text-on-surface">BOM Details</span>
+        {selectedBom && (
+          <StatusChip 
+            status={BOM_STATUS_MAP[selectedBom.status] || 'created'} 
+            label={selectedBom.status} 
+          />
+        )}
+      </div>
+      
+      {selectedBom && selectedBom.status === 'PENDING_APPROVAL' && (
+        <PermissionGuard
+          module="bom"
+          action="approve"
+          fallback="disable"
+          tooltip="คุณไม่มีสิทธิ์อนุมัติ BOM"
+        >
+          <button
+            onClick={handleApprove}
+            disabled={approving}
+            className="px-4 py-1.5 bg-success text-white rounded-lg text-xs font-semibold hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          >
+            {approving ? (
+              <>
+                <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+                Approving...
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                Approve BOM
+              </>
+            )}
           </button>
-        ))}
-      </div>
-
-      {tab && (
-        <InteractiveGrid
-          key={tab.key}
-          columns={COLUMNS[tab.key]}
-          data={filteredData}
-          loading={loading[activeTab]}
-          idKey={tab.idKey}
-          searchable
-          onSearch={handleSearch}
-          onAddRow={openCreate}
-          onEdit={(row) => openEdit(row)}
-          onDelete={(row) => handleDelete(row)}
-          addLabel={`Add ${tab.label}`}
-          tableHeight="calc(100vh - 320px)"
-        />
+        </PermissionGuard>
       )}
+    </div>
+  )
 
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div className="flex items-center justify-between p-5 border-b border-outline-variant">
-              <h2 className="text-lg font-bold text-on-surface">{editingItem ? `Edit ${tab?.label}` : `Add ${tab?.label}`}</h2>
-              <button onClick={closeModal} className="p-1.5 rounded-lg hover:bg-surface-container-high text-outline hover:text-on-surface transition-colors">
-                <span className="material-symbols-outlined text-[18px]">close</span>
-              </button>
+  const detailContent = selectedBom ? (
+    <div className="flex flex-col h-full">
+      {detailHeader}
+      
+      <div className="p-4 bg-surface-container-lowest border-b border-outline-variant">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
+              BOM ID
             </div>
-            <form onSubmit={handleSave} className="p-5 space-y-4">
-              {formError && <div className="bg-error-container text-error p-3 rounded-xl text-sm font-medium">{formError}</div>}
-              {fields.map((f) => (
-                <div key={f.key}>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-1.5">
-                    {f.label} {f.required && '*'}
-                  </label>
-                  <input type="text" value={form[f.key] || ''}
-                    onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
-                    required={f.required} />
-                </div>
-              ))}
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={closeModal}
-                  className="neo-button px-5 py-2.5 text-sm font-semibold text-on-surface-variant">Cancel</button>
-                <button type="submit" disabled={saving}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-primary/20">
-                  {saving && <span className="animate-spin inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />}
-                  {editingItem ? 'Save Changes' : 'Create'}
-                </button>
-              </div>
-            </form>
+            <div className="text-xs text-on-surface font-mono">
+              {selectedBom.bom_header_id}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
+              Item ID
+            </div>
+            <div className="text-xs text-on-surface font-mono">
+              {selectedBom.item_id}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
+              Revision
+            </div>
+            <div className="text-xs text-on-surface font-semibold">
+              {selectedBom.revision}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
+              Alternate Code
+            </div>
+            <div className="text-xs text-on-surface">
+              {selectedBom.alternate_bom_code || '-'}
+            </div>
           </div>
         </div>
-      )}
+      </div>
+
+      <div className="flex-1 overflow-hidden">
+        <div className="px-4 py-2 bg-surface-container-low border-b border-outline-variant">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-[18px]">
+              account_tree
+            </span>
+            <span className="text-sm font-semibold text-on-surface">
+              Multi-Level Structure (Exploded View)
+            </span>
+          </div>
+        </div>
+        
+        <div className="h-full overflow-auto">
+          {exploding ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-3 text-outline">
+                <span className="material-symbols-outlined text-[24px] animate-spin">
+                  progress_activity
+                </span>
+                <span className="text-sm">Loading BOM structure...</span>
+              </div>
+            </div>
+          ) : treeData.length > 0 ? (
+            <TreeGrid
+              data={treeData}
+              columns={treeColumns}
+              nodeLabelAccessor={(row) => row.item_name || 'Unnamed Item'}
+              nodeIconAccessor={(row) => 
+                row.children && row.children.length > 0 ? 'inventory_2' : 'inventory'
+              }
+              nodeDescriptionAccessor={(row) => `Component: ${row.component_item_id}`}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-outline">
+              <span className="material-symbols-outlined text-[48px] mb-2">
+                account_tree
+              </span>
+              <p className="text-sm">No components found in this BOM</p>
+              <p className="text-xs mt-1">Add components to see the structure</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className="flex flex-col items-center justify-center h-full text-outline">
+      <span className="material-symbols-outlined text-[64px] mb-3">
+        select_all
+      </span>
+      <p className="text-sm font-medium">Select a BOM to view details</p>
+      <p className="text-xs mt-1">Click on a row in the left panel</p>
+    </div>
+  )
+
+  return (
+    <div className="p-6 space-y-4">
+      <div>
+        <h1 className="text-2xl font-bold text-on-surface">Bill of Materials</h1>
+        <p className="text-sm text-outline mt-1">
+          Manage BOM structures and multi-level component hierarchies
+        </p>
+      </div>
+
+      <MasterDetailSplit
+        masterContent={masterContent}
+        detailContent={detailContent}
+        masterTitle="BOM Headers"
+        detailTitle=""
+        masterWidth="45%"
+        className="h-[calc(100vh-200px)]"
+      />
     </div>
   )
 }
