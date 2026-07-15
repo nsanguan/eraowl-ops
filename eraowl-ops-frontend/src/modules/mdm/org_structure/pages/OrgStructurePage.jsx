@@ -50,6 +50,7 @@ const FIELDS = {
   ],
   locators: [
     { key: 'locator_code', label: 'Code', required: true },
+    { key: 'warehouse_id', label: 'Warehouse', lookup: 'warehouse_id' },
     { key: 'zone', label: 'Zone' },
     { key: 'aisle', label: 'Aisle' },
     { key: 'rack', label: 'Rack' },
@@ -116,12 +117,13 @@ export default function OrgStructurePage() {
     { key: 'is_active',      header: 'Status', width: '100px' },
   ],
   locators: [
-    { key: 'locator_code', header: 'Code',     width: '140px' },
-    { key: 'zone',         header: 'Zone',     width: '80px'  },
-    { key: 'aisle',        header: 'Aisle',    width: '80px'  },
-    { key: 'rack',         header: 'Rack',     width: '80px'  },
-    { key: 'bin',          header: 'Bin',      width: '80px'  },
-    { key: 'is_active',    header: 'Status',   width: '100px' },
+    { key: 'locator_code', header: 'Code',        width: '140px' },
+    { key: 'warehouse_id', header: 'Warehouse',   width: '140px', render: (r) => resolveLabel('warehouse_id', r.warehouse_id) },
+    { key: 'zone',         header: 'Zone',        width: '80px'  },
+    { key: 'aisle',        header: 'Aisle',       width: '80px'  },
+    { key: 'rack',         header: 'Rack',        width: '80px'  },
+    { key: 'bin',          header: 'Bin',         width: '80px'  },
+    { key: 'is_active',    header: 'Status',      width: '100px' },
   ],
 }
 
