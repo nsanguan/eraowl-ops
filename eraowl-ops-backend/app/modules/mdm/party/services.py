@@ -412,8 +412,32 @@ class PartyService:
 
         elif node_type == "role_item" and action in ("add", "delete"):
             if action == "add":
-                pr = PartyRole(party_id=party_id, role_type=entity.get("role_type", "UNKNOWN"))
+                role_type = entity.get("role_type", "UNKNOWN")
+                pr = PartyRole(party_id=party_id, role_type=role_type)
                 self.db.add(pr)
+                await self.db.flush()
+
+                if role_type == "SUPPLIER":
+                    supplier_code = entity.get("supplier_code") or f"SUP-{pr.party_role_id.hex[:8].upper()}"
+                    supplier = Supplier(
+                        party_id=party_id,
+                        party_role_id=pr.party_role_id,
+                        supplier_code=supplier_code,
+                        currency_code=entity.get("currency_code"),
+                        payment_term_days=int(entity.get("payment_term_days", 30)),
+                    )
+                    self.db.add(supplier)
+                elif role_type == "CUSTOMER":
+                    customer_code = entity.get("customer_code") or f"CUS-{pr.party_role_id.hex[:8].upper()}"
+                    customer = Customer(
+                        party_id=party_id,
+                        party_role_id=pr.party_role_id,
+                        customer_code=customer_code,
+                        credit_limit=float(entity.get("credit_limit", 0)),
+                        payment_term_days=int(entity.get("payment_term_days", 30)),
+                    )
+                    self.db.add(customer)
+
             elif action == "delete" and "party_role_id" in entity:
                 pr = await self._get_by_id(PartyRole, uuid.UUID(entity["party_role_id"]))
                 pr.is_deleted = True

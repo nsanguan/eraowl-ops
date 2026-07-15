@@ -151,6 +151,8 @@ class PartyRoleOut(BaseModel):
 class SupplierCreate(BaseModel):
     party_id: uuid.UUID
     party_role_id: Optional[uuid.UUID] = None
+    supplier_code: Optional[str] = None
+    currency_code: Optional[str] = None
     vendor_type_lookup_code: Optional[str] = None
     payment_method_code: Optional[str] = None
     payment_term_days: int = 30
@@ -158,6 +160,8 @@ class SupplierCreate(BaseModel):
 
 
 class SupplierUpdate(BaseModel):
+    supplier_code: Optional[str] = None
+    currency_code: Optional[str] = None
     vendor_type_lookup_code: Optional[str] = None
     payment_method_code: Optional[str] = None
     payment_term_days: Optional[int] = None
@@ -168,6 +172,8 @@ class SupplierOut(BaseModel):
     supplier_id: uuid.UUID
     party_id: uuid.UUID
     party_role_id: Optional[uuid.UUID]
+    supplier_code: Optional[str]
+    currency_code: Optional[str]
     vendor_type_lookup_code: Optional[str]
     payment_method_code: Optional[str]
     payment_term_days: int

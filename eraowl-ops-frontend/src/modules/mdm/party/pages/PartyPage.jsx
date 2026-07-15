@@ -33,7 +33,7 @@ const COLUMNS = {
   suppliers: [
     { key: 'supplier_code',    header: 'Code',        width: '140px' },
     { key: 'payment_term_days', header: 'Payment Terms', width: '140px' },
-    { key: 'currency',         header: 'Currency',    width: '100px' },
+    { key: 'currency_code',    header: 'Currency',    width: '100px' },
     { key: 'is_active',        header: 'Status',      width: '100px',
       render: (r) => r.is_active !== false
         ? <span className="text-success text-xs font-semibold">Active</span>
@@ -68,8 +68,8 @@ const FIELDS = {
   ],
   suppliers: [
     { key: 'supplier_code',    label: 'Supplier Code',    required: true },
+    { key: 'currency_code',    label: 'Currency Code' },
     { key: 'payment_term_days', label: 'Payment Term Days' },
-    { key: 'currency',         label: 'Currency' },
   ],
   customers: [
     { key: 'customer_code',    label: 'Customer Code',    required: true },

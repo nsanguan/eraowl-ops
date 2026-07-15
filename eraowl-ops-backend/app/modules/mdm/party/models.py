@@ -144,6 +144,8 @@ class Supplier(SQLModel, table=True):
     )
     party_id: uuid.UUID = Field(foreign_key="mdm.parties.party_id", unique=True)
     party_role_id: Optional[uuid.UUID] = Field(default=None, foreign_key="mdm.party_roles.party_role_id", nullable=True)
+    supplier_code: Optional[str] = Field(default=None, max_length=50)
+    currency_code: Optional[str] = Field(default=None, max_length=10)
     vendor_type_lookup_code: Optional[str] = Field(default=None, max_length=30)
     payment_method_code: Optional[str] = Field(default=None, max_length=30)
     payment_term_days: int = Field(default=30, sa_column=Column(Integer, default=30, nullable=False))

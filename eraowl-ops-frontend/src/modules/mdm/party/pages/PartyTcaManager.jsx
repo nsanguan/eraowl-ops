@@ -46,6 +46,7 @@ export default function PartyTcaManager() {
   const [showAddRole, setShowAddRole] = useState(false)
   const [showAddSite, setShowAddSite] = useState(false)
   const [addSiteForm, setAddSiteForm] = useState({ country: 'Thailand', address_line1: '', city: '', site_name: '' })
+  const [addRoleForm, setAddRoleForm] = useState({ supplier_code: '', currency_code: 'THB', payment_term_days: '30' })
   const [partyFilter, setPartyFilter] = useState('ALL')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -148,10 +149,17 @@ export default function PartyTcaManager() {
   const handleAddRole = async (roleType) => {
     setSavingNode(true)
     try {
-      await api.post(`/party/parties/${selectedParty.party_id}/tree/update-node`, { node_type: 'role_item', action: 'add', entity: { role_type: roleType } })
+      const entity = { role_type: roleType }
+      if (roleType === 'SUPPLIER') {
+        if (addRoleForm.supplier_code) entity.supplier_code = addRoleForm.supplier_code
+        if (addRoleForm.currency_code) entity.currency_code = addRoleForm.currency_code
+        if (addRoleForm.payment_term_days) entity.payment_term_days = parseInt(addRoleForm.payment_term_days)
+      }
+      await api.post(`/party/parties/${selectedParty.party_id}/tree/update-node`, { node_type: 'role_item', action: 'add', entity })
       console.log('Role added:', roleType)
       await fetchTree(selectedParty.party_id, selectedNodeRef.current)
       setShowAddRole(false)
+      setAddRoleForm({ supplier_code: '', currency_code: 'THB', payment_term_days: '30' })
     } catch (err) {
       console.error('Add role failed:', err)
       alert(err.response?.data?.detail?.message || 'Failed to add role')
@@ -195,7 +203,7 @@ export default function PartyTcaManager() {
 
   return (
     <div className="h-[calc(100vh-6.5rem)]">
-    <MasterDetailSplit masterWidth="320px"
+    <MasterDetailSplit masterWidth="320px" masterTitle="" detailTitle=""
       masterContent={
         <div className="h-full flex flex-col">
           <div className="p-4 border-b border-outline-variant space-y-3">
@@ -272,13 +280,37 @@ export default function PartyTcaManager() {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowAddRole(false)}>
         <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
           <h2 className="text-sm font-bold text-on-surface mb-3">Add Business Role</h2>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {['SUPPLIER', 'CUSTOMER'].map((r) => (
-              <button key={r} onClick={() => handleAddRole(r)}
-                className="w-full flex items-center gap-3 px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl hover:bg-surface-container-low hover:border-primary/30 transition-all text-left">
-                <span className="material-symbols-outlined text-[20px] text-primary">{r === 'SUPPLIER' ? 'conveyor_belt' : 'handshake'}</span>
-                <div><div className="text-sm font-semibold text-on-surface">{r}</div><div className="text-[10px] text-outline">Register as a {r.toLowerCase()}</div></div>
-              </button>
+              <div key={r} className={`border rounded-xl p-3 transition-all ${r === 'SUPPLIER' ? 'border-primary/30 bg-primary/5' : 'border-outline-variant'}`}>
+                <button onClick={() => handleAddRole(r)}
+                  className="w-full flex items-center gap-3 text-left">
+                  <span className="material-symbols-outlined text-[20px] text-primary">{r === 'SUPPLIER' ? 'conveyor_belt' : 'handshake'}</span>
+                  <div><div className="text-sm font-semibold text-on-surface">{r}</div><div className="text-[10px] text-outline">Register as a {r.toLowerCase()}</div></div>
+                </button>
+                {r === 'SUPPLIER' && (
+                  <div className="mt-3 space-y-2">
+                    <div>
+                      <label className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1 block">Supplier Code</label>
+                      <input type="text" value={addRoleForm.supplier_code} onChange={(e) => setAddRoleForm((p) => ({ ...p, supplier_code: e.target.value }))}
+                        placeholder="Auto-generated if empty"
+                        className="w-full px-3 py-2 bg-surface-bright border border-outline-variant rounded-lg text-sm text-on-surface outline-none focus:border-primary" />
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <label className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1 block">Currency</label>
+                        <input type="text" value={addRoleForm.currency_code} onChange={(e) => setAddRoleForm((p) => ({ ...p, currency_code: e.target.value }))}
+                          className="w-full px-3 py-2 bg-surface-bright border border-outline-variant rounded-lg text-sm text-on-surface outline-none focus:border-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1 block">Payment Terms (days)</label>
+                        <input type="number" value={addRoleForm.payment_term_days} onChange={(e) => setAddRoleForm((p) => ({ ...p, payment_term_days: e.target.value }))}
+                          className="w-full px-3 py-2 bg-surface-bright border border-outline-variant rounded-lg text-sm text-on-surface outline-none focus:border-primary" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
           <button onClick={() => setShowAddRole(false)} className="w-full mt-3 px-3 py-2 bg-surface-container-low border border-outline-variant rounded-xl text-xs font-semibold text-outline">Cancel</button>
