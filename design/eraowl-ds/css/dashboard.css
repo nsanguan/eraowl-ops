@@ -1,0 +1,457 @@
+/* ==========================================================================
+   Dashboard Layout — EraOwl Design System (EODS)
+   Version: 1.0.0
+   Target: React 19 + FastAPI + Tailwind CSS 4
+   ========================================================================== */
+
+/* ==========================================================================
+   Dashboard Grid Container
+   ========================================================================== */
+
+.eods-dashboard {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  width: 100%;
+}
+
+.eods-dashboard--cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.eods-dashboard--cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.eods-dashboard--cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.eods-dashboard--cols-2-1 {
+  grid-template-columns: 2fr 1fr;
+}
+
+.eods-dashboard--cols-1-2 {
+  grid-template-columns: 1fr 2fr;
+}
+
+.eods-dashboard--responsive {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* ==========================================================================
+   Dashboard Section
+   ========================================================================== */
+
+.eods-dashboard__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.eods-dashboard__section--span-2 {
+  grid-column: span 2;
+}
+
+.eods-dashboard__section--span-3 {
+  grid-column: span 3;
+}
+
+.eods-dashboard__section--span-full {
+  grid-column: 1 / -1;
+}
+
+/* ==========================================================================
+   Dashboard Widget
+   ========================================================================== */
+
+.eods-dashboard__widget {
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--border-color-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: box-shadow var(--transition-fast);
+}
+
+.eods-dashboard__widget:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.eods-dashboard__widget--drag-over {
+  border-color: var(--color-primary-400);
+  box-shadow: var(--shadow-focus);
+}
+
+/* ==========================================================================
+   Widget Header
+   ========================================================================== */
+
+.eods-dashboard__widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-color-default);
+  flex-shrink: 0;
+  min-height: 3rem;
+}
+
+.eods-dashboard__widget-title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--eods-text-primary);
+  line-height: var(--line-height-tight);
+}
+
+.eods-dashboard__widget-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* ==========================================================================
+   Widget Body
+   ========================================================================== */
+
+.eods-dashboard__widget-body {
+  flex: 1;
+  padding: var(--space-4);
+  overflow: auto;
+  min-height: 0;
+}
+
+.eods-dashboard__widget-body--no-padding {
+  padding: 0;
+}
+
+.eods-dashboard__widget-body--centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Widget Footer
+   ========================================================================== */
+
+.eods-dashboard__widget-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border-color-default);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Widget Sizes
+   ========================================================================== */
+
+.eods-dashboard__widget--sm { min-height: 120px; }
+.eods-dashboard__widget--md { min-height: 200px; }
+.eods-dashboard__widget--lg { min-height: 320px; }
+.eods-dashboard__widget--xl { min-height: 480px; }
+
+/* ==========================================================================
+   Metric Widget (KPI)
+   ========================================================================== */
+
+.eods-dashboard__metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.eods-dashboard__metric-value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--eods-text-primary);
+  line-height: var(--line-height-tight);
+}
+
+.eods-dashboard__metric-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-400);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.eods-dashboard__metric-change {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.eods-dashboard__metric-change--up { color: var(--color-success-600); }
+.eods-dashboard__metric-change--down { color: var(--color-danger-600); }
+.eods-dashboard__metric-change--neutral { color: var(--color-neutral-500); }
+
+/* ==========================================================================
+   KPI Row
+   ========================================================================== */
+
+.eods-dashboard__kpi-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--space-4);
+}
+
+/* ==========================================================================
+   Chart Container
+   ========================================================================== */
+
+.eods-dashboard__chart {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+}
+
+/* ==========================================================================
+   Quick Actions Panel
+   ========================================================================== */
+
+.eods-dashboard__quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-3);
+}
+
+.eods-dashboard__quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--border-color-default);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--eods-text-secondary);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 100px;
+}
+
+.eods-dashboard__quick-action:hover {
+  border-color: var(--color-primary-300);
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-600);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.eods-dashboard__quick-action-icon {
+  font-size: var(--font-size-2xl);
+  flex-shrink: 0;
+}
+
+.eods-dashboard__quick-action-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ==========================================================================
+   Activity Feed
+   ========================================================================== */
+
+.eods-dashboard__activity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.eods-dashboard__activity-item {
+  display: flex;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-color-default);
+  font-size: var(--font-size-sm);
+}
+
+.eods-dashboard__activity-item:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.eods-dashboard__activity-icon {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  color: #ffffff;
+}
+
+.eods-dashboard__activity-icon--primary { background-color: var(--color-primary-500); }
+.eods-dashboard__activity-icon--success { background-color: var(--color-success-500); }
+.eods-dashboard__activity-icon--warning { background-color: var(--color-warning-500); }
+.eods-dashboard__activity-icon--danger { background-color: var(--color-danger-500); }
+
+.eods-dashboard__activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.eods-dashboard__activity-title {
+  font-weight: var(--font-weight-medium);
+  color: var(--eods-text-primary);
+  margin-bottom: var(--space-0-5);
+}
+
+.eods-dashboard__activity-text {
+  color: var(--color-neutral-500);
+  margin-bottom: var(--space-0-5);
+}
+
+.eods-dashboard__activity-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-400);
+}
+
+/* ==========================================================================
+   Dashboard Page Header
+   ========================================================================== */
+
+.eods-dashboard__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: 0 var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.eods-dashboard__header-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--eods-text-primary);
+  margin: 0;
+}
+
+.eods-dashboard__header-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-500);
+  margin: var(--space-1) 0 0;
+}
+
+.eods-dashboard__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ==========================================================================
+   Filters Bar
+   ========================================================================== */
+
+.eods-dashboard__filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-neutral-50);
+  border: 1px solid var(--border-color-default);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+}
+
+.eods-dashboard__filters-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-600);
+}
+
+/* ==========================================================================
+   Drag & Drop (reorder widgets)
+   ========================================================================== */
+
+.eods-dashboard--draggable .eods-dashboard__widget-header {
+  cursor: grab;
+  user-select: none;
+}
+
+.eods-dashboard--draggable .eods-dashboard__widget-header:active {
+  cursor: grabbing;
+}
+
+.eods-dashboard__widget--dragging {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 1280px) {
+  .eods-dashboard--cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .eods-dashboard--cols-2,
+  .eods-dashboard--cols-3,
+  .eods-dashboard--cols-2-1,
+  .eods-dashboard--cols-1-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .eods-dashboard__section--span-2,
+  .eods-dashboard__section--span-3 {
+    grid-column: span 1;
+  }
+
+  .eods-dashboard__kpi-row {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .eods-dashboard {
+    padding: var(--space-3);
+  }
+
+  .eods-dashboard--cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .eods-dashboard__kpi-row {
+    grid-template-columns: 1fr;
+  }
+
+  .eods-dashboard__header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 var(--space-3);
+  }
+
+  .eods-dashboard__header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .eods-dashboard__quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .eods-dashboard__metric-value {
+    font-size: var(--font-size-2xl);
+  }
+}

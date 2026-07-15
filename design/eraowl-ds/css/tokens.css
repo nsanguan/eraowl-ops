@@ -1,0 +1,352 @@
+/* ==========================================================================
+   Design Tokens — EraOwl Design System (EODS)
+   Version: 1.0.0
+   Format: CSS Custom Properties
+   Target: React 19 + FastAPI + Tailwind CSS 4
+   ========================================================================== */
+
+:root {
+  /* ========================================================================
+     Primary Color — Blue (#2563EB)
+     ======================================================================== */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #2563eb;
+  --color-primary-600: #1d4ed8;
+  --color-primary-700: #1e40af;
+  --color-primary-800: #1e3a8a;
+  --color-primary-900: #172554;
+
+  /* ========================================================================
+     Neutral / Secondary — Slate (#64748B)
+     ======================================================================== */
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  /* ========================================================================
+     Semantic — Success (#10B981)
+     ======================================================================== */
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-200: #a7f3d0;
+  --color-success-300: #6ee7b7;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #065f46;
+  --color-success-900: #064e3b;
+
+  /* ========================================================================
+     Semantic — Warning (#F59E0B)
+     ======================================================================== */
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+
+  /* ========================================================================
+     Semantic — Danger (#EF4444)
+     ======================================================================== */
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-200: #fecaca;
+  --color-danger-300: #fca5a5;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger-800: #991b1b;
+  --color-danger-900: #7f1d1d;
+
+  /* ========================================================================
+     Semantic — Info (#3B82F6)
+     ======================================================================== */
+  --color-info-50: #eff6ff;
+  --color-info-100: #dbeafe;
+  --color-info-200: #bfdbfe;
+  --color-info-300: #93c5fd;
+  --color-info-400: #60a5fa;
+  --color-info-500: #3b82f6;
+  --color-info-600: #2563eb;
+  --color-info-700: #1d4ed8;
+  --color-info-800: #1e40af;
+  --color-info-900: #1e3a8a;
+
+  /* ========================================================================
+     Surface Colors
+     ======================================================================== */
+  --color-surface-page: #ffffff;
+  --color-surface-region: #f8fafc;
+  --color-surface-card: #ffffff;
+  --color-surface-overlay: #ffffff;
+  --color-surface-selected: #eff6ff;
+  --color-surface-disabled: #f1f5f9;
+  --color-surface-hover: #f8fafc;
+
+  /* ========================================================================
+     Typography — Font Families
+     ======================================================================== */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Courier New',
+    monospace;
+  --font-family-display: var(--font-family-sans);
+
+  /* ========================================================================
+     Typography — Font Sizes (1.25 Major Third Scale)
+     ======================================================================== */
+  --font-size-2xs: 0.625rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+
+  /* ========================================================================
+     Typography — Font Weights
+     ======================================================================== */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* ========================================================================
+     Typography — Line Heights
+     ======================================================================== */
+  --line-height-none: 1;
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* ========================================================================
+     Typography — Letter Spacing
+     ======================================================================== */
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+
+  /* ========================================================================
+     Border Radius
+     ======================================================================== */
+  --radius-none: 0;
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-base: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ========================================================================
+     Spacing Scale (4px base / 0.25rem increments)
+     ======================================================================== */
+  --space-0: 0;
+  --space-0-5: 0.125rem;
+  --space-1: 0.25rem;
+  --space-1-5: 0.375rem;
+  --space-2: 0.5rem;
+  --space-2-5: 0.625rem;
+  --space-3: 0.75rem;
+  --space-3-5: 0.875rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 1.75rem;
+  --space-8: 2rem;
+  --space-9: 2.25rem;
+  --space-10: 2.5rem;
+  --space-11: 2.75rem;
+  --space-12: 3rem;
+  --space-14: 3.5rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-28: 7rem;
+  --space-32: 8rem;
+  --space-36: 9rem;
+  --space-40: 10rem;
+  --space-44: 11rem;
+  --space-48: 12rem;
+  --space-52: 13rem;
+  --space-56: 14rem;
+  --space-60: 15rem;
+  --space-64: 16rem;
+  --space-72: 18rem;
+  --space-80: 20rem;
+  --space-96: 24rem;
+
+  /* ========================================================================
+     Shadows / Elevation
+     ======================================================================== */
+  --shadow-none: none;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-base: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.3);
+  --shadow-focus-danger: 0 0 0 3px rgba(239, 68, 68, 0.3);
+
+  /* ========================================================================
+     Animation & Transitions
+     ======================================================================== */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-very-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ========================================================================
+     Z-Index Scale
+     ======================================================================== */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+  --z-debug: 9999;
+
+  /* ========================================================================
+     Layout
+     ======================================================================== */
+  --container-max-width: 1280px;
+  --container-narrow-width: 768px;
+  --container-wide-width: 1600px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 1024px;
+  --breakpoint-lg: 1280px;
+  --breakpoint-xl: 1536px;
+  --grid-columns: 12;
+  --grid-gutter: var(--space-4);
+
+  /* ========================================================================
+     Borders
+     ======================================================================== */
+  --border-width-thin: 1px;
+  --border-width-base: 1px;
+  --border-width-thick: 2px;
+  --border-style: solid;
+  --border-color-default: var(--color-neutral-200);
+  --border-color-strong: var(--color-neutral-300);
+  --border-color-focus: var(--color-primary-400);
+  --border-color-error: var(--color-danger-400);
+
+  /* ========================================================================
+     Component-Specific Tokens — Button
+     ======================================================================== */
+  --eods-btn-height-sm: 2rem;
+  --eods-btn-height-md: 2.5rem;
+  --eods-btn-height-lg: 3rem;
+  --eods-btn-height-xl: 3.5rem;
+  --eods-btn-padding-x-sm: var(--space-3);
+  --eods-btn-padding-x-md: var(--space-4);
+  --eods-btn-padding-x-lg: var(--space-6);
+  --eods-btn-font-size-sm: var(--font-size-xs);
+  --eods-btn-font-size-md: var(--font-size-sm);
+  --eods-btn-font-size-lg: var(--font-size-base);
+  --eods-btn-radius: var(--radius-base);
+  --eods-btn-transition: var(--transition-fast);
+
+  /* ========================================================================
+     Component-Specific Tokens — Form
+     ======================================================================== */
+  --eods-form-label-size: var(--font-size-sm);
+  --eods-form-label-weight: var(--font-weight-medium);
+  --eods-form-label-color: var(--color-neutral-700);
+  --eods-form-control-height: 2.5rem;
+  --eods-form-control-padding: var(--space-2) var(--space-3);
+  --eods-form-control-radius: var(--radius-sm);
+  --eods-form-control-bg: var(--color-surface-page);
+  --eods-form-control-border: var(--border-color-default);
+  --eods-form-control-focus-border: var(--border-color-focus);
+  --eods-form-hint-size: var(--font-size-xs);
+  --eods-form-hint-color: var(--color-neutral-400);
+  --eods-form-error-size: var(--font-size-xs);
+  --eods-form-error-color: var(--color-danger-600);
+
+  /* ========================================================================
+     Component-Specific Tokens — Card
+     ======================================================================== */
+  --eods-card-padding: var(--space-6);
+  --eods-card-radius: var(--radius-md);
+  --eods-card-shadow: var(--shadow-base);
+  --eods-card-shadow-hover: var(--shadow-md);
+  --eods-card-gap: var(--space-4);
+  --eods-card-bg: var(--color-surface-card);
+
+  /* ========================================================================
+     Component-Specific Tokens — Dialog
+     ======================================================================== */
+  --eods-dialog-radius: var(--radius-lg);
+  --eods-dialog-shadow: var(--shadow-xl);
+  --eods-dialog-padding: var(--space-6);
+  --eods-dialog-max-width-sm: 400px;
+  --eods-dialog-max-width-md: 560px;
+  --eods-dialog-max-width-lg: 720px;
+  --eods-dialog-max-width-xl: 960px;
+  --eods-dialog-bg: var(--color-surface-overlay);
+
+  /* ========================================================================
+     Component-Specific Tokens — Navigation
+     ======================================================================== */
+  --eods-nav-width: 240px;
+  --eods-nav-collapsed-width: 64px;
+  --eods-nav-bg: var(--color-neutral-800);
+  --eods-nav-text: var(--color-neutral-100);
+  --eods-nav-text-muted: var(--color-neutral-400);
+  --eods-nav-active-bg: var(--color-primary-600);
+  --eods-nav-hover-bg: var(--color-neutral-700);
+  --eods-nav-divider: var(--color-neutral-700);
+  --eods-nav-transition: var(--transition-base);
+
+  /* ========================================================================
+     Component-Specific Tokens — Interactive Grid
+     ======================================================================== */
+  --eods-ig-row-stripe: var(--color-neutral-50);
+  --eods-ig-row-hover: var(--color-primary-50);
+  --eods-ig-row-selected: var(--color-primary-100);
+  --eods-ig-cell-padding: var(--space-2) var(--space-3);
+  --eods-ig-header-bg: var(--color-neutral-100);
+  --eods-ig-header-text: var(--color-neutral-700);
+  --eods-ig-border: 1px solid var(--color-neutral-200);
+  --eods-ig-font-size: var(--font-size-sm);
+}

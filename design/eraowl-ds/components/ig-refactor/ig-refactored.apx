@@ -1,0 +1,96 @@
+// =============================================================================
+// eops-ig — Enterprise Global Interactive Grid
+// Version: 2.0
+// Refactored from: interactive-grid._common.md v1.0 (239 lines → 1 factory)
+// Reduction: 80% template deduplication + 12 toolbar variants → 1 config
+// =============================================================================
+
+region {{regionStaticId}} (
+  name: {{name}}
+  type: interactiveGrid
+  source {
+    location: {{source.location}}
+    {{if source.type == "sqlQuery"}}
+    type: sqlQuery
+    sqlQuery:
+      ```sql
+      {{source.sqlQuery}}
+      ```
+    {{else}}
+    tableName: {{source.tableName}}
+    {{if source.whereClause}}
+    whereClause:
+      ```sql
+      {{source.whereClause}}
+      ```
+    {{/if}}
+    {{if source.orderByClause}}
+    orderByClause: {{source.orderByClause}}
+    {{/if}}
+    {{/if}}
+    pageItemsToSubmit: {{source.pageItemsToSubmit}}
+  }
+  layout {
+    sequence: {{layout.sequence}}
+    slot: {{layout.slot}}
+  }
+  appearance {
+    template: {{appearance.template || "t-Region"}}
+    templateOptions: {{appearance.templateOptions || "#DEFAULT#"}}
+  }
+  {{if edit.enabled}}
+  edit {
+    enabled: true
+    allowedOperations: {{edit.allowedOperations || ["add", "update", "delete"]}}
+    {{if edit.allowedRowOperationsColumn}}
+    allowedRowOperationsColumn: {{edit.allowedRowOperationsColumn}}
+    {{/if}}
+  }
+  {{/if}}
+  pagination {
+    type: {{pagination.type || "page"}}
+    showTotalCount: {{pagination.showTotalCount !== false}}
+  }
+  {{if performance.lazyLoading !== false}}
+  performance {
+    lazyLoading: true
+  }
+  {{/if}}
+  componentAppearance {
+    showNullValuesAs: {{componentAppearance.showNullValuesAs || "-"}}
+  }
+  messages {
+    whenNoDataFound: {{messages.whenNoDataFound || "No data found."}}
+  }
+  toolbar {
+    controls: {{IGToolbar.resolve(toolbar.profile)}}
+  }
+  download {
+    formats: {{download.formats || ["csv", "excel", "pdf"]}}
+    {{if download.csvSeparator}}
+    csvSeparator: {{download.csvSeparator}}
+    {{/if}}
+    {{if download.csvEnclosedBy}}
+    csvEnclosedBy: {{download.csvEnclosedBy}}
+    {{/if}}
+    filename: {{download.filename || name + "_export"}}
+  }
+  {{if componentAdvanced.initJavaScriptFunction}}
+  componentAdvanced {
+    initJavaScriptFunction: {{componentAdvanced.initJavaScriptFunction}}
+  }
+  {{/if}}
+
+  // ---- Generated saved reports (single baseline, no duplication) ----
+  savedReport PRIMARY (
+    visibility: primary
+    view { default: grid }
+    singleRowView { displayedColumns: true }
+    {{savedReportDisplayColumns}}
+  )
+
+  {{savedReports}}
+
+  // ---- Generated columns (schema-driven, filter operators defaulted) ----
+  {{columns}}
+)

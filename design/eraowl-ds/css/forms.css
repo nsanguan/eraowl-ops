@@ -1,0 +1,507 @@
+/* ==========================================================================
+   Global Form — EraOwl Design System (EODS)
+   Version: 1.0.0
+   Target: React 19 + FastAPI + Tailwind CSS 4
+   ========================================================================== */
+
+/* ==========================================================================
+   Form Container
+   ========================================================================== */
+
+.eods-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+/* ==========================================================================
+   Form Grid Layouts
+   ========================================================================== */
+
+.eods-form--cols-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5) var(--space-6);
+}
+
+.eods-form--cols-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-5) var(--space-6);
+}
+
+.eods-form--cols-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: var(--space-5) var(--space-6);
+}
+
+.eods-form--responsive {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5) var(--space-6);
+}
+
+.eods-form--inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+/* ==========================================================================
+   Form Group (Field Wrapper)
+   ========================================================================== */
+
+.eods-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.eods-form__group--full {
+  grid-column: 1 / -1;
+}
+
+.eods-form__group--half {
+  grid-column: span 1;
+}
+
+/* ==========================================================================
+   Labels
+   ========================================================================== */
+
+.eods-form__label {
+  display: block;
+  font-size: var(--eods-form-label-size);
+  font-weight: var(--eods-form-label-weight);
+  color: var(--eods-form-label-color);
+  line-height: var(--line-height-snug);
+}
+
+.eods-form__required {
+  color: var(--color-danger-500);
+  margin-left: var(--space-0-5);
+}
+
+/* ==========================================================================
+   Form Controls (Input, Select, Textarea)
+   ========================================================================== */
+
+.eods-form__control {
+  display: block;
+  width: 100%;
+  height: var(--eods-form-control-height);
+  padding: var(--eods-form-control-padding);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--eods-text-primary);
+  background-color: var(--eods-form-control-bg);
+  border: 1px solid var(--eods-form-control-border);
+  border-radius: var(--eods-form-control-radius);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.eods-form__control::placeholder {
+  color: var(--color-neutral-300);
+  opacity: 1;
+}
+
+.eods-form__control:focus {
+  border-color: var(--eods-form-control-focus-border);
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.eods-form__control:disabled {
+  background-color: var(--color-surface-disabled);
+  color: var(--color-neutral-400);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.eods-form__control[readonly] {
+  background-color: var(--color-neutral-50);
+  cursor: default;
+}
+
+/* Textarea */
+.eods-form__textarea {
+  height: auto;
+  min-height: 6rem;
+  resize: vertical;
+  line-height: var(--line-height-relaxed);
+}
+
+.eods-form__textarea--auto-resize {
+  resize: none;
+  overflow: hidden;
+}
+
+/* Select */
+.eods-form__select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+  background-size: 12px 12px;
+  padding-right: var(--space-8);
+  cursor: pointer;
+}
+
+.eods-form__select[multiple] {
+  height: auto;
+  background-image: none;
+  padding-right: var(--space-3);
+}
+
+/* ==========================================================================
+   Hint & Help Text
+   ========================================================================== */
+
+.eods-form__hint {
+  font-size: var(--eods-form-hint-size);
+  color: var(--eods-form-hint-color);
+  line-height: var(--line-height-normal);
+}
+
+/* ==========================================================================
+   Error & Validation States
+   ========================================================================== */
+
+.eods-form__error {
+  font-size: var(--eods-form-error-size);
+  color: var(--eods-form-error-color);
+  line-height: var(--line-height-normal);
+  display: none;
+}
+
+.eods-form__group--error .eods-form__control {
+  border-color: var(--color-danger-400);
+}
+
+.eods-form__group--error .eods-form__control:focus {
+  border-color: var(--color-danger-500);
+  box-shadow: var(--shadow-focus-danger);
+}
+
+.eods-form__group--error .eods-form__error {
+  display: block;
+}
+
+.eods-form__group--error .eods-form__label {
+  color: var(--color-danger-600);
+}
+
+/* Warning */
+.eods-form__warning {
+  font-size: var(--eods-form-error-size);
+  color: var(--color-warning-700);
+  line-height: var(--line-height-normal);
+  display: none;
+}
+
+.eods-form__group--warning .eods-form__control {
+  border-color: var(--color-warning-400);
+}
+
+.eods-form__group--warning .eods-form__warning {
+  display: block;
+}
+
+/* Valid / Success */
+.eods-form__group--valid .eods-form__control {
+  border-color: var(--color-success-400);
+}
+
+.eods-form__icon-valid {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-success-500);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Character Counter
+   ========================================================================== */
+
+.eods-form__counter {
+  font-size: var(--eods-form-hint-size);
+  color: var(--eods-form-hint-color);
+  text-align: right;
+}
+
+.eods-form__group--error .eods-form__counter {
+  color: var(--eods-form-error-color);
+}
+
+/* ==========================================================================
+   Switch / Toggle
+   ========================================================================== */
+
+.eods-form__group--switch {
+  flex-direction: row;
+  align-items: center;
+}
+
+.eods-form__switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.eods-form__switch-track {
+  position: relative;
+  display: inline-flex;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.eods-form__switch-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.eods-form__switch-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-neutral-300);
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-fast);
+  cursor: pointer;
+}
+
+.eods-form__switch-thumb::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border-radius: var(--radius-full);
+  transition: transform var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+}
+
+.eods-form__switch-input:checked + .eods-form__switch-thumb {
+  background-color: var(--color-primary-500);
+}
+
+.eods-form__switch-input:checked + .eods-form__switch-thumb::after {
+  transform: translateX(20px);
+}
+
+.eods-form__switch-input:focus-visible + .eods-form__switch-thumb {
+  box-shadow: var(--shadow-focus);
+}
+
+.eods-form__switch-input:disabled + .eods-form__switch-thumb {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.eods-form__switch-text {
+  font-size: var(--font-size-sm);
+  color: var(--eods-text-primary);
+}
+
+/* ==========================================================================
+   Checkbox & Radio
+   ========================================================================== */
+
+.eods-form__checkbox-label,
+.eods-form__radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  user-select: none;
+}
+
+.eods-form__checkbox-input,
+.eods-form__radio-input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary-500);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Sizes: Compact & Large
+   ========================================================================== */
+
+.eods-form--compact .eods-form__control {
+  height: 2rem;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.eods-form--compact .eods-form__label {
+  font-size: var(--font-size-xs);
+}
+
+.eods-form--compact .eods-form__group {
+  gap: var(--space-0-5);
+}
+
+.eods-form--large .eods-form__control {
+  height: 3rem;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+}
+
+.eods-form--large .eods-form__label {
+  font-size: var(--font-size-base);
+}
+
+.eods-form--large .eods-form__group {
+  gap: var(--space-2);
+}
+
+/* ==========================================================================
+   Label Position: Left
+   ========================================================================== */
+
+.eods-form--label-left .eods-form__group {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  align-items: start;
+  gap: var(--space-3);
+}
+
+.eods-form--label-left .eods-form__group--full {
+  grid-template-columns: 1fr;
+}
+
+.eods-form--label-left .eods-form__label {
+  text-align: right;
+  padding-top: var(--space-2);
+}
+
+/* ==========================================================================
+   Floating Labels
+   ========================================================================== */
+
+.eods-form--label-floating .eods-form__group {
+  position: relative;
+}
+
+.eods-form--label-floating .eods-form__label {
+  position: absolute;
+  top: 50%;
+  left: var(--space-3);
+  transform: translateY(-50%);
+  background-color: var(--eods-form-control-bg);
+  padding: 0 var(--space-1);
+  transition: all var(--transition-fast);
+  pointer-events: none;
+  color: var(--color-neutral-400);
+}
+
+.eods-form--label-floating .eods-form__control:focus ~ .eods-form__label,
+.eods-form--label-floating .eods-form__control:not(:placeholder-shown) ~ .eods-form__label,
+.eods-form--label-floating .eods-form__select.has-value ~ .eods-form__label,
+.eods-form--label-floating .eods-form__textarea:focus ~ .eods-form__label,
+.eods-form--label-floating .eods-form__textarea:not(:placeholder-shown) ~ .eods-form__label {
+  top: 0;
+  transform: translateY(-50%);
+  font-size: var(--font-size-xs);
+  color: var(--color-primary-500);
+}
+
+/* ==========================================================================
+   Fieldset & Legend
+   ========================================================================== */
+
+.eods-form__fieldset {
+  border: 1px solid var(--border-color-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  margin: 0;
+}
+
+.eods-form__legend {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-700);
+  padding: 0 var(--space-2);
+}
+
+/* ==========================================================================
+   Form Actions / Footer
+   ========================================================================== */
+
+.eods-form__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-color-default);
+}
+
+.eods-form__actions--right {
+  justify-content: flex-end;
+}
+
+.eods-form__actions--between {
+  justify-content: space-between;
+}
+
+.eods-form__actions--centered {
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .eods-form--cols-2,
+  .eods-form--cols-3,
+  .eods-form--cols-4,
+  .eods-form--responsive {
+    grid-template-columns: 1fr;
+  }
+
+  .eods-form--label-left .eods-form__group {
+    grid-template-columns: 1fr;
+  }
+
+  .eods-form--label-left .eods-form__label {
+    text-align: left;
+    padding-top: 0;
+  }
+
+  .eods-form--inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .eods-form__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

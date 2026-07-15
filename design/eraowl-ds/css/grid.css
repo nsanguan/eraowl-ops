@@ -1,0 +1,517 @@
+/* ==========================================================================
+   Interactive Grid Standard — EraOwl Design System (EODS)
+   Version: 1.0.0
+   Target: React 19 + FastAPI + Tailwind CSS 4
+   ========================================================================== */
+
+.eods-ig {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font-size: var(--eods-ig-font-size);
+  background-color: var(--color-surface-page);
+  border: var(--eods-ig-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Toolbar
+   ========================================================================== */
+
+.eods-ig__toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--eods-ig-header-bg);
+  border-bottom: var(--eods-ig-border);
+  min-height: 3rem;
+}
+
+.eods-ig__toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.eods-ig__toolbar-search {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
+  margin-left: auto;
+}
+
+.eods-ig__toolbar-search .eods-form__control {
+  padding-left: var(--space-8);
+}
+
+.eods-ig__toolbar-search-icon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-neutral-400);
+  pointer-events: none;
+}
+
+.eods-ig__toolbar-divider {
+  width: 1px;
+  height: 1.5rem;
+  background-color: var(--border-color-default);
+  margin: 0 var(--space-1);
+}
+
+/* ==========================================================================
+   Table Container
+   ========================================================================== */
+
+.eods-ig__table-container {
+  overflow-x: auto;
+  flex: 1;
+}
+
+.eods-ig__table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.eods-ig__header-row {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.eods-ig__header-cell {
+  padding: var(--eods-ig-cell-padding);
+  font-size: var(--eods-ig-font-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--eods-ig-header-text);
+  background-color: var(--eods-ig-header-bg);
+  border-bottom: 2px solid var(--border-color-default);
+  text-align: left;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.eods-ig__header-cell--sortable {
+  cursor: pointer;
+}
+
+.eods-ig__header-cell--sortable:hover {
+  background-color: var(--color-neutral-200);
+}
+
+.eods-ig__header-cell--sorted {
+  color: var(--color-primary-600);
+}
+
+.eods-ig__header-cell--sorted::after {
+  content: '';
+  display: inline-block;
+  margin-left: var(--space-1);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+.eods-ig__header-cell--sorted-asc::after {
+  border-bottom: 5px solid currentColor;
+}
+
+.eods-ig__header-cell--sorted-desc::after {
+  border-top: 5px solid currentColor;
+}
+
+.eods-ig__header-cell--actions {
+  width: 3rem;
+  text-align: center;
+}
+
+.eods-ig__header-cell--selection {
+  width: 2.5rem;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Data Rows
+   ========================================================================== */
+
+.eods-ig__row {
+  transition: background-color var(--transition-fast);
+}
+
+.eods-ig__row:hover {
+  background-color: var(--eods-ig-row-hover);
+}
+
+.eods-ig__row--selected {
+  background-color: var(--eods-ig-row-selected);
+}
+
+.eods-ig__row--selected:hover {
+  background-color: var(--color-primary-200);
+}
+
+.eods-ig--striped .eods-ig__row:nth-child(even):not(:hover):not(.eods-ig__row--selected) {
+  background-color: var(--eods-ig-row-stripe);
+}
+
+/* ==========================================================================
+   Data Cells
+   ========================================================================== */
+
+.eods-ig__cell {
+  padding: var(--eods-ig-cell-padding);
+  border-bottom: var(--eods-ig-border);
+  color: var(--eods-text-primary);
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eods-ig__cell--editable {
+  cursor: pointer;
+  position: relative;
+}
+
+.eods-ig__cell--editable::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: var(--space-3);
+  right: var(--space-3);
+  height: 1px;
+  background-color: var(--color-primary-300);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.eods-ig__cell--editable:hover::after {
+  opacity: 1;
+}
+
+.eods-ig__cell--readonly {
+  cursor: default;
+}
+
+/* Cell Formatting */
+.eods-ig__cell--align-right { text-align: right; }
+.eods-ig__cell--align-center { text-align: center; }
+.eods-ig__cell--align-left { text-align: left; }
+
+/* Conditional Highlights */
+.eods-ig__cell--success { background-color: var(--color-success-50) !important; color: var(--color-success-700); }
+.eods-ig__cell--warning { background-color: var(--color-warning-50) !important; color: var(--color-warning-700); }
+.eods-ig__cell--danger { background-color: var(--color-danger-50) !important; color: var(--color-danger-700); }
+.eods-ig__cell--info { background-color: var(--color-info-50) !important; color: var(--color-info-700); }
+
+/* Column Width Utilities */
+.eods-ig__cell--width-xs { width: 4rem; }
+.eods-ig__cell--width-sm { width: 8rem; }
+.eods-ig__cell--width-md { width: 12rem; }
+.eods-ig__cell--width-lg { width: 16rem; }
+.eods-ig__cell--width-xl { width: 20rem; }
+
+/* ==========================================================================
+   Row Actions Menu
+   ========================================================================== */
+
+.eods-ig__row-actions {
+  position: relative;
+  display: inline-flex;
+}
+
+.eods-ig__row-actions-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: var(--radius-base);
+  color: var(--color-neutral-400);
+  transition: all var(--transition-fast);
+}
+
+.eods-ig__row-actions-btn:hover {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-600);
+}
+
+/* ==========================================================================
+   Bulk Actions
+   ========================================================================== */
+
+.eods-ig__bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-primary-50);
+  border-bottom: var(--eods-ig-border);
+}
+
+.eods-ig__bulk-actions-count {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-700);
+}
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+
+.eods-ig__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--eods-ig-header-bg);
+  border-top: var(--eods-ig-border);
+  flex-wrap: wrap;
+}
+
+.eods-ig__pagination-info {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-500);
+}
+
+.eods-ig__pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.eods-ig__pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-color-default);
+  background-color: var(--color-surface-page);
+  color: var(--color-neutral-600);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.eods-ig__pagination-btn:hover {
+  background-color: var(--color-neutral-100);
+  border-color: var(--color-neutral-300);
+}
+
+.eods-ig__pagination-btn--active {
+  background-color: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+  color: #ffffff;
+}
+
+.eods-ig__pagination-btn--active:hover {
+  background-color: var(--color-primary-600);
+}
+
+.eods-ig__pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.eods-ig__pagination-btn--prev,
+.eods-ig__pagination-btn--next {
+  font-size: var(--font-size-sm);
+}
+
+.eods-ig__pagination-rows-select {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-500);
+}
+
+.eods-ig__pagination-rows-select select {
+  height: 2rem;
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-xs);
+  border: 1px solid var(--border-color-default);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-page);
+}
+
+/* Compact Pagination */
+.eods-ig--paginated-compact .eods-ig__pagination {
+  padding: var(--space-2) var(--space-4);
+  justify-content: center;
+}
+
+.eods-ig--paginated-compact .eods-ig__pagination-info {
+  display: none;
+}
+
+/* ==========================================================================
+   No Data / Empty State
+   ========================================================================== */
+
+.eods-ig__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-16) var(--space-4);
+  text-align: center;
+  color: var(--color-neutral-400);
+}
+
+.eods-ig__empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+  opacity: 0.5;
+}
+
+.eods-ig__empty-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-500);
+  margin-bottom: var(--space-2);
+}
+
+.eods-ig__empty-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-400);
+  max-width: 400px;
+}
+
+/* ==========================================================================
+   Loading State
+   ========================================================================== */
+
+.eods-ig__loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: var(--z-dropdown);
+}
+
+/* ==========================================================================
+   Modifiers
+   ========================================================================== */
+
+.eods-ig--no-toolbar .eods-ig__toolbar {
+  display: none;
+}
+
+.eods-ig--fixed-header .eods-ig__table-container {
+  max-height: 500px;
+}
+
+.eods-ig--bordered .eods-ig__cell {
+  border-right: var(--eods-ig-border);
+}
+
+.eods-ig--bordered .eods-ig__cell:last-child {
+  border-right: none;
+}
+
+.eods-ig--compact .eods-ig__cell,
+.eods-ig--compact .eods-ig__header-cell {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+/* ==========================================================================
+   Export Menu
+   ========================================================================== */
+
+.eods-ig__export-menu {
+  position: relative;
+}
+
+.eods-ig__export-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--space-1);
+  min-width: 200px;
+  background-color: var(--color-surface-overlay);
+  border: 1px solid var(--border-color-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+  display: none;
+}
+
+.eods-ig__export-dropdown--open {
+  display: block;
+}
+
+.eods-ig__export-option {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: var(--font-size-sm);
+  color: var(--eods-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.eods-ig__export-option:hover {
+  background-color: var(--color-neutral-50);
+}
+
+.eods-ig__export-option + .eods-ig__export-option {
+  border-top: 1px solid var(--border-color-default);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .eods-ig__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+
+  .eods-ig__toolbar-search {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .eods-ig__pagination {
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .eods-ig__pagination-pages {
+    justify-content: center;
+  }
+}

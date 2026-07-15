@@ -1,0 +1,345 @@
+/* ==========================================================================
+   Theme: Dark — EraOwl Design System (EODS)
+   Version: 1.0.0
+   Target: React 19 + FastAPI + Tailwind CSS 4
+
+   Dark mode overrides using CSS custom properties.
+   No duplicate CSS — only variable reassignment.
+   ========================================================================== */
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* ========================================================================
+     Surface Colors — Dark Mode
+     ======================================================================== */
+  --color-surface-page: #0f172a;
+  --color-surface-region: #1e293b;
+  --color-surface-card: #1e293b;
+  --color-surface-overlay: #1e293b;
+  --color-surface-selected: #1e3a8a;
+  --color-surface-disabled: #1e293b;
+  --color-surface-hover: #334155;
+
+  /* ========================================================================
+     Neutral Colors — Inverted
+     ======================================================================== */
+  --color-neutral-50: #1e293b;
+  --color-neutral-100: #334155;
+  --color-neutral-200: #475569;
+  --color-neutral-300: #64748b;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #cbd5e1;
+  --color-neutral-600: #e2e8f0;
+  --color-neutral-700: #f1f5f9;
+  --color-neutral-800: #f8fafc;
+  --color-neutral-900: #ffffff;
+
+  /* ========================================================================
+     Border Colors
+     ======================================================================== */
+  --border-color-default: var(--color-neutral-700);
+  --border-color-strong: var(--color-neutral-600);
+  --border-color-focus: var(--color-primary-400);
+
+  /* ========================================================================
+     Text Colors
+     ======================================================================== */
+  --eods-text-primary: var(--color-neutral-900);
+  --eods-text-secondary: var(--color-neutral-500);
+  --eods-text-muted: var(--color-neutral-400);
+  --eods-text-link: var(--color-primary-400);
+  --eods-text-link-hover: var(--color-primary-300);
+
+  /* ========================================================================
+     Form-Specific Overrides
+     ======================================================================== */
+  --eods-form-label-color: var(--color-neutral-400);
+  --eods-form-control-bg: var(--color-neutral-800);
+  --eods-form-control-border: var(--color-neutral-600);
+  --eods-form-control-focus-border: var(--color-primary-400);
+  --eods-form-hint-color: var(--color-neutral-400);
+  --eods-form-error-color: var(--color-danger-400);
+
+  /* ========================================================================
+     Card
+     ======================================================================== */
+  --eods-card-bg: var(--color-surface-card);
+  --eods-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --eods-card-shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.4);
+
+  /* ========================================================================
+     Dialog
+     ======================================================================== */
+  --eods-dialog-bg: var(--color-surface-overlay);
+  --eods-dialog-shadow: 0 20px 25px rgba(0, 0, 0, 0.5);
+
+  /* ========================================================================
+     Navigation
+     ======================================================================== */
+  --eods-nav-bg: var(--color-neutral-800);
+  --eods-nav-text: var(--color-neutral-300);
+  --eods-nav-text-muted: var(--color-neutral-400);
+  --eods-nav-active-bg: var(--color-primary-600);
+  --eods-nav-hover-bg: var(--color-neutral-700);
+  --eods-nav-divider: var(--color-neutral-700);
+
+  /* ========================================================================
+     Interactive Grid
+     ======================================================================== */
+  --eods-ig-row-stripe: var(--color-neutral-700);
+  --eods-ig-row-hover: rgba(37, 99, 235, 0.1);
+  --eods-ig-row-selected: rgba(37, 99, 235, 0.2);
+  --eods-ig-header-bg: var(--color-neutral-800);
+  --eods-ig-header-text: var(--color-neutral-400);
+  --eods-ig-border: 1px solid var(--color-neutral-700);
+  --eods-ig-font-size: var(--font-size-sm);
+
+  /* ========================================================================
+     Backgrounds
+     ======================================================================== */
+  --eods-body-bg: var(--color-surface-page);
+  --eods-body-color: var(--eods-text-primary);
+
+  /* ========================================================================
+     Icon Colors
+     ======================================================================== */
+  --eods-icon-default: var(--color-neutral-400);
+  --eods-icon-active: var(--color-primary-400);
+  --eods-icon-muted: var(--color-neutral-500);
+
+  /* ========================================================================
+     Selection
+     ======================================================================== */
+  --eods-selection-bg: var(--color-primary-800);
+  --eods-selection-color: var(--color-neutral-100);
+
+  /* ========================================================================
+     Scrollbar
+     ======================================================================== */
+  --eods-scrollbar-track: var(--color-neutral-800);
+  --eods-scrollbar-thumb: var(--color-neutral-600);
+  --eods-scrollbar-thumb-hover: var(--color-neutral-500);
+
+  /* ========================================================================
+     Code
+     ======================================================================== */
+  --eods-code-bg: var(--color-neutral-700);
+  --eods-code-color: var(--color-danger-300);
+
+  /* ========================================================================
+     Blockquote
+     ======================================================================== */
+  --eods-blockquote-border: var(--color-primary-600);
+  --eods-blockquote-bg: var(--color-neutral-800);
+  --eods-blockquote-color: var(--color-neutral-400);
+
+  /* ========================================================================
+     Table
+     ======================================================================== */
+  --eods-table-header-bg: var(--color-neutral-800);
+  --eods-table-stripe-bg: var(--color-neutral-700);
+  --eods-table-hover-bg: rgba(37, 99, 235, 0.1);
+  --eods-table-border: var(--border-color-default);
+
+  /* ========================================================================
+     Shadows — Dark Mode (stronger)
+     ======================================================================== */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-base: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.6);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+  --shadow-focus: 0 0 0 3px rgba(96, 165, 250, 0.4);
+  --shadow-focus-danger: 0 0 0 3px rgba(248, 113, 113, 0.4);
+
+  /* ========================================================================
+     Link
+     ======================================================================== */
+  --eods-link-decoration: underline;
+
+  /* ========================================================================
+     Divider
+     ======================================================================== */
+  --eods-divider-color: var(--color-neutral-700);
+
+  /* ========================================================================
+     KBD
+     ======================================================================== */
+  --eods-kbd-bg: var(--color-neutral-700);
+  --eods-kbd-border: var(--color-neutral-500);
+  --eods-kbd-color: var(--color-neutral-300);
+}
+
+/* ==========================================================================
+   System Preference Dark Mode (auto-detection)
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --color-surface-page: #0f172a;
+    --color-surface-region: #1e293b;
+    --color-surface-card: #1e293b;
+    --color-surface-overlay: #1e293b;
+    --color-surface-selected: #1e3a8a;
+    --color-surface-disabled: #1e293b;
+    --color-surface-hover: #334155;
+
+    --color-neutral-50: #1e293b;
+    --color-neutral-100: #334155;
+    --color-neutral-200: #475569;
+    --color-neutral-300: #64748b;
+    --color-neutral-400: #94a3b8;
+    --color-neutral-500: #cbd5e1;
+    --color-neutral-600: #e2e8f0;
+    --color-neutral-700: #f1f5f9;
+    --color-neutral-800: #f8fafc;
+    --color-neutral-900: #ffffff;
+
+    --border-color-default: var(--color-neutral-700);
+    --border-color-strong: var(--color-neutral-600);
+
+    --eods-text-primary: var(--color-neutral-900);
+    --eods-text-secondary: var(--color-neutral-500);
+    --eods-text-muted: var(--color-neutral-400);
+    --eods-text-link: var(--color-primary-400);
+    --eods-text-link-hover: var(--color-primary-300);
+
+    --eods-form-label-color: var(--color-neutral-400);
+    --eods-form-control-bg: var(--color-neutral-800);
+    --eods-form-control-border: var(--color-neutral-600);
+    --eods-form-control-focus-border: var(--color-primary-400);
+    --eods-form-hint-color: var(--color-neutral-400);
+    --eods-form-error-color: var(--color-danger-400);
+
+    --eods-card-bg: var(--color-surface-card);
+    --eods-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --eods-card-shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.4);
+
+    --eods-dialog-bg: var(--color-surface-overlay);
+    --eods-dialog-shadow: 0 20px 25px rgba(0, 0, 0, 0.5);
+
+    --eods-nav-bg: var(--color-neutral-800);
+    --eods-nav-text: var(--color-neutral-300);
+    --eods-nav-text-muted: var(--color-neutral-400);
+    --eods-nav-active-bg: var(--color-primary-600);
+    --eods-nav-hover-bg: var(--color-neutral-700);
+    --eods-nav-divider: var(--color-neutral-700);
+
+    --eods-ig-row-stripe: var(--color-neutral-700);
+    --eods-ig-row-hover: rgba(37, 99, 235, 0.1);
+    --eods-ig-row-selected: rgba(37, 99, 235, 0.2);
+    --eods-ig-header-bg: var(--color-neutral-800);
+    --eods-ig-header-text: var(--color-neutral-400);
+    --eods-ig-border: 1px solid var(--color-neutral-700);
+
+    --eods-body-bg: var(--color-surface-page);
+    --eods-body-color: var(--eods-text-primary);
+
+    --eods-icon-default: var(--color-neutral-400);
+    --eods-icon-active: var(--color-primary-400);
+    --eods-icon-muted: var(--color-neutral-500);
+
+    --eods-selection-bg: var(--color-primary-800);
+    --eods-selection-color: var(--color-neutral-100);
+
+    --eods-scrollbar-track: var(--color-neutral-800);
+    --eods-scrollbar-thumb: var(--color-neutral-600);
+    --eods-scrollbar-thumb-hover: var(--color-neutral-500);
+
+    --eods-code-bg: var(--color-neutral-700);
+    --eods-code-color: var(--color-danger-300);
+
+    --eods-blockquote-border: var(--color-primary-600);
+    --eods-blockquote-bg: var(--color-neutral-800);
+    --eods-blockquote-color: var(--color-neutral-400);
+
+    --eods-table-header-bg: var(--color-neutral-800);
+    --eods-table-stripe-bg: var(--color-neutral-700);
+    --eods-table-hover-bg: rgba(37, 99, 235, 0.1);
+    --eods-table-border: var(--border-color-default);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-base: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5);
+    --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.6);
+    --shadow-focus: 0 0 0 3px rgba(96, 165, 250, 0.4);
+    --shadow-focus-danger: 0 0 0 3px rgba(248, 113, 113, 0.4);
+
+    --eods-link-decoration: underline;
+    --eods-divider-color: var(--color-neutral-700);
+    --eods-kbd-bg: var(--color-neutral-700);
+    --eods-kbd-border: var(--color-neutral-500);
+    --eods-kbd-color: var(--color-neutral-300);
+  }
+}
+
+/* ==========================================================================
+   Button Dark Mode Contrast Fixes
+   ========================================================================== */
+
+[data-theme='dark'] .eods-btn--secondary {
+  background-color: var(--color-neutral-600);
+  color: var(--color-neutral-100);
+  border-color: var(--color-neutral-500);
+}
+
+[data-theme='dark'] .eods-btn--secondary:hover {
+  background-color: var(--color-neutral-500);
+}
+
+[data-theme='dark'] .eods-btn--ghost {
+  color: var(--color-neutral-400);
+}
+
+[data-theme='dark'] .eods-btn--ghost:hover {
+  background-color: var(--color-neutral-700);
+  color: var(--color-neutral-200);
+}
+
+[data-theme='dark'] .eods-btn--outline {
+  border-color: var(--color-neutral-500);
+  color: var(--color-primary-400);
+}
+
+[data-theme='dark'] .eods-btn--outline:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .eods-btn--secondary {
+    background-color: var(--color-neutral-600);
+    color: var(--color-neutral-100);
+    border-color: var(--color-neutral-500);
+  }
+
+  :root:not([data-theme='light']) .eods-btn--secondary:hover {
+    background-color: var(--color-neutral-500);
+  }
+
+  :root:not([data-theme='light']) .eods-btn--ghost {
+    color: var(--color-neutral-400);
+  }
+
+  :root:not([data-theme='light']) .eods-btn--ghost:hover {
+    background-color: var(--color-neutral-700);
+    color: var(--color-neutral-200);
+  }
+
+  :root:not([data-theme='light']) .eods-btn--outline {
+    border-color: var(--color-neutral-500);
+    color: var(--color-primary-400);
+  }
+
+  :root:not([data-theme='light']) .eods-btn--outline:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+  }
+}

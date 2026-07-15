@@ -1,0 +1,311 @@
+/* ==========================================================================
+   Badge & Indicator — EraOwl Design System (EODS)
+   Version: 1.0.0
+   Target: React 19 + FastAPI + Tailwind CSS 4
+   ========================================================================== */
+
+/* ==========================================================================
+   Base Badge
+   ========================================================================== */
+
+.eods-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-0-5) var(--space-2);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  color: var(--color-neutral-700);
+  background-color: var(--color-neutral-100);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ==========================================================================
+   Size Variants
+   ========================================================================== */
+
+.eods-badge--sm {
+  padding: 0 var(--space-1-5);
+  font-size: var(--font-size-2xs);
+  line-height: 1.25rem;
+}
+
+.eods-badge--md {
+  padding: var(--space-0-5) var(--space-2-5);
+  font-size: var(--font-size-xs);
+}
+
+.eods-badge--lg {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-base);
+}
+
+/* ==========================================================================
+   Shape Variants
+   ========================================================================== */
+
+.eods-badge--pill {
+  border-radius: var(--radius-full);
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
+}
+
+.eods-badge--sm.eods-badge--pill {
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+
+/* ==========================================================================
+   Style Variants
+   ========================================================================== */
+
+.eods-badge--solid {
+  border-color: transparent;
+}
+
+.eods-badge--outline {
+  background-color: transparent;
+}
+
+.eods-badge--subtle {
+  border-color: transparent;
+}
+
+/* ==========================================================================
+   Color Variants — Default/Neutral
+   ========================================================================== */
+
+.eods-badge--default.eods-badge--solid {
+  background-color: var(--color-neutral-500);
+  color: #ffffff;
+}
+
+.eods-badge--default.eods-badge--outline {
+  border-color: var(--color-neutral-300);
+  color: var(--color-neutral-600);
+}
+
+.eods-badge--default.eods-badge--subtle {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-600);
+}
+
+/* ==========================================================================
+   Color Variants — Primary
+   ========================================================================== */
+
+.eods-badge--primary.eods-badge--solid {
+  background-color: var(--color-primary-500);
+  color: #ffffff;
+}
+
+.eods-badge--primary.eods-badge--outline {
+  border-color: var(--color-primary-300);
+  color: var(--color-primary-600);
+}
+
+.eods-badge--primary.eods-badge--subtle {
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+/* ==========================================================================
+   Color Variants — Success
+   ========================================================================== */
+
+.eods-badge--success.eods-badge--solid {
+  background-color: var(--color-success-500);
+  color: #ffffff;
+}
+
+.eods-badge--success.eods-badge--outline {
+  border-color: var(--color-success-300);
+  color: var(--color-success-600);
+}
+
+.eods-badge--success.eods-badge--subtle {
+  background-color: var(--color-success-50);
+  color: var(--color-success-700);
+}
+
+/* ==========================================================================
+   Color Variants — Warning
+   ========================================================================== */
+
+.eods-badge--warning.eods-badge--solid {
+  background-color: var(--color-warning-500);
+  color: #000000;
+}
+
+.eods-badge--warning.eods-badge--outline {
+  border-color: var(--color-warning-300);
+  color: var(--color-warning-700);
+}
+
+.eods-badge--warning.eods-badge--subtle {
+  background-color: var(--color-warning-50);
+  color: var(--color-warning-700);
+}
+
+/* ==========================================================================
+   Color Variants — Danger
+   ========================================================================== */
+
+.eods-badge--danger.eods-badge--solid {
+  background-color: var(--color-danger-500);
+  color: #ffffff;
+}
+
+.eods-badge--danger.eods-badge--outline {
+  border-color: var(--color-danger-300);
+  color: var(--color-danger-600);
+}
+
+.eods-badge--danger.eods-badge--subtle {
+  background-color: var(--color-danger-50);
+  color: var(--color-danger-700);
+}
+
+/* ==========================================================================
+   Color Variants — Info
+   ========================================================================== */
+
+.eods-badge--info.eods-badge--solid {
+  background-color: var(--color-info-500);
+  color: #ffffff;
+}
+
+.eods-badge--info.eods-badge--outline {
+  border-color: var(--color-info-300);
+  color: var(--color-info-600);
+}
+
+.eods-badge--info.eods-badge--subtle {
+  background-color: var(--color-info-50);
+  color: var(--color-info-700);
+}
+
+/* ==========================================================================
+   Badge with Icon
+   ========================================================================== */
+
+.eods-badge__icon {
+  font-size: 0.875em;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ==========================================================================
+   Dismissible Badge
+   ========================================================================== */
+
+.eods-badge--dismissible {
+  padding-right: var(--space-1);
+}
+
+.eods-badge__dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  margin-left: var(--space-1);
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: var(--font-size-2xs);
+  border-radius: var(--radius-full);
+  transition: opacity var(--transition-fast);
+}
+
+.eods-badge__dismiss:hover {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Dot Badge (Indicator)
+   ========================================================================== */
+
+.eods-badge--dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border-radius: var(--radius-full);
+  border: none;
+  line-height: 1;
+}
+
+.eods-badge--dot.eods-badge--sm { width: 0.375rem; height: 0.375rem; }
+.eods-badge--dot.eods-badge--lg { width: 0.75rem; height: 0.75rem; }
+
+/* ==========================================================================
+   Badge Group / Stack
+   ========================================================================== */
+
+.eods-badge-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Notification / Count Badge
+   ========================================================================== */
+
+.eods-badge--count {
+  position: relative;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25rem;
+  text-align: center;
+  border-radius: var(--radius-full);
+  background-color: var(--color-danger-500);
+  color: #ffffff;
+  border: 2px solid var(--color-surface-page);
+}
+
+.eods-badge--count.eods-badge--sm {
+  min-width: 1rem;
+  height: 1rem;
+  line-height: 1rem;
+  padding: 0 var(--space-0-5);
+  font-size: 0.5625rem;
+}
+
+/* ==========================================================================
+   Status Indicator
+   ========================================================================== */
+
+.eods-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-size: var(--font-size-sm);
+  color: var(--eods-text-secondary);
+}
+
+.eods-status__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.eods-status__dot--online { background-color: var(--color-success-500); }
+.eods-status__dot--offline { background-color: var(--color-neutral-300); }
+.eods-status__dot--away { background-color: var(--color-warning-500); }
+.eods-status__dot--busy { background-color: var(--color-danger-500); }
+.eods-status__dot--idle { background-color: var(--color-warning-300); }
