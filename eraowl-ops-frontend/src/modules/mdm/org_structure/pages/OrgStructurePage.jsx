@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import api from '../../../../api/client'
 import { Plus } from 'lucide-react'
 import { InteractiveGrid } from '../../../../shared-ui-kit/components/ui/InteractiveGrid'
+import { TreeGrid } from '../../../../shared-ui-kit/components/ui/TreeGrid'
 
 const TABS = [
   { key: 'corporates',    label: 'Corporates',    endpoint: '/org_structure/corporates',    idKey: 'corporate_id',      nameField: 'corp_name'  },
@@ -58,6 +59,94 @@ const FIELDS = {
   ],
 }
 
+function OrgTreeView({ data }) {
+  const corporates = data.corporates || []
+  const companies = data.companies || []
+  const businessUnits = data.businessUnits || []
+  const sites = data.sites || []
+  const warehouses = data.warehouses || []
+  const locators = data.locators || []
+
+  const treeNodes = useMemo(() => {
+    return corporates.map((corp) => {
+      const corpId = corp.corporate_id
+      const corpCompanies = companies.filter((c) => String(c.corporate_id) === String(corpId))
+      return {
+        id: `corp-${corpId}`,
+        data: { type: 'Corporate', name: corp.corp_name, code: corp.corp_code },
+        children: corpCompanies.map((comp) => {
+          const compId = comp.company_id
+          const compBus = businessUnits.filter((b) => String(b.company_id) === String(compId))
+          return {
+            id: `comp-${compId}`,
+            data: { type: 'Company', name: comp.legal_name, code: comp.company_code },
+            children: compBus.map((bu) => {
+              const buId = bu.business_unit_id
+              const buSites = sites.filter((s) => String(s.business_unit_id) === String(buId))
+              return {
+                id: `bu-${buId}`,
+                data: { type: 'Business Unit', name: bu.bu_name, code: bu.bu_code },
+                children: buSites.map((site) => {
+                  const siteId = site.site_id
+                  const siteWarehouses = warehouses.filter((w) => String(w.site_id) === String(siteId))
+                  return {
+                    id: `site-${siteId}`,
+                    data: { type: 'Site', name: site.site_name, code: site.site_code },
+                    children: siteWarehouses.map((wh) => {
+                      const whId = wh.warehouse_id
+                      const whLocators = locators.filter((l) => String(l.warehouse_id) === String(whId))
+                      return {
+                        id: `wh-${whId}`,
+                        data: { type: 'Warehouse', name: wh.warehouse_name, code: wh.warehouse_code },
+                        children: whLocators.map((loc) => ({
+                          id: `loc-${loc.warehouse_locator_id}`,
+                          data: { type: 'Locator', name: loc.locator_code, code: loc.locator_code },
+                        })),
+                      }
+                    }),
+                  }
+                }),
+              }
+            }),
+          }
+        }),
+      }
+    })
+  }, [corporates, companies, businessUnits, sites, warehouses, locators])
+
+  const treeColumns = [
+    { id: 'type', header: 'Level', width: '130px', render: (r) => (
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-outline">{r.type}</span>
+    )},
+    { id: 'name', header: 'Name', width: '250px', render: (r) => (
+      <span className="text-sm font-medium text-on-surface">{r.name}</span>
+    )},
+    { id: 'code', header: 'Code', width: '120px', render: (r) => (
+      <span className="text-xs font-mono text-outline">{r.code}</span>
+    )},
+  ]
+
+  if (treeNodes.length === 0) {
+    return <p className="text-sm text-outline py-4 text-center">No organization data available.</p>
+  }
+
+  return (
+    <TreeGrid
+      data={treeNodes}
+      columns={treeColumns}
+      nodeLabelAccessor={(r) => `${r.type}: ${r.name}`}
+      nodeIconAccessor={(r) =>
+        r.type === 'Corporate' ? 'business' :
+        r.type === 'Company' ? 'apartment' :
+        r.type === 'Business Unit' ? 'layers' :
+        r.type === 'Site' ? 'location_on' :
+        r.type === 'Warehouse' ? 'warehouse' : 'inventory_2'
+      }
+      nodeDescriptionAccessor={(r) => r.code || r.name}
+    />
+  )
+}
+
 export default function OrgStructurePage() {
   const [activeTab, setActiveTab] = useState('corporates')
   const [data, setData] = useState({})
@@ -69,6 +158,7 @@ export default function OrgStructurePage() {
   const [formError, setFormError] = useState(null)
   const [form, setForm] = useState({})
   const [lookupData, setLookupData] = useState({})
+  const [treeData, setTreeData] = useState({})
   const searchTimeout = useRef({})
 
   const resolveLabel = (lookupName, value) => {
@@ -143,6 +233,31 @@ export default function OrgStructurePage() {
       setLoading((prev) => ({ ...prev, [tabKey]: false }))
     }
   }, [])
+
+  const fetchAllTreeData = useCallback(async () => {
+    try {
+      const endpoints = [
+        ['corporates', '/org_structure/corporates'],
+        ['companies', '/org_structure/companies'],
+        ['businessUnits', '/org_structure/business-units'],
+        ['sites', '/org_structure/sites'],
+        ['warehouses', '/org_structure/warehouses'],
+        ['locators', '/org_structure/locators'],
+      ]
+      const results = {}
+      for (const [key, ep] of endpoints) {
+        try {
+          const { data: res } = await api.get(ep, { params: { page: 1, page_size: 200 } })
+          results[key] = res.items || res.data || []
+        } catch { results[key] = [] }
+      }
+      setTreeData(results)
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    fetchAllTreeData()
+  }, [fetchAllTreeData])
 
   useEffect(() => {
     const tabCfg = TABS.find((t) => t.key === activeTab)
@@ -277,6 +392,20 @@ export default function OrgStructurePage() {
           tableHeight="calc(100vh - 320px)"
         />
       )}
+
+      {/* ── ORG TREE VIEW ── */}
+      <details className="border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest group" open>
+        <summary className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-surface-container-low transition-colors text-sm font-semibold text-outline group-open:text-on-surface list-none">
+          <span className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">account_tree</span>
+            Organization Hierarchy
+          </span>
+          <span className="material-symbols-outlined text-[18px] transition-transform group-open:rotate-180">expand_more</span>
+        </summary>
+        <div className="border-t border-outline-variant p-4">
+          <OrgTreeView data={treeData} />
+        </div>
+      </details>
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
