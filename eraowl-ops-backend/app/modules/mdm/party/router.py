@@ -14,6 +14,7 @@ from app.modules.mdm.party.schemas import (
     PartyRoleOut, PartyRoleCreate, PartyRoleUpdate,
     SupplierOut, SupplierCreate, SupplierUpdate,
     CustomerOut, CustomerCreate, CustomerUpdate,
+    CompositePartyCreate, TcaPartyView,
 )
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
@@ -22,6 +23,26 @@ router = APIRouter(dependencies=[Depends(get_current_user)])
 def _build_paginated(items, total, page, page_size):
     total_pages = max(1, (total + page_size - 1) // page_size)
     return PaginatedResponse(items=items, total=total, page=page, page_size=page_size, total_pages=total_pages)
+
+
+# --- TCA Composite ---
+@router.post("/parties/composite", response_model=TcaPartyView, status_code=201)
+async def create_composite_party(
+    data: CompositePartyCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    svc = PartyService(db)
+    party = await svc.create_composite_party(data)
+    return await svc.get_tca_view(party.party_id)
+
+
+@router.get("/parties/{party_id}/tca-view", response_model=TcaPartyView)
+async def get_tca_view(
+    party_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    svc = PartyService(db)
+    return await svc.get_tca_view(party_id)
 
 
 # --- Addresses ---

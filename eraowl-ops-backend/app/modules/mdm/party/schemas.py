@@ -208,3 +208,43 @@ class CustomerOut(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class CompositeSiteInput(BaseModel):
+    country: str
+    address_line1: str
+    address_line2: Optional[str] = None
+    city: str
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    site_name: Optional[str] = None
+    site_uses: list[str] = []
+
+
+class CompositePartyCreate(BaseModel):
+    party_number: str
+    party_name: str
+    party_type: str = "ORGANIZATION"
+    tax_reference: Optional[str] = None
+    roles: list[str] = []
+    vendor_type_lookup_code: Optional[str] = None
+    payment_method_code: Optional[str] = None
+    customer_class_code: Optional[str] = None
+    credit_limit: Optional[float] = None
+    sites: list[CompositeSiteInput] = []
+
+
+class TcaSiteView(BaseModel):
+    party_site_id: uuid.UUID
+    party_site_number: str
+    site_name: Optional[str]
+    address: Optional[AddressOut] = None
+    site_uses: list[PartySiteUseOut] = []
+
+
+class TcaPartyView(BaseModel):
+    party: PartyOut
+    roles: list[PartyRoleOut] = []
+    supplier: Optional[SupplierOut] = None
+    customer: Optional[CustomerOut] = None
+    sites: list[TcaSiteView] = []

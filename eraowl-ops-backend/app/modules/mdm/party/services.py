@@ -178,3 +178,131 @@ class PartyService:
 
     async def delete_customer(self, entity_id: uuid.UUID):
         await self._delete(Customer, entity_id)
+
+    # ── TCA Composite ──
+    async def create_composite_party(self, data) -> Party:
+        from app.modules.mdm.party.schemas import CompositePartyCreate
+        from sqlalchemy import text
+
+        party = Party(
+            party_number=data.party_number,
+            party_name=data.party_name,
+            party_type=data.party_type,
+            tax_reference=data.tax_reference,
+        )
+        self.db.add(party)
+        await self.db.flush()
+
+        registered_roles = []
+        for role_type in data.roles:
+            pr = PartyRole(party_id=party.party_id, role_type=role_type)
+            self.db.add(pr)
+            await self.db.flush()
+            registered_roles.append(pr)
+
+            if role_type == "SUPPLIER":
+                supp = Supplier(
+                    party_id=party.party_id,
+                    party_role_id=pr.party_role_id,
+                    vendor_type_lookup_code=data.vendor_type_lookup_code,
+                    payment_method_code=data.payment_method_code,
+                )
+                self.db.add(supp)
+            elif role_type == "CUSTOMER":
+                cust = Customer(
+                    party_id=party.party_id,
+                    party_role_id=pr.party_role_id,
+                    customer_class_code=data.customer_class_code,
+                    credit_limit=data.credit_limit,
+                )
+                self.db.add(cust)
+
+        for site_data in data.sites:
+            addr = Address(
+                country=site_data.country,
+                address_line1=site_data.address_line1,
+                address_line2=site_data.address_line2,
+                city=site_data.city,
+                state=site_data.state,
+                postal_code=site_data.postal_code,
+            )
+            self.db.add(addr)
+            await self.db.flush()
+
+            ps = PartySite(
+                party_id=party.party_id,
+                address_id=addr.address_id,
+                party_site_number=f"{party.party_number}-{addr.address_id.hex[:6].upper()}",
+                site_name=site_data.site_name,
+            )
+            self.db.add(ps)
+            await self.db.flush()
+
+            for idx, su_type in enumerate(site_data.site_uses):
+                psu = PartySiteUse(
+                    party_site_id=ps.party_site_id,
+                    site_use_type=su_type,
+                    is_primary=(idx == 0),
+                )
+                self.db.add(psu)
+
+        await self.db.commit()
+        await self.db.refresh(party)
+        return party
+
+    async def get_tca_view(self, party_id: uuid.UUID) -> dict:
+        party = await self._get_by_id(Party, party_id)
+
+        roles_result = await self.db.execute(
+            select(PartyRole).where(PartyRole.party_id == party_id, PartyRole.is_deleted == False)
+        )
+        roles = list(roles_result.scalars().all())
+
+        supplier = None
+        customer = None
+        role_types = [r.role_type for r in roles]
+        if "SUPPLIER" in role_types:
+            sr = await self.db.execute(
+                select(Supplier).where(Supplier.party_id == party_id, Supplier.is_deleted == False)
+            )
+            supplier = sr.scalar_one_or_none()
+        if "CUSTOMER" in role_types:
+            cr = await self.db.execute(
+                select(Customer).where(Customer.party_id == party_id, Customer.is_deleted == False)
+            )
+            customer = cr.scalar_one_or_none()
+
+        sites_result = await self.db.execute(
+            select(PartySite).where(PartySite.party_id == party_id, PartySite.is_deleted == False)
+        )
+        sites = list(sites_result.scalars().all())
+
+        tca_sites = []
+        for ps in sites:
+            addr = None
+            if ps.address_id:
+                addr_result = await self.db.execute(
+                    select(Address).where(Address.address_id == ps.address_id)
+                )
+                addr = addr_result.scalar_one_or_none()
+
+            su_result = await self.db.execute(
+                select(PartySiteUse).where(PartySiteUse.party_site_id == ps.party_site_id, PartySiteUse.is_deleted == False)
+            )
+            site_uses = list(su_result.scalars().all())
+
+            tca_sites.append({
+                "party_site_id": ps.party_site_id,
+                "party_site_number": ps.party_site_number,
+                "site_name": ps.site_name,
+                "address": addr,
+                "site_uses": site_uses,
+            })
+
+        return {
+            "party": party,
+            "roles": roles,
+            "supplier": supplier,
+            "customer": customer,
+            "sites": tca_sites,
+        }
