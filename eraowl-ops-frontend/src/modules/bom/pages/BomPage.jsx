@@ -3,6 +3,7 @@ import api from '../../../api/client'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
 import { TreeGrid } from '../../../shared-ui-kit/components/ui/TreeGrid'
 import { StatusChip } from '../../../shared-ui-kit/components/ui/StatusChip'
+import { LovSection } from '../../../shared-ui-kit/components/ui/LovSection'
 import PermissionGuard from '../../../components/PermissionGuard'
 
 const BOM_STATUS_MAP = {
@@ -50,6 +51,7 @@ export default function BomPage() {
   const [editingBom, setEditingBom] = useState(null)
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [saving, setSaving] = useState(false)
+  const [lovOpen, setLovOpen] = useState(false)
 
   const fetchBomHeaders = useCallback(async () => {
     setLoading(true)
@@ -67,9 +69,11 @@ export default function BomPage() {
 
   const fetchItems = useCallback(async () => {
     try {
-      const { data } = await api.get('/item/items', { params: { page: 1, page_size: 500 } })
+      const { data } = await api.get('/item/items', { params: { page: 1, page_size: 100 } })
       setItems(data.items || [])
-    } catch { }
+    } catch (err) {
+      console.error('Failed to fetch items:', err)
+    }
   }, [])
 
   const fetchExplodedView = useCallback(async (bomHeaderId) => {
@@ -339,15 +343,19 @@ export default function BomPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-outline mb-1">Item *</label>
-                <select value={form.item_id} onChange={e => handleFormChange('item_id', e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary">
-                  <option value="">-- Select Item --</option>
-                  {items.map(item => (
-                    <option key={item.item_id} value={item.item_id}>
-                      {item.item_code} - {item.item_name}
-                    </option>
-                  ))}
-                </select>
+                <button type="button" onClick={() => setLovOpen(true)}
+                  className="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-left focus:border-primary focus:ring-1 focus:ring-primary flex items-center justify-between">
+                  <span className={form.item_id ? 'text-on-surface' : 'text-outline'}>
+                    {form.item_id ? items.find(i => i.item_id === form.item_id)?.item_code + ' - ' + items.find(i => i.item_id === form.item_id)?.item_name : '-- Select Item --'}
+                  </span>
+                  <span className="material-symbols-outlined text-[18px] text-outline">search</span>
+                </button>
+                {form.item_id && (
+                  <button type="button" onClick={() => handleFormChange('item_id', '')}
+                    className="mt-1 text-xs text-outline hover:text-on-surface">
+                    Clear
+                  </button>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -396,6 +404,26 @@ export default function BomPage() {
           </div>
         </div>
       )}
+
+      <LovSection
+        isOpen={lovOpen}
+        onClose={() => setLovOpen(false)}
+        onSelect={(row) => {
+          handleFormChange('item_id', row.item_id)
+          setLovOpen(false)
+        }}
+        title="Item"
+        columns={[
+          { key: 'item_code', header: 'Item Code', width: '120px' },
+          { key: 'item_name', header: 'Item Name', width: '200px' },
+          { key: 'item_type', header: 'Type', width: '100px' },
+        ]}
+        data={items}
+        searchOptions={[
+          { key: 'item_code', label: 'Item Code' },
+          { key: 'item_name', label: 'Item Name' },
+        ]}
+      />
     </div>
   )
 }
