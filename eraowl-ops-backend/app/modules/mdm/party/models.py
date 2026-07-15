@@ -171,6 +171,7 @@ class Customer(SQLModel, table=True):
     )
     party_id: uuid.UUID = Field(foreign_key="mdm.parties.party_id", unique=True)
     party_role_id: Optional[uuid.UUID] = Field(default=None, foreign_key="mdm.party_roles.party_role_id", nullable=True)
+    customer_code: Optional[str] = Field(default=None, max_length=50)
     customer_class_code: Optional[str] = Field(default=None, max_length=30)
     credit_limit: Optional[float] = Field(default=None, sa_column=Column(Float, nullable=True))
     payment_term_days: int = Field(default=30, sa_column=Column(Integer, default=30, nullable=False))

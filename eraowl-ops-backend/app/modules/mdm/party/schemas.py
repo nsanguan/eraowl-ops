@@ -188,6 +188,7 @@ class SupplierOut(BaseModel):
 class CustomerCreate(BaseModel):
     party_id: uuid.UUID
     party_role_id: Optional[uuid.UUID] = None
+    customer_code: Optional[str] = None
     customer_class_code: Optional[str] = None
     credit_limit: Optional[float] = None
     payment_term_days: int = 30
@@ -195,6 +196,7 @@ class CustomerCreate(BaseModel):
 
 
 class CustomerUpdate(BaseModel):
+    customer_code: Optional[str] = None
     customer_class_code: Optional[str] = None
     credit_limit: Optional[float] = None
     payment_term_days: Optional[int] = None
@@ -205,6 +207,7 @@ class CustomerOut(BaseModel):
     customer_id: uuid.UUID
     party_id: uuid.UUID
     party_role_id: Optional[uuid.UUID]
+    customer_code: Optional[str]
     customer_class_code: Optional[str]
     credit_limit: Optional[float]
     payment_term_days: int
