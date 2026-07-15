@@ -52,7 +52,7 @@ export default function PartyTcaManager() {
   // Guard against stale async responses
   const fetchIdRef = useRef(0)
   const selectedNodeRef = useRef(null)
-  const abortRef = useRef(null)
+  const detailPanelRef = useRef(null)
 
   const fetchParties = useCallback(async () => {
     setLoading(true)
@@ -113,6 +113,9 @@ export default function PartyTcaManager() {
     setSelectedNode(null)
     selectedNodeRef.current = null
     setExpanded({})
+    setTreeData([])
+    // Reset right-panel scroll to top
+    if (detailPanelRef.current) detailPanelRef.current.scrollTop = 0
     fetchTree(partyId)
   }, [selectedParty?.party_id])
 
@@ -225,11 +228,11 @@ export default function PartyTcaManager() {
         </div>
       }
       detailContent={
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col" key={selectedParty?.party_id || 'empty'}>
           {!selectedParty ? (
             <div className="flex items-center justify-center flex-1 text-outline text-sm">Select a party from the list</div>
           ) : (
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden" ref={detailPanelRef}>
               <div className="w-1/2 border-r border-outline-variant overflow-y-auto p-3 bg-surface-container-lowest/50">
                 <div className="flex items-center justify-between mb-2 px-1">
                   <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider">TCA Tree</h3>
@@ -237,12 +240,14 @@ export default function PartyTcaManager() {
                     <span className="material-symbols-outlined text-[16px]">refresh</span>
                   </button>
                 </div>
-                {treeData.length === 0 && !treeLoading ? (
+                {treeLoading && treeData.length === 0 ? (
                   <div className="text-sm text-outline py-8 text-center">Loading tree...</div>
-                ) : (
+                ) : treeData.length > 0 ? (
                   <div className={treeLoading ? 'opacity-60 pointer-events-none transition-opacity' : ''}>
                     {treeData.map((node) => <TreeNode key={node.node_id} node={node} depth={0} selected={selectedNode?.node_id} onSelect={handleTreeNodeSelect} onToggle={(nid) => setExpanded((p) => ({ ...p, [nid]: !p[nid] }))} expanded={expanded} />)}
                   </div>
+                ) : (
+                  <div className="text-sm text-outline py-8 text-center">No tree data available</div>
                 )}
                 <div className="flex gap-2 mt-3 px-1">
                   <button onClick={() => setShowAddRole(true)} className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-[10px] font-semibold hover:bg-primary/20 transition-colors">
