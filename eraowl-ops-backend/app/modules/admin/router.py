@@ -192,6 +192,24 @@ async def list_roles(
     return await svc.list_roles(page=page, page_size=page_size)
 
 
+# Permission Matrix — defined before {role_id} routes to avoid UUID matching
+@router.get("/roles/permission-matrix")
+async def get_permission_matrix(
+    svc: AdminService = Depends(get_service),
+    _priv=check_privilege("admin", "assign_privileges"),
+):
+    return await svc.get_permission_matrix()
+
+
+@router.put("/roles/permission-matrix/sync", status_code=status.HTTP_204_NO_CONTENT)
+async def sync_permission_matrix(
+    data: schemas.PermissionMatrixSync,
+    svc: AdminService = Depends(get_service),
+    _priv=check_privilege("admin", "assign_privileges"),
+):
+    await svc.sync_permission_matrix(data.matrix)
+
+
 @router.get("/roles/{role_id}", response_model=schemas.RoleOut)
 async def get_role(
     role_id: uuid.UUID,

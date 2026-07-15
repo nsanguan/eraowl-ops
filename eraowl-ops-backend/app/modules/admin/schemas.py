@@ -123,3 +123,13 @@ class RefreshRequest(BaseModel):
 
 class LogoutRequest(BaseModel):
     refresh_token: str
+
+
+class PermissionMatrixResponse(BaseModel):
+    roles: list[RoleOut]
+    privileges: list[PrivilegeOut]
+    matrix: dict[str, list[str]]
+
+
+class PermissionMatrixSync(BaseModel):
+    matrix: dict[str, list[str]]

@@ -618,3 +618,68 @@ class AdminService:
             )
         )
         return result.scalar_one_or_none()
+
+    async def get_permission_matrix(self) -> dict:
+        roles_result = await self.db.execute(
+            select(Role).order_by(Role.role_name)
+        )
+        roles = roles_result.scalars().all()
+
+        privileges_result = await self.db.execute(
+            select(Privilege).order_by(Privilege.module, Privilege.action)
+        )
+        privileges = privileges_result.scalars().all()
+
+        rp_rows = (await self.db.execute(select(RolePrivilege))).scalars().all()
+
+        matrix: dict[str, list[str]] = {}
+        for rp in rp_rows:
+            rid = str(rp.role_id)
+            pid = str(rp.privilege_id)
+            if rid not in matrix:
+                matrix[rid] = []
+            matrix[rid].append(pid)
+
+        return {
+            "roles": [{"role_id": str(r.role_id), "role_name": r.role_name, "description": r.description} for r in roles],
+            "privileges": [{"privilege_id": str(p.privilege_id), "module": p.module, "action": p.action, "description": p.description} for p in privileges],
+            "matrix": matrix,
+        }
+
+    async def sync_permission_matrix(self, matrix: dict[str, list[str]]) -> None:
+        role_ids = [uuid.UUID(rid) for rid in matrix.keys()]
+
+        for role_id in role_ids:
+            await self.db.execute(
+                delete(RolePrivilege).where(RolePrivilege.role_id == role_id)
+            )
+
+            priv_ids = matrix.get(str(role_id), [])
+            for pid in priv_ids:
+                rp = RolePrivilege(role_id=role_id, privilege_id=uuid.UUID(pid))
+                self.db.add(rp)
+
+            user_ids_result = await self.db.execute(
+                select(UserRole.user_id).where(UserRole.role_id == role_id)
+            )
+            user_ids = [row[0] for row in user_ids_result.all()]
+            if user_ids:
+                await self.db.execute(
+                    text(
+                        "UPDATE admin.users SET permission_version = permission_version + 1 "
+                        "WHERE user_id = ANY(:ids)"
+                    ),
+                    {"ids": user_ids},
+                )
+
+            try:
+                import redis.asyncio as aioredis
+                from app.core.config import settings
+                r = await aioredis.from_url(settings.REDIS_URL, decode_responses=True)
+                await r.set(f"perm_version:{role_id}", datetime.now(timezone.utc).timestamp())
+                await r.expire(f"perm_version:{role_id}", 900)
+                await r.aclose()
+            except Exception:
+                pass
+
+        await self.db.commit()
