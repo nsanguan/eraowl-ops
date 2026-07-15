@@ -185,6 +185,38 @@ class SupplierOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class SupplierSiteCreate(BaseModel):
+    supplier_id: uuid.UUID
+    address_id: uuid.UUID
+    site_name: Optional[str] = None
+    site_number: Optional[str] = None
+    is_primary: bool = False
+    is_active: bool = True
+
+
+class SupplierSiteUpdate(BaseModel):
+    address_id: Optional[uuid.UUID] = None
+    site_name: Optional[str] = None
+    site_number: Optional[str] = None
+    is_primary: Optional[bool] = None
+    is_active: Optional[bool] = None
+
+
+class SupplierSiteOut(BaseModel):
+    supplier_site_id: uuid.UUID
+    supplier_id: uuid.UUID
+    address_id: uuid.UUID
+    site_name: Optional[str]
+    site_number: Optional[str]
+    is_primary: bool
+    is_active: bool
+    is_deleted: bool
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 class CustomerCreate(BaseModel):
     party_id: uuid.UUID
     party_role_id: Optional[uuid.UUID] = None
@@ -211,6 +243,38 @@ class CustomerOut(BaseModel):
     customer_class_code: Optional[str]
     credit_limit: Optional[float]
     payment_term_days: int
+    is_active: bool
+    is_deleted: bool
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class CustomerSiteCreate(BaseModel):
+    customer_id: uuid.UUID
+    address_id: uuid.UUID
+    site_name: Optional[str] = None
+    site_number: Optional[str] = None
+    is_primary: bool = False
+    is_active: bool = True
+
+
+class CustomerSiteUpdate(BaseModel):
+    address_id: Optional[uuid.UUID] = None
+    site_name: Optional[str] = None
+    site_number: Optional[str] = None
+    is_primary: Optional[bool] = None
+    is_active: Optional[bool] = None
+
+
+class CustomerSiteOut(BaseModel):
+    customer_site_id: uuid.UUID
+    customer_id: uuid.UUID
+    address_id: uuid.UUID
+    site_name: Optional[str]
+    site_number: Optional[str]
+    is_primary: bool
     is_active: bool
     is_deleted: bool
     created_at: datetime

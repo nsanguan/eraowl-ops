@@ -13,7 +13,9 @@ from app.modules.mdm.party.schemas import (
     PartySiteUseOut, PartySiteUseCreate, PartySiteUseUpdate,
     PartyRoleOut, PartyRoleCreate, PartyRoleUpdate,
     SupplierOut, SupplierCreate, SupplierUpdate,
+    SupplierSiteOut, SupplierSiteCreate, SupplierSiteUpdate,
     CustomerOut, CustomerCreate, CustomerUpdate,
+    CustomerSiteOut, CustomerSiteCreate, CustomerSiteUpdate,
     CompositePartyCreate, TcaPartyView,
     TreeResponse, TreeUpdateRequest,
 )
@@ -288,6 +290,43 @@ async def delete_supplier(entity_id: uuid.UUID, db: AsyncSession = Depends(get_d
     await svc.delete_supplier(entity_id)
 
 
+# --- Supplier Sites ---
+@router.get("/supplier-sites", response_model=PaginatedResponse[SupplierSiteOut])
+async def list_supplier_sites(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    supplier_id: uuid.UUID | None = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
+    svc = PartyService(db)
+    items, total = await svc.list_supplier_sites(page, page_size, supplier_id)
+    return _build_paginated(items, total, page, page_size)
+
+
+@router.get("/supplier-sites/{entity_id}", response_model=SupplierSiteOut)
+async def get_supplier_site(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    svc = PartyService(db)
+    return await svc.get_supplier_site(entity_id)
+
+
+@router.post("/supplier-sites", response_model=SupplierSiteOut, status_code=201)
+async def create_supplier_site(data: SupplierSiteCreate, db: AsyncSession = Depends(get_db)):
+    svc = PartyService(db)
+    return await svc.create_supplier_site(data)
+
+
+@router.put("/supplier-sites/{entity_id}", response_model=SupplierSiteOut)
+async def update_supplier_site(entity_id: uuid.UUID, data: SupplierSiteUpdate, db: AsyncSession = Depends(get_db)):
+    svc = PartyService(db)
+    return await svc.update_supplier_site(entity_id, data)
+
+
+@router.delete("/supplier-sites/{entity_id}", status_code=204)
+async def delete_supplier_site(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    svc = PartyService(db)
+    await svc.delete_supplier_site(entity_id)
+
+
 # --- Customers ---
 @router.get("/customers", response_model=PaginatedResponse[CustomerOut])
 async def list_customers(
@@ -323,3 +362,40 @@ async def update_customer(entity_id: uuid.UUID, data: CustomerUpdate, db: AsyncS
 async def delete_customer(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
     svc = PartyService(db)
     await svc.delete_customer(entity_id)
+
+
+# --- Customer Sites ---
+@router.get("/customer-sites", response_model=PaginatedResponse[CustomerSiteOut])
+async def list_customer_sites(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    customer_id: uuid.UUID | None = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
+    svc = PartyService(db)
+    items, total = await svc.list_customer_sites(page, page_size, customer_id)
+    return _build_paginated(items, total, page, page_size)
+
+
+@router.get("/customer-sites/{entity_id}", response_model=CustomerSiteOut)
+async def get_customer_site(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    svc = PartyService(db)
+    return await svc.get_customer_site(entity_id)
+
+
+@router.post("/customer-sites", response_model=CustomerSiteOut, status_code=201)
+async def create_customer_site(data: CustomerSiteCreate, db: AsyncSession = Depends(get_db)):
+    svc = PartyService(db)
+    return await svc.create_customer_site(data)
+
+
+@router.put("/customer-sites/{entity_id}", response_model=CustomerSiteOut)
+async def update_customer_site(entity_id: uuid.UUID, data: CustomerSiteUpdate, db: AsyncSession = Depends(get_db)):
+    svc = PartyService(db)
+    return await svc.update_customer_site(entity_id, data)
+
+
+@router.delete("/customer-sites/{entity_id}", status_code=204)
+async def delete_customer_site(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    svc = PartyService(db)
+    await svc.delete_customer_site(entity_id)

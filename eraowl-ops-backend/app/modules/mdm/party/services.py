@@ -5,6 +5,7 @@ from sqlalchemy.sql import func
 
 from app.modules.mdm.party.models import (
     Address, Party, PartySite, PartySiteUse, PartyRole, Supplier, Customer,
+    SupplierSite, CustomerSite,
 )
 from app.modules.mdm.party.schemas import (
     AddressCreate, AddressUpdate,
@@ -13,7 +14,9 @@ from app.modules.mdm.party.schemas import (
     PartySiteUseCreate, PartySiteUseUpdate,
     PartyRoleCreate, PartyRoleUpdate,
     SupplierCreate, SupplierUpdate,
+    SupplierSiteCreate, SupplierSiteUpdate,
     CustomerCreate, CustomerUpdate,
+    CustomerSiteCreate, CustomerSiteUpdate,
 )
 from app.modules.mdm.party.exceptions import PartyNotFoundError
 
@@ -162,6 +165,23 @@ class PartyService:
     async def delete_supplier(self, entity_id: uuid.UUID):
         await self._delete(Supplier, entity_id)
 
+    # --- Supplier Sites ---
+    async def list_supplier_sites(self, page: int = 1, page_size: int = 20, supplier_id: uuid.UUID | None = None):
+        filters = {"supplier_id": supplier_id} if supplier_id else None
+        return await self._paginate(SupplierSite, page, page_size, filters)
+
+    async def get_supplier_site(self, entity_id: uuid.UUID):
+        return await self._get_by_id(SupplierSite, entity_id)
+
+    async def create_supplier_site(self, data: SupplierSiteCreate):
+        return await self._create(SupplierSite, data)
+
+    async def update_supplier_site(self, entity_id: uuid.UUID, data: SupplierSiteUpdate):
+        return await self._update(SupplierSite, entity_id, data)
+
+    async def delete_supplier_site(self, entity_id: uuid.UUID):
+        await self._delete(SupplierSite, entity_id)
+
     # --- Customers ---
     async def list_customers(self, page: int = 1, page_size: int = 20, party_id: uuid.UUID | None = None):
         filters = {"party_id": party_id} if party_id else None
@@ -178,6 +198,23 @@ class PartyService:
 
     async def delete_customer(self, entity_id: uuid.UUID):
         await self._delete(Customer, entity_id)
+
+    # --- Customer Sites ---
+    async def list_customer_sites(self, page: int = 1, page_size: int = 20, customer_id: uuid.UUID | None = None):
+        filters = {"customer_id": customer_id} if customer_id else None
+        return await self._paginate(CustomerSite, page, page_size, filters)
+
+    async def get_customer_site(self, entity_id: uuid.UUID):
+        return await self._get_by_id(CustomerSite, entity_id)
+
+    async def create_customer_site(self, data: CustomerSiteCreate):
+        return await self._create(CustomerSite, data)
+
+    async def update_customer_site(self, entity_id: uuid.UUID, data: CustomerSiteUpdate):
+        return await self._update(CustomerSite, entity_id, data)
+
+    async def delete_customer_site(self, entity_id: uuid.UUID):
+        await self._delete(CustomerSite, entity_id)
 
     # ── TCA Composite ──
     async def create_composite_party(self, data) -> Party:
