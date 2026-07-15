@@ -194,7 +194,7 @@ export default function PartyTcaManager() {
   }
 
   return (
-    <div className="h-[calc(100vh-7rem)]">
+    <div className="h-[calc(100vh-6.5rem)]">
     <MasterDetailSplit masterWidth="320px"
       masterContent={
         <div className="h-full flex flex-col">

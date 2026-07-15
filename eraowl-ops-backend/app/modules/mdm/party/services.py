@@ -321,7 +321,7 @@ class PartyService:
                 "node_id": f"role-{r.party_role_id}",
                 "node_type": "role_item",
                 "label": r.role_type,
-                "entity": {"party_role_id": str(r.party_id), "role_type": r.role_type},
+                "entity": {"party_role_id": str(r.party_role_id), "role_type": r.role_type},
             })
 
         site_nodes = []
@@ -362,7 +362,13 @@ class PartyService:
                     "party_site_id": str(ps.party_site_id),
                     "party_site_number": ps.party_site_number,
                     "site_name": ps.site_name,
-                    "address": addr_label,
+                    "address": {
+                        "country": addr.country if addr else "",
+                        "address_line1": addr.address_line1 if addr else "",
+                        "city": addr.city if addr else "",
+                        "state": addr.state if addr else "",
+                        "postal_code": addr.postal_code if addr else "",
+                    } if addr else None,
                 },
                 "children": use_nodes,
             })
@@ -437,6 +443,18 @@ class PartyService:
             if "party_site_id" in entity:
                 ps = await self._get_by_id(PartySite, uuid.UUID(entity["party_site_id"]))
                 ps.is_deleted = True
+
+        elif node_type == "site_item" and action == "update":
+            if "party_site_id" in entity:
+                from app.modules.mdm.party.models import Address as AddrModel
+                ps = await self._get_by_id(PartySite, uuid.UUID(entity["party_site_id"]))
+                if "site_name" in entity:
+                    ps.site_name = entity["site_name"]
+                if ps.address_id:
+                    addr = await self._get_by_id(AddrModel, ps.address_id)
+                    for field in ["country", "address_line1", "address_line2", "city", "state", "postal_code"]:
+                        if field in entity:
+                            setattr(addr, field, entity[field])
 
         elif node_type == "site_use" and action == "add":
             psu = PartySiteUse(

@@ -96,7 +96,7 @@ export default function Layout() {
           onOpenCommandBar={() => setCommandBarOpen(true)}
         />
 
-        <main className="mt-14 p-6 min-h-[calc(100vh-3.5rem)] overflow-y-auto bg-surface-container-lowest">
+        <main className="mt-14 p-6 h-[calc(100vh-3.5rem)] overflow-y-auto bg-surface-container-lowest">
           <Outlet />
         </main>
       </div>
