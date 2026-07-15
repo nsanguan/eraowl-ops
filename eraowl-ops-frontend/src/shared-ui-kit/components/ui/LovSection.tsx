@@ -8,7 +8,7 @@ export interface LovColumn {
   render?: (row: any) => React.ReactNode;
 }
 
-export interface LovModalProps {
+export interface LovSectionProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (row: any) => void;
@@ -18,7 +18,7 @@ export interface LovModalProps {
   searchOptions: { key: string; label: string }[];
 }
 
-export function LovModal({ isOpen, onClose, onSelect, title, columns, data, searchOptions }: LovModalProps) {
+export function LovSection({ isOpen, onClose, onSelect, title, columns, data, searchOptions }: LovSectionProps) {
   const [searchBy, setSearchBy] = useState(searchOptions[0]?.key || '');
   const [searchValue, setSearchValue] = useState('');
   const [appliedSearch, setAppliedSearch] = useState({ by: '', value: '' });

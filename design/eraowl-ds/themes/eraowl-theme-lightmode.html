@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Axon OS | New Order Entry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        /* Custom scrollbar for enterprise density */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f3f5; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#191c1d",
+                      "surface-container-low": "#f3f4f5",
+                      "inverse-on-surface": "#f0f1f2",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed": "#001a41",
+                      "on-tertiary-container": "#fefcff",
+                      "secondary-fixed-dim": "#bac7de",
+                      "error-container": "#ffdad6",
+                      "background": "#f8f9fa",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed-dim": "#adc7ff",
+                      "on-surface-variant": "#414754",
+                      "on-error": "#ffffff",
+                      "surface-tint": "#005bc0",
+                      "on-secondary-container": "#586579",
+                      "on-primary-container": "#fefcff",
+                      "surface-variant": "#e1e3e4",
+                      "on-surface": "#191c1d",
+                      "on-primary-fixed-variant": "#004493",
+                      "outline": "#717786",
+                      "surface-bright": "#f8f9fa",
+                      "on-primary": "#ffffff",
+                      "surface-container": "#edeeef",
+                      "on-tertiary-fixed": "#131b2e",
+                      "secondary-container": "#d6e3fb",
+                      "primary-fixed": "#d8e2ff",
+                      "on-secondary-fixed": "#0f1c2d",
+                      "tertiary-container": "#6c748b",
+                      "inverse-surface": "#2e3132",
+                      "primary-container": "#0070ea",
+                      "surface-container-highest": "#e1e3e4",
+                      "on-secondary-fixed-variant": "#3b485a",
+                      "on-tertiary": "#ffffff",
+                      "secondary": "#525f73",
+                      "surface-dim": "#d9dadb",
+                      "tertiary-fixed": "#dae2fd",
+                      "primary": "#0059bb",
+                      "inverse-primary": "#adc7ff",
+                      "outline-variant": "#c1c6d7",
+                      "surface": "#f8f9fa",
+                      "tertiary-fixed-dim": "#bec6e0",
+                      "tertiary": "#545c72",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed": "#d6e3fb",
+                      "on-tertiary-fixed-variant": "#3f465c",
+                      "error": "#ba1a1a",
+                      "surface-container-high": "#e7e8e9"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "gutter-desktop": "24px",
+                      "xs": "4px",
+                      "margin-desktop": "40px",
+                      "base": "8px",
+                      "lg": "24px",
+                      "margin-mobile": "16px",
+                      "gutter-mobile": "16px",
+                      "xl": "32px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "label-md": ["Inter"],
+                      "title-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "body-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "title-lg": ["20px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-md": ["30px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "headline-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "headline-sm": ["24px", {"lineHeight": "1.35", "fontWeight": "600"}],
+                      "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface">
+<div class="flex min-h-screen">
+<!-- SideNavBar - JSON Command Execution -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 h-full w-64 flex-shrink-0 bg-surface-dim dark:bg-inverse-surface border-r border-outline-variant">
+<div class="p-6">
+<div class="font-headline-sm text-headline-sm font-bold text-on-surface dark:text-inverse-on-surface mb-8">Axon OS</div>
+<div class="flex flex-col gap-1">
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer active:opacity-80 transition-all">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</button>
+<!-- Orders Active State -->
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary dark:text-inverse-primary font-bold border-r-2 border-primary bg-surface-container-high cursor-pointer active:opacity-80 transition-all">
+<span class="material-symbols-outlined" data-icon="shopping_cart" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+<span class="font-label-md text-label-md">Orders</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer active:opacity-80 transition-all">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md text-label-md">Inventory</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer active:opacity-80 transition-all">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Customers</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer active:opacity-80 transition-all">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="font-label-md text-label-md">Reports</span>
+</button>
+</div>
+</div>
+<div class="mt-auto p-6 space-y-1">
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md shadow-sm hover:opacity-90 transition-opacity mb-4">
+                    New Order
+                </button>
+<button class="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</button>
+<div class="flex items-center gap-3 mt-4 pt-4 border-t border-outline-variant">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A professional headshot of a senior software engineer in an office setting, soft natural lighting, high-quality digital photography with a blurred background of a modern tech workspace, neutral tones matching the light UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5qoXUudRG3NcwuYSZRLlRkR71q7F7OiAgAe9tepNG3J1uvi4on7LlAnQbGF_7Q2JlogynpCX0RJ8D7WPIib1WFjU_UZs977XppLd4Sq3R-7wps_BoIvHTheimTUxOQn_sVETKaEV1tCcvVCOn7-tYFUZgQy_iiMVOjXLVeY8YISPgRB_2pGO96gXihIWherFKrExHAcrgL4siHhNAx4Jh784ZTjIJN4LMIk9g54cijO0prGEB7mIk"/>
+<div class="overflow-hidden">
+<div class="font-label-md text-label-md truncate">Alex Chen</div>
+<div class="text-[10px] text-on-surface-variant opacity-70">Administrator</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-64 flex-1 flex flex-col min-w-0">
+<!-- TopNavBar - JSON Command Execution -->
+<header class="sticky top-0 z-30 flex justify-between items-center w-full px-6 py-3 bg-surface dark:bg-on-background border-b border-outline-variant">
+<div class="flex items-center gap-6 flex-1">
+<div class="font-headline-sm text-headline-sm font-black text-primary dark:text-inverse-primary">Order Entry</div>
+<!-- Search Bar on Left -->
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-sm font-body-sm focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" placeholder="Search orders, customers, or SKUs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<nav class="hidden md:flex gap-4 items-center mr-6">
+<a class="font-title-lg text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Drafts</a>
+<a class="font-title-lg text-label-md text-primary border-b-2 border-primary pb-1" href="#">Active</a>
+<a class="font-title-lg text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">History</a>
+</nav>
+<div class="flex items-center gap-1 border-l border-outline-variant pl-4">
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors relative scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="home">home</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors relative scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-primary" data-icon="psychology" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors scale-95 active:scale-90 transition-transform" id="dark-mode-toggle">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="dark_mode">dark_mode</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="help">help</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+<div class="ml-2 w-8 h-8 rounded-full overflow-hidden border border-outline-variant cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+<img class="w-full h-full object-cover" data-alt="A focused headshot of a business professional, sleek lighting, soft corporate background, high-resolution portrait for a web application profile icon." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNlsVgNFz8UbuPWR7BkkG5en4vq3wu3niYgwx0zKSupCCIzrHVzWkPoH0g9q98Kecldu606r5vgQjDyKtPW0uCaVXlHG-RKvZakeZCT6-f8ljArxcY0wSY-wJM7C0DYFz5pC7PgO66834HSvSQ5xtKcXkNBtSpXeCCqNsFUELkFGDS4kL9AYwzV2X0IGNCmdtV97e0k9Z7gIncf-Hco8hpEvLPmOBUQKiYTKe1ThHD7iPUICYQdhnR"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p- gutter-desktop flex-1">
+<div class="max-w-[1400px] mx-auto py-8">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md mb-4 opacity-70">
+<a class="hover:text-primary" href="#">Home</a>
+<span class="material-symbols-outlined text-[14px]" data-icon="chevron_right">chevron_right</span>
+<a class="hover:text-primary" href="#">Orders</a>
+<span class="material-symbols-outlined text-[14px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-on-surface font-bold">New Order</span>
+</nav>
+<!-- Header -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight">New Order</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Order Ref: <span class="font-mono bg-surface-container px-2 py-0.5 rounded text-primary">#ORD-2024-88421</span></p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2.5 bg-white border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-low transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="draft">draft</span>
+                                Save Draft
+                            </button>
+<button class="px-6 py-2.5 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="send">send</span>
+                                Submit Order
+                            </button>
+</div>
+</div>
+<!-- Main Grid Layout -->
+<div class="grid grid-cols-10 gap-gutter-desktop items-start">
+<!-- Left Column (70%) -->
+<div class="col-span-10 lg:col-span-7 space-y-6">
+<!-- Customer & Shipping Bento Section -->
+<div class="grid grid-cols-2 gap-6">
+<!-- Customer Information Card -->
+<div class="bg-white border border-outline-variant rounded-xl p-6 shadow-sm">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="person">person</span>
+<h3 class="font-title-lg text-label-md uppercase tracking-wider text-on-surface-variant">Customer Information</h3>
+</div>
+<div class="space-y-4">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant ml-1">Search Customer</label>
+<div class="relative">
+<input class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" type="text" value="Global Logistics Inc."/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant ml-1">Contact Name</label>
+<input class="w-full px-4 py-3 border border-outline-variant rounded-lg bg-surface-container-low text-on-surface cursor-not-allowed" readonly="" type="text" value="Sarah Jenkins"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant ml-1">Account Tier</label>
+<div class="px-4 py-3 border border-outline-variant rounded-lg bg-surface-container-low flex items-center gap-2">
+<span class="w-2 h-2 bg-green-500 rounded-full"></span>
+<span class="font-body-sm text-body-sm font-bold">Premium Enterprise</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Shipping Details Card -->
+<div class="bg-white border border-outline-variant rounded-xl p-6 shadow-sm">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="local_shipping">local_shipping</span>
+<h3 class="font-title-lg text-label-md uppercase tracking-wider text-on-surface-variant">Shipping Details</h3>
+</div>
+<div class="space-y-4">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant ml-1">Shipping Address</label>
+<div class="relative">
+<select class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none appearance-none bg-white">
+<option>HQ - 402 Tech Boulevard, SF, CA</option>
+<option>Warehouse - 12 Industrial Way, NV</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg border border-dashed border-outline flex items-start gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="info">info</span>
+<p class="font-body-sm text-[12px] leading-tight text-on-surface-variant">Free standard shipping applied based on Premium Account Tier benefits.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Items Table -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="flex justify-between items-center p-6 border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="list_alt">list_alt</span>
+<h3 class="font-title-lg text-label-md uppercase tracking-wider text-on-surface-variant">Order Items</h3>
+</div>
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-[18px]" data-icon="add_circle">add_circle</span>
+                                        Add Item
+                                    </button>
+</div>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Product Details</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant w-32">Quantity</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant text-right">Unit Price</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant text-right">Total</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant text-center w-20"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container rounded-lg flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up macro photography of a high-tech processor chip with glowing circuits, set against a dark glass background with vibrant blue accent lighting, modern industrial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5H6XXquIdqTlLF4ezdfzCkmN_8PHykl3rhcB3T4oneRCqSllLCO4twVJLHyWiRdLciFrHYO9qGZqjqE_GCV8H8nmNrOSESrTUEpgtCzH_aWPpXt-1ap1wMEHFpV4P7ijXXaHaFYjv3kKPNtMVc69_jLtuunpk8UjK613qR48nd6s2YISP1u1q8byWO8gCjPuTO8sNErLWLgnV1GvihI6_lIk2VzoM_0TsrtvUDfMF-GDlhfOTotYk"/>
+</div>
+<div>
+<div class="font-body-md text-body-md font-bold">Axon Edge Compute Node v4</div>
+<div class="text-[12px] text-on-surface-variant">SKU: AX-ECN-004-PR</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<input class="w-20 px-3 py-1.5 border border-outline-variant rounded-md text-center focus:ring-primary outline-none" type="number" value="12"/>
+</td>
+<td class="px-6 py-4 text-right font-mono text-body-sm">$1,250.00</td>
+<td class="px-6 py-4 text-right font-mono font-bold text-body-sm text-primary">$15,000.00</td>
+<td class="px-6 py-4 text-center">
+<button class="text-on-surface-variant hover:text-error opacity-0 group-hover:opacity-100 transition-all">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container rounded-lg flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A bundle of high-speed fiber optic cables with glowing blue tips, showing intricate glass fibers, professional product studio lighting, clean light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDpbghAVBVGkTq0JQ_0aY9PdkMcxIHPWfiiO4gyA5-GJx8Nme8DPvOXIny6XhWhEr4VLfFd1y4Cz6q3KxBpxhohdrdjKX2RqW2JEZL9wf7X_hiaCeu3mal2oQSQXLt0klQp-GKwOZv4vS3aL6ykOx2hWsjmgZYGkd3zu4yG0Nz7-z90Iq_I_O2M-taHnqio2vrq0-jsl4ciM9AgZ9uSFd9MbdhURPk3SCexUVLzXXRjN2GoxpQKCHF"/>
+</div>
+<div>
+<div class="font-body-md text-body-md font-bold">High-Bandwidth Fiber Link (10m)</div>
+<div class="text-[12px] text-on-surface-variant">SKU: CAB-FIB-10G-010</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<input class="w-20 px-3 py-1.5 border border-outline-variant rounded-md text-center focus:ring-primary outline-none" type="number" value="45"/>
+</td>
+<td class="px-6 py-4 text-right font-mono text-body-sm">$89.00</td>
+<td class="px-6 py-4 text-right font-mono font-bold text-body-sm text-primary">$4,005.00</td>
+<td class="px-6 py-4 text-center">
+<button class="text-on-surface-variant hover:text-error opacity-0 group-hover:opacity-100 transition-all">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+<tr class="bg-surface-container-low/30">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4 italic opacity-60">
+<div class="w-12 h-12 bg-outline-variant/20 rounded-lg border border-dashed border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</div>
+<div>
+<div class="font-body-md text-body-md">New Line Item...</div>
+</div>
+</div>
+</td>
+<td></td><td></td><td></td><td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Column (30%) - Order Summary -->
+<div class="col-span-10 lg:col-span-3 space-y-6 sticky top-24">
+<div class="bg-white border-2 border-primary rounded-xl shadow-xl overflow-hidden relative">
+<!-- Subtle pattern overlay -->
+<div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(#0059bb 1px, transparent 1px); background-size: 10px 10px;"></div>
+<div class="p-6 border-b border-outline-variant relative z-10 bg-primary/5">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary" data-icon="receipt_long" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+<h3 class="font-title-lg text-label-md uppercase tracking-wider text-primary">Order Summary</h3>
+</div>
+<p class="text-[11px] text-on-surface-variant font-medium">Calculated for <span class="text-on-surface">Global Logistics Inc.</span></p>
+</div>
+<div class="p-6 space-y-6 relative z-10">
+<div class="space-y-3">
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-sm text-body-sm">Subtotal</span>
+<span class="font-mono text-body-sm">$19,005.00</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-sm text-body-sm">Tax (8.5%)</span>
+<span class="font-mono text-body-sm">$1,615.43</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-sm text-body-sm">Shipping</span>
+<span class="font-mono text-body-sm text-green-600 font-bold">FREE</span>
+</div>
+<div class="pt-3 border-t border-outline-variant flex justify-between items-end">
+<span class="font-headline-sm text-label-md text-on-surface-variant uppercase">Total Amount</span>
+<div class="text-right">
+<div class="text-[10px] text-on-surface-variant font-mono mb-1">USD</div>
+<div class="font-headline-sm text-headline-sm text-primary tracking-tighter leading-none">$20,620.43</div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant ml-1">Payment Terms</label>
+<div class="px-4 py-3 border border-outline-variant rounded-lg bg-surface-container-low font-body-sm text-body-sm">
+                                                Net 30 Days
+                                            </div>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant ml-1">Order Notes (Internal)</label>
+<textarea class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none text-body-sm font-body-sm" placeholder="Add specific delivery instructions or discount overrides..." rows="3"></textarea>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded-lg font-headline-sm text-label-md shadow-lg shadow-primary/25 hover:translate-y-[-2px] transition-all flex justify-center items-center gap-2 group">
+                                        Process &amp; Confirm Order
+                                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<p class="text-center text-[10px] text-on-surface-variant italic">Final price includes applied enterprise discounts.</p>
+</div>
+</div>
+<!-- Quick Actions / Metadata Card -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex flex-col gap-3">
+<h4 class="font-label-md text-label-md text-on-surface-variant px-1">SYSTEM CHECKS</h4>
+<div class="flex items-center justify-between bg-white p-3 rounded-lg border border-outline-variant shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-green-500 text-[18px]" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm font-medium">Inventory Verified</span>
+</div>
+<span class="text-[10px] text-on-surface-variant">Live</span>
+</div>
+<div class="flex items-center justify-between bg-white p-3 rounded-lg border border-outline-variant shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-green-500 text-[18px]" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm font-medium">Credit Limit OK</span>
+</div>
+<span class="text-[10px] text-on-surface-variant">$250k Avail.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Background Subtle Decorative Element -->
+<div class="fixed top-0 right-0 -z-10 w-1/2 h-full opacity-[0.03] pointer-events-none overflow-hidden">
+<svg class="w-full h-full scale-150 text-primary" fill="currentColor" viewbox="0 0 1000 1000">
+<path d="M500,0 C223.858,0 0,223.858 0,500 C0,776.142 223.858,1000 500,1000 L500,500 L1000,500 C1000,223.858 776.142,0 500,0 Z"></path>
+</svg>
+</div>
+<script>
+        // Micro-interaction for dark mode toggle simulation
+        const toggleBtn = document.getElementById('dark-mode-toggle');
+        toggleBtn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const icon = toggleBtn.querySelector('span');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.textContent = 'light_mode';
+            } else {
+                icon.textContent = 'dark_mode';
+            }
+        });
+
+        // Simulating some input interactivity
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('focus', () => {
+                el.parentElement.parentElement.classList.add('ring-offset-2');
+            });
+            el.addEventListener('blur', () => {
+                el.parentElement.parentElement.classList.remove('ring-offset-2');
+            });
+        });
+    </script>
+</body></html>
