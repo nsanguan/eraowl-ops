@@ -11,6 +11,7 @@ import OrgStructurePage from './modules/mdm/org_structure/pages/OrgStructurePage
 import PartyPage from './modules/mdm/party/pages/PartyPage'
 import ItemPage from './modules/mdm/item/pages/ItemPage'
 import BomPage from './modules/bom/pages/BomPage'
+import DashboardHome from './components/DashboardHome'
 import CollaborationDashboard from './modules/collaboration/pages/Dashboard'
 import DiscussPage from './modules/collaboration/pages/DiscussPage'
 import ChatPage from './modules/collaboration/pages/ChatPage'
@@ -36,7 +37,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<div className="p-4"><h1 className="text-2xl font-bold text-on-surface">Welcome to EraOwl-OPS</h1><p className="text-sm text-outline mt-2">Use the sidebar to navigate between modules, or press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-surface-container-high rounded border border-outline-variant">⌘K</kbd> for quick search.</p></div>} />
+          <Route path="/" element={<DashboardHome />} />
           <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/roles" element={<RoleManagement />} />
           <Route path="/admin/objects" element={<ObjectsPage />} />
