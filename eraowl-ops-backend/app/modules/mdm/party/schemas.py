@@ -5,39 +5,33 @@ from datetime import datetime
 
 
 class AddressCreate(BaseModel):
+    country: str
     address_line1: str
     address_line2: Optional[str] = None
     city: str
-    state_province: str
-    postal_code: str
-    country_code: str
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
     is_active: bool = True
 
 
 class AddressUpdate(BaseModel):
+    country: Optional[str] = None
     address_line1: Optional[str] = None
     address_line2: Optional[str] = None
     city: Optional[str] = None
-    state_province: Optional[str] = None
+    state: Optional[str] = None
     postal_code: Optional[str] = None
-    country_code: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
     is_active: Optional[bool] = None
 
 
 class AddressOut(BaseModel):
     address_id: uuid.UUID
+    country: Optional[str]
     address_line1: str
     address_line2: Optional[str]
     city: str
-    state_province: Optional[str]
-    postal_code: str
-    country_code: str
-    latitude: Optional[float]
-    longitude: Optional[float]
+    state: Optional[str]
+    postal_code: Optional[str]
     is_active: bool
     is_deleted: bool
     created_at: datetime
@@ -47,24 +41,27 @@ class AddressOut(BaseModel):
 
 
 class PartyCreate(BaseModel):
-    party_type: str
+    party_number: str
     party_name: str
-    tax_id: Optional[str] = None
+    party_type: str = "ORGANIZATION"
+    tax_reference: Optional[str] = None
     is_active: bool = True
 
 
 class PartyUpdate(BaseModel):
-    party_type: Optional[str] = None
+    party_number: Optional[str] = None
     party_name: Optional[str] = None
-    tax_id: Optional[str] = None
+    party_type: Optional[str] = None
+    tax_reference: Optional[str] = None
     is_active: Optional[bool] = None
 
 
 class PartyOut(BaseModel):
     party_id: uuid.UUID
-    party_type: str
+    party_number: str
     party_name: str
-    tax_id: Optional[str]
+    party_type: str
+    tax_reference: Optional[str]
     is_active: bool
     is_deleted: bool
     created_at: datetime
@@ -76,15 +73,15 @@ class PartyOut(BaseModel):
 class PartySiteCreate(BaseModel):
     party_id: uuid.UUID
     address_id: uuid.UUID
+    party_site_number: str
     site_name: Optional[str] = None
-    is_primary: bool = False
     is_active: bool = True
 
 
 class PartySiteUpdate(BaseModel):
     address_id: Optional[uuid.UUID] = None
+    party_site_number: Optional[str] = None
     site_name: Optional[str] = None
-    is_primary: Optional[bool] = None
     is_active: Optional[bool] = None
 
 
@@ -92,8 +89,8 @@ class PartySiteOut(BaseModel):
     party_site_id: uuid.UUID
     party_id: uuid.UUID
     address_id: uuid.UUID
+    party_site_number: str
     site_name: Optional[str]
-    is_primary: bool
     is_active: bool
     is_deleted: bool
     created_at: datetime
@@ -104,19 +101,22 @@ class PartySiteOut(BaseModel):
 
 class PartySiteUseCreate(BaseModel):
     party_site_id: uuid.UUID
-    use_type: str
+    site_use_type: str
+    is_primary: bool = False
     is_active: bool = True
 
 
 class PartySiteUseUpdate(BaseModel):
-    use_type: Optional[str] = None
+    site_use_type: Optional[str] = None
+    is_primary: Optional[bool] = None
     is_active: Optional[bool] = None
 
 
 class PartySiteUseOut(BaseModel):
-    party_site_use_id: uuid.UUID
+    site_use_id: uuid.UUID
     party_site_id: uuid.UUID
-    use_type: str
+    site_use_type: str
+    is_primary: bool
     is_active: bool
     is_deleted: bool
     created_at: datetime
@@ -150,25 +150,27 @@ class PartyRoleOut(BaseModel):
 
 class SupplierCreate(BaseModel):
     party_id: uuid.UUID
-    supplier_code: str
+    party_role_id: Optional[uuid.UUID] = None
+    vendor_type_lookup_code: Optional[str] = None
+    payment_method_code: Optional[str] = None
     payment_term_days: int = 30
-    currency: str
     is_active: bool = True
 
 
 class SupplierUpdate(BaseModel):
-    supplier_code: Optional[str] = None
+    vendor_type_lookup_code: Optional[str] = None
+    payment_method_code: Optional[str] = None
     payment_term_days: Optional[int] = None
-    currency: Optional[str] = None
     is_active: Optional[bool] = None
 
 
 class SupplierOut(BaseModel):
     supplier_id: uuid.UUID
     party_id: uuid.UUID
-    supplier_code: str
+    party_role_id: Optional[uuid.UUID]
+    vendor_type_lookup_code: Optional[str]
+    payment_method_code: Optional[str]
     payment_term_days: int
-    currency: str
     is_active: bool
     is_deleted: bool
     created_at: datetime
@@ -179,14 +181,15 @@ class SupplierOut(BaseModel):
 
 class CustomerCreate(BaseModel):
     party_id: uuid.UUID
-    customer_code: str
+    party_role_id: Optional[uuid.UUID] = None
+    customer_class_code: Optional[str] = None
     credit_limit: Optional[float] = None
     payment_term_days: int = 30
     is_active: bool = True
 
 
 class CustomerUpdate(BaseModel):
-    customer_code: Optional[str] = None
+    customer_class_code: Optional[str] = None
     credit_limit: Optional[float] = None
     payment_term_days: Optional[int] = None
     is_active: Optional[bool] = None
@@ -195,7 +198,8 @@ class CustomerUpdate(BaseModel):
 class CustomerOut(BaseModel):
     customer_id: uuid.UUID
     party_id: uuid.UUID
-    customer_code: str
+    party_role_id: Optional[uuid.UUID]
+    customer_class_code: Optional[str]
     credit_limit: Optional[float]
     payment_term_days: int
     is_active: bool

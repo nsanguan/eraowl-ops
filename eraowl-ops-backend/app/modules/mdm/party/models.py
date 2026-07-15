@@ -1,7 +1,8 @@
 import uuid
-from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Optional
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, UniqueConstraint, func
+from datetime import datetime
+from typing import Optional
+
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -14,14 +15,12 @@ class Address(SQLModel, table=True):
         default_factory=uuid.uuid4,
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
+    country: str = Field(max_length=100)
     address_line1: str = Field(max_length=255)
     address_line2: Optional[str] = Field(default=None, max_length=255)
     city: str = Field(max_length=100)
-    state_province: str = Field(max_length=100)
-    postal_code: str = Field(max_length=20)
-    country_code: str = Field(max_length=5)
-    latitude: Optional[float] = Field(default=None, sa_column=Column(Float, nullable=True))
-    longitude: Optional[float] = Field(default=None, sa_column=Column(Float, nullable=True))
+    state: Optional[str] = Field(default=None, max_length=100)
+    postal_code: Optional[str] = Field(default=None, max_length=20)
     is_active: bool = Field(default=True, sa_column=Column(Boolean, default=True, nullable=False))
     is_deleted: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
     created_at: datetime = Field(
@@ -42,9 +41,10 @@ class Party(SQLModel, table=True):
         default_factory=uuid.uuid4,
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
-    party_type: str = Field(max_length=20)
+    party_number: str = Field(max_length=50, unique=True, index=True)
     party_name: str = Field(max_length=255)
-    tax_id: Optional[str] = Field(default=None, max_length=50)
+    party_type: str = Field(default="ORGANIZATION", sa_column=Column(String(20), default="ORGANIZATION", nullable=False))
+    tax_reference: Optional[str] = Field(default=None, max_length=50)
     is_active: bool = Field(default=True, sa_column=Column(Boolean, default=True, nullable=False))
     is_deleted: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
     created_at: datetime = Field(
@@ -68,10 +68,10 @@ class PartySite(SQLModel, table=True):
         default_factory=uuid.uuid4,
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
-    party_id: uuid.UUID = Field(foreign_key="mdm.parties.party_id")
-    address_id: uuid.UUID = Field(foreign_key="mdm.addresses.address_id")
+    party_id: uuid.UUID = Field(foreign_key="mdm.parties.party_id", nullable=False)
+    address_id: uuid.UUID = Field(foreign_key="mdm.addresses.address_id", nullable=False)
+    party_site_number: str = Field(max_length=50, unique=True, index=True)
     site_name: Optional[str] = Field(default=None, max_length=255)
-    is_primary: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
     is_active: bool = Field(default=True, sa_column=Column(Boolean, default=True, nullable=False))
     is_deleted: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
     created_at: datetime = Field(
@@ -90,12 +90,13 @@ class PartySiteUse(SQLModel, table=True):
     __tablename__ = "party_site_uses"
     __table_args__ = {"schema": "mdm"}
 
-    party_site_use_id: uuid.UUID = Field(
+    site_use_id: uuid.UUID = Field(
         default_factory=uuid.uuid4,
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
-    party_site_id: uuid.UUID = Field(foreign_key="mdm.party_sites.party_site_id")
-    use_type: str = Field(max_length=20)
+    party_site_id: uuid.UUID = Field(foreign_key="mdm.party_sites.party_site_id", nullable=False)
+    site_use_type: str = Field(max_length=20)
+    is_primary: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
     is_active: bool = Field(default=True, sa_column=Column(Boolean, default=True, nullable=False))
     is_deleted: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
     created_at: datetime = Field(
@@ -119,8 +120,8 @@ class PartyRole(SQLModel, table=True):
         default_factory=uuid.uuid4,
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
-    party_id: uuid.UUID = Field(foreign_key="mdm.parties.party_id")
-    role_type: str = Field(max_length=20)
+    party_id: uuid.UUID = Field(foreign_key="mdm.parties.party_id", nullable=False)
+    role_type: str = Field(max_length=30)
     is_active: bool = Field(default=True, sa_column=Column(Boolean, default=True, nullable=False))
     is_deleted: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
     created_at: datetime = Field(
@@ -142,9 +143,10 @@ class Supplier(SQLModel, table=True):
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
     party_id: uuid.UUID = Field(foreign_key="mdm.parties.party_id", unique=True)
-    supplier_code: str = Field(max_length=50, unique=True, index=True)
+    party_role_id: Optional[uuid.UUID] = Field(default=None, foreign_key="mdm.party_roles.party_role_id", nullable=True)
+    vendor_type_lookup_code: Optional[str] = Field(default=None, max_length=30)
+    payment_method_code: Optional[str] = Field(default=None, max_length=30)
     payment_term_days: int = Field(default=30, sa_column=Column(Integer, default=30, nullable=False))
-    currency: str = Field(max_length=10)
     is_active: bool = Field(default=True, sa_column=Column(Boolean, default=True, nullable=False))
     is_deleted: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
     created_at: datetime = Field(
@@ -166,7 +168,8 @@ class Customer(SQLModel, table=True):
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
     party_id: uuid.UUID = Field(foreign_key="mdm.parties.party_id", unique=True)
-    customer_code: str = Field(max_length=50, unique=True, index=True)
+    party_role_id: Optional[uuid.UUID] = Field(default=None, foreign_key="mdm.party_roles.party_role_id", nullable=True)
+    customer_class_code: Optional[str] = Field(default=None, max_length=30)
     credit_limit: Optional[float] = Field(default=None, sa_column=Column(Float, nullable=True))
     payment_term_days: int = Field(default=30, sa_column=Column(Integer, default=30, nullable=False))
     is_active: bool = Field(default=True, sa_column=Column(Boolean, default=True, nullable=False))
