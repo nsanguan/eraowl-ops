@@ -363,7 +363,7 @@ async def seed():
         # BOM for FG-001 (Industrial Water Pump)
         bom_header_id = uuid.uuid4()
         await db.execute(text(
-            "INSERT INTO mdm.bom_headers (id, item_id, revision, status, effective_date_from) VALUES (:id, :iid, :rev, :status, :eff)"
+            "INSERT INTO bom.bom_headers (id, item_id, revision, status, effective_date_from) VALUES (:id, :iid, :rev, :status, :eff)"
         ), {"id": bom_header_id, "iid": fg_item_id, "rev": "A", "status": "ACTIVE", "eff": date.today()})
 
         # BOM lines
@@ -373,16 +373,16 @@ async def seed():
         ]
         for comp_id, qty, uom, seq in bom_line_data:
             await db.execute(text(
-                "INSERT INTO mdm.bom_lines (id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES (:id, :bid, :cid, :qty, :uom, :seq, :eff)"
+                "INSERT INTO bom.bom_lines (id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES (:id, :bid, :cid, :qty, :uom, :seq, :eff)"
             ), {"id": uuid.uuid4(), "bid": bom_header_id, "cid": comp_id, "qty": qty, "uom": uom, "seq": seq, "eff": date.today()})
 
         # BOM for SA-001 (Motor Assembly)
         bom2_header_id = uuid.uuid4()
         await db.execute(text(
-            "INSERT INTO mdm.bom_headers (id, item_id, revision, status, effective_date_from) VALUES (:id, :iid, :rev, :status, :eff)"
+            "INSERT INTO bom.bom_headers (id, item_id, revision, status, effective_date_from) VALUES (:id, :iid, :rev, :status, :eff)"
         ), {"id": bom2_header_id, "iid": sa_item_id, "rev": "A", "status": "ACTIVE", "eff": date.today()})
         await db.execute(text(
-            "INSERT INTO mdm.bom_lines (id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES (:id, :bid, :cid, :qty, :uom, :seq, :eff)"
+            "INSERT INTO bom.bom_lines (id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES (:id, :bid, :cid, :qty, :uom, :seq, :eff)"
         ), {"id": uuid.uuid4(), "bid": bom2_header_id, "cid": rm_item_id, "qty": 5.0, "uom": kg_id, "seq": 10, "eff": date.today()})
 
         await db.commit()

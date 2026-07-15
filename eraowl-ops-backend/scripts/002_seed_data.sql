@@ -226,18 +226,18 @@ INSERT INTO mdm.item_supplier_xref (item_supplier_xref_id, item_id, supplier_id,
 -- ============================================================
 
 -- BOM for FG-001 (Industrial Water Pump)
-INSERT INTO mdm.bom_headers (bom_header_id, item_id, revision, status, effective_date_from) VALUES
+INSERT INTO bom.bom_headers (bom_header_id, item_id, revision, status, effective_date_from) VALUES
 ('88888888-8888-8888-8888-888888880001', '77777777-7777-7777-7777-777777770003', 'A', 'ACTIVE', CURRENT_DATE);
 
-INSERT INTO mdm.bom_lines (bom_line_id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES
+INSERT INTO bom.bom_lines (bom_line_id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES
 (gen_random_uuid(), '88888888-8888-8888-8888-888888880001', '77777777-7777-7777-7777-777777770001', 25.0, '55555555-5555-5555-5555-555555550002', 10, CURRENT_DATE),
 (gen_random_uuid(), '88888888-8888-8888-8888-888888880001', '77777777-7777-7777-7777-777777770002', 1.0, '55555555-5555-5555-5555-555555550001', 20, CURRENT_DATE);
 
 -- BOM for SA-001 (Motor Assembly)
-INSERT INTO mdm.bom_headers (bom_header_id, item_id, revision, status, effective_date_from) VALUES
+INSERT INTO bom.bom_headers (bom_header_id, item_id, revision, status, effective_date_from) VALUES
 ('88888888-8888-8888-8888-888888880002', '77777777-7777-7777-7777-777777770002', 'A', 'ACTIVE', CURRENT_DATE);
 
-INSERT INTO mdm.bom_lines (bom_line_id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES
+INSERT INTO bom.bom_lines (bom_line_id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES
 (gen_random_uuid(), '88888888-8888-8888-8888-888888880002', '77777777-7777-7777-7777-777777770001', 5.0, '55555555-5555-5555-5555-555555550002', 10, CURRENT_DATE);
 
 COMMIT;

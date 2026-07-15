@@ -9,7 +9,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 class BomHeader(SQLModel, table=True):
     __tablename__ = "bom_headers"
-    __table_args__ = {"schema": "mdm"}
+    __table_args__ = {"schema": "bom"}
 
     bom_header_id: uuid.UUID = Field(
         default_factory=uuid.uuid4,
@@ -34,13 +34,13 @@ class BomHeader(SQLModel, table=True):
 
 class BomLine(SQLModel, table=True):
     __tablename__ = "bom_lines"
-    __table_args__ = {"schema": "mdm"}
+    __table_args__ = {"schema": "bom"}
 
     bom_line_id: uuid.UUID = Field(
         default_factory=uuid.uuid4,
         sa_column=Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
-    bom_header_id: uuid.UUID = Field(foreign_key="mdm.bom_headers.bom_header_id")
+    bom_header_id: uuid.UUID = Field(foreign_key="bom.bom_headers.bom_header_id")
     component_item_id: uuid.UUID = Field(foreign_key="mdm.items.item_id")
     quantity_per: float = Field(default=1.0)
     uom_id: uuid.UUID = Field(foreign_key="mdm.uoms.uom_id")

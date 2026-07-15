@@ -18,6 +18,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.execute("CREATE SCHEMA IF NOT EXISTS mdm")
+    op.execute("CREATE SCHEMA IF NOT EXISTS bom")
     op.execute("CREATE SCHEMA IF NOT EXISTS admin")
 
     # =========================================================================
@@ -400,7 +401,7 @@ def upgrade() -> None:
     )
 
     # =========================================================================
-    # mdm schema — bom
+    # bom schema
     # =========================================================================
 
     op.create_table(
@@ -416,13 +417,13 @@ def upgrade() -> None:
         sa.Column("is_deleted", sa.Boolean(), server_default=sa.text("false")),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
-        schema="mdm",
+        schema="bom",
     )
 
     op.create_table(
         "bom_lines",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("bom_header_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("mdm.bom_headers.id"), nullable=False),
+        sa.Column("bom_header_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("bom.bom_headers.id"), nullable=False),
         sa.Column("component_item_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("mdm.items.id"), nullable=False),
         sa.Column("quantity_per", sa.Float(), nullable=False),
         sa.Column("uom_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("mdm.uoms.id"), nullable=False),
@@ -433,7 +434,7 @@ def upgrade() -> None:
         sa.Column("is_deleted", sa.Boolean(), server_default=sa.text("false")),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
-        schema="mdm",
+        schema="bom",
     )
 
     # =========================================================================
@@ -468,8 +469,8 @@ def downgrade() -> None:
     # mdm schema — bom
     # =========================================================================
 
-    op.drop_table("bom_lines", schema="mdm")
-    op.drop_table("bom_headers", schema="mdm")
+    op.drop_table("bom_lines", schema="bom")
+    op.drop_table("bom_headers", schema="bom")
 
     # =========================================================================
     # admin schema
@@ -523,5 +524,6 @@ def downgrade() -> None:
     # Schemas
     # =========================================================================
 
+    op.execute("DROP SCHEMA IF EXISTS bom CASCADE")
     op.execute("DROP SCHEMA IF EXISTS mdm CASCADE")
     op.execute("DROP SCHEMA IF EXISTS admin CASCADE")

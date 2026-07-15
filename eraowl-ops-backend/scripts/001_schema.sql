@@ -1,6 +1,7 @@
 DROP SCHEMA IF EXISTS org_structure, party, item, mdm, admin, bom CASCADE;
 
 CREATE SCHEMA IF NOT EXISTS mdm;
+CREATE SCHEMA IF NOT EXISTS bom;
 CREATE SCHEMA IF NOT EXISTS admin;
 
 -- ============================================================
@@ -317,7 +318,13 @@ CREATE TABLE admin.refresh_tokens (
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
-CREATE TABLE mdm.bom_headers (
+-- ============================================================
+
+-- ============================================================
+-- bom
+-- ============================================================
+
+CREATE TABLE bom.bom_headers (
     bom_header_id UUID DEFAULT uuidv7() NOT NULL PRIMARY KEY,
     item_id UUID NOT NULL REFERENCES mdm.items(item_id),
     alternate_bom_code VARCHAR(50),
@@ -331,9 +338,9 @@ CREATE TABLE mdm.bom_headers (
     updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
-CREATE TABLE mdm.bom_lines (
+CREATE TABLE bom.bom_lines (
     bom_line_id UUID DEFAULT uuidv7() NOT NULL PRIMARY KEY,
-    bom_header_id UUID NOT NULL REFERENCES mdm.bom_headers(bom_header_id) ON DELETE CASCADE,
+    bom_header_id UUID NOT NULL REFERENCES bom.bom_headers(bom_header_id) ON DELETE CASCADE,
     component_item_id UUID NOT NULL REFERENCES mdm.items(item_id),
     quantity_per DOUBLE PRECISION NOT NULL,
     uom_id UUID NOT NULL REFERENCES mdm.uoms(uom_id),
