@@ -173,7 +173,13 @@ class PartyService:
         return enriched, total
 
     async def get_supplier(self, entity_id: uuid.UUID):
-        return await self._get_by_id(Supplier, entity_id)
+        s = await self._get_by_id(Supplier, entity_id)
+        out = SupplierOut.model_validate(s)
+        party = await self._get_by_id(Party, s.party_id)
+        if party:
+            out.party_code = party.party_code
+            out.party_name = party.party_name
+        return out
 
     async def create_supplier(self, data: SupplierCreate):
         return await self._create(Supplier, data)
