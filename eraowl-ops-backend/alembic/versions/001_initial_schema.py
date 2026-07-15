@@ -400,6 +400,25 @@ def upgrade() -> None:
         schema="admin",
     )
 
+    op.create_table(
+        "objects",
+        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column("object_type", sa.String(50), nullable=False),
+        sa.Column("module_name", sa.String(100), nullable=True),
+        sa.Column("object_name", sa.String(255), nullable=False),
+        sa.Column("parent_object_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("admin.objects.id"), nullable=True),
+        sa.Column("description", sa.Text(), nullable=True),
+        sa.Column("metadata", postgresql.JSONB(), nullable=True),
+        sa.Column("is_active", sa.Boolean(), server_default=sa.text("true")),
+        sa.Column("is_deleted", sa.Boolean(), server_default=sa.text("false")),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        schema="admin",
+    )
+    op.create_index("ix_objects_type", "objects", ["object_type"], schema="admin")
+    op.create_index("ix_objects_module", "objects", ["module_name"], schema="admin")
+    op.create_index("ix_objects_parent", "objects", ["parent_object_id"], schema="admin")
+
     # =========================================================================
     # bom schema
     # =========================================================================
@@ -466,7 +485,7 @@ def downgrade() -> None:
     op.drop_index("ix_users_username", table_name="users", schema="admin")
 
     # =========================================================================
-    # mdm schema — bom
+    # bom schema
     # =========================================================================
 
     op.drop_table("bom_components", schema="bom")
@@ -476,6 +495,10 @@ def downgrade() -> None:
     # admin schema
     # =========================================================================
 
+    op.drop_index("ix_objects_parent", table_name="objects", schema="admin")
+    op.drop_index("ix_objects_module", table_name="objects", schema="admin")
+    op.drop_index("ix_objects_type", table_name="objects", schema="admin")
+    op.drop_table("objects", schema="admin")
     op.drop_table("refresh_tokens", schema="admin")
     op.drop_table("audit_logs", schema="admin")
     op.drop_table("user_business_units", schema="admin")

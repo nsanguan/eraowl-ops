@@ -34,8 +34,6 @@ MODULE_LABELS = {
     "item": "Item Master",
     "bom": "Bill of Materials",
     "po": "Purchase Order",
-    "gl": "General Ledger",
-    "om": "Order Management",
 }
 
 
@@ -246,7 +244,8 @@ async def main():
                 submodules.append(sub)
 
         for sm in submodules:
-            sm_name = sm.relative_to(BACKEND_MODULES).as_posix()
+            sm_rel = sm.relative_to(BACKEND_MODULES).as_posix()
+            sm_name = sm.name  # Use leaf name for API routes (e.g., org_structure not mdm/org_structure)
 
             # Models
             models_file = sm / "models.py"
@@ -258,7 +257,7 @@ async def main():
                         seen.add(key)
                         all_objects.append(obj)
 
-            # Endpoints
+            # Endpoints — use sm_name (leaf) so route prefix matches module_registry.py behavior
             router_file = sm / "router.py"
             if router_file.exists():
                 for obj in parse_endpoints(router_file, sm_name):
@@ -269,7 +268,7 @@ async def main():
                             seen.add(key)
                             all_objects.append(obj)
 
-            # Permissions
+            # Permissions — use module_name (top-level module) for permission module prefix
             perm_file = sm / "permissions.py"
             if perm_file.exists():
                 for obj in parse_permissions(perm_file, module_name):

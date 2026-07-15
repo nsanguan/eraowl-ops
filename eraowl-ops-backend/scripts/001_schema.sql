@@ -361,3 +361,25 @@ CREATE INDEX ix_items_item_code ON mdm.items(item_code);
 CREATE INDEX ix_privileges_module_action ON admin.privileges(module, action);
 CREATE INDEX ix_audit_logs_user_id ON admin.audit_logs(user_id);
 CREATE INDEX ix_audit_logs_target ON admin.audit_logs(target_entity, target_id);
+
+-- ============================================================
+-- admin.objects — code-level object catalog
+-- ============================================================
+
+CREATE TABLE admin.objects (
+    object_id UUID DEFAULT uuidv7() NOT NULL PRIMARY KEY,
+    object_type VARCHAR(50) NOT NULL,
+    module_name VARCHAR(100),
+    object_name VARCHAR(255) NOT NULL,
+    parent_object_id UUID REFERENCES admin.objects(object_id),
+    description TEXT,
+    metadata JSONB,
+    is_active BOOLEAN DEFAULT TRUE NOT NULL,
+    is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+CREATE INDEX ix_objects_type ON admin.objects(object_type);
+CREATE INDEX ix_objects_module ON admin.objects(module_name);
+CREATE INDEX ix_objects_parent ON admin.objects(parent_object_id);
