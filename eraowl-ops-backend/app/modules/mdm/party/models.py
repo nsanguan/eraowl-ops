@@ -42,6 +42,7 @@ class Party(SQLModel, table=True):
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
     party_number: str = Field(max_length=50, unique=True, index=True)
+    party_code: Optional[str] = Field(default=None, max_length=50)
     party_name: str = Field(max_length=255)
     party_type: str = Field(default="ORGANIZATION", sa_column=Column(String(20), default="ORGANIZATION", nullable=False))
     tax_reference: Optional[str] = Field(default=None, max_length=50)

@@ -42,6 +42,7 @@ class AddressOut(BaseModel):
 
 class PartyCreate(BaseModel):
     party_number: str
+    party_code: Optional[str] = None
     party_name: str
     party_type: str = "ORGANIZATION"
     tax_reference: Optional[str] = None
@@ -50,6 +51,7 @@ class PartyCreate(BaseModel):
 
 class PartyUpdate(BaseModel):
     party_number: Optional[str] = None
+    party_code: Optional[str] = None
     party_name: Optional[str] = None
     party_type: Optional[str] = None
     tax_reference: Optional[str] = None
@@ -59,6 +61,7 @@ class PartyUpdate(BaseModel):
 class PartyOut(BaseModel):
     party_id: uuid.UUID
     party_number: str
+    party_code: Optional[str]
     party_name: str
     party_type: str
     tax_reference: Optional[str]
