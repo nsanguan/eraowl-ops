@@ -150,7 +150,7 @@ export default function OrgStructurePage() {
       if (!lk) continue
       ;(async () => {
         try {
-          const { data: res } = await api.get(lk.endpoint, { params: { page: 1, page_size: 500 } })
+          const { data: res } = await api.get(lk.endpoint, { params: { page: 1, page_size: 100 } })
           setLookupData((prev) => ({ ...prev, [lk.endpoint]: res.items || res.data || [] }))
         } catch {}
       })()
