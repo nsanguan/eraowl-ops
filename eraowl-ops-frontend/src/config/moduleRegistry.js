@@ -111,6 +111,16 @@ export const MODULE_REGISTRY = [
     keywords: ['po', 'purchase order', 'procurement', 'buy', 'requisition'],
   },
   {
+    id: 'collab',
+    label: 'Collaboration',
+    icon: 'group',
+    path: '/collaboration',
+    area: 'supply_chain',
+    module: 'collaboration',
+    action: 'view',
+    keywords: ['collaboration', 'discuss', 'chat', 'task', 'team', 'calendar'],
+  },
+  {
     id: 'gl',
     label: 'General Ledger',
     icon: 'account_balance',

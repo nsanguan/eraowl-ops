@@ -67,6 +67,26 @@ export default function Header({
             <span className="material-symbols-outlined text-[20px]">home</span>
           </button>
 
+          <div className="w-px h-5 bg-outline-variant/50 mx-1" />
+
+          <button className="text-on-surface-variant hover:text-primary transition-colors" onClick={() => onNavigate?.('/collaboration/discuss')} title="Discuss">
+            <span className="material-symbols-outlined text-[20px]">forum</span>
+          </button>
+          <button className="text-on-surface-variant hover:text-primary transition-colors" onClick={() => onNavigate?.('/collaboration/chat')} title="Chat">
+            <span className="material-symbols-outlined text-[20px]">chat</span>
+          </button>
+          <button className="text-on-surface-variant hover:text-primary transition-colors" onClick={() => onNavigate?.('/collaboration/calendar')} title="Calendar">
+            <span className="material-symbols-outlined text-[20px]">calendar_month</span>
+          </button>
+          <button className="text-on-surface-variant hover:text-primary transition-colors" onClick={() => onNavigate?.('/collaboration/todo')} title="Tasks">
+            <span className="material-symbols-outlined text-[20px]">checklist</span>
+          </button>
+          <button className="text-on-surface-variant hover:text-primary transition-colors" onClick={() => onNavigate?.('/collaboration/activities')} title="Activities">
+            <span className="material-symbols-outlined text-[20px]">event_note</span>
+          </button>
+
+          <div className="w-px h-5 bg-outline-variant/50 mx-1" />
+
           <div className="relative">
             <button
               className="text-on-surface-variant hover:text-primary transition-colors"

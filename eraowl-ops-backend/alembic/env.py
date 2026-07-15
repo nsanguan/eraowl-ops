@@ -22,6 +22,7 @@ from app.modules.mdm.item import models as _item  # noqa: F401
 from app.modules.bom import models as _bom  # noqa: F401
 from app.modules.po import models as _po  # noqa: F401
 from app.modules.admin import models as _admin  # noqa: F401
+from app.modules.collaboration import models as _collab  # noqa: F401
 
 target_metadata = SQLModel.metadata
 
