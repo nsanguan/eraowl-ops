@@ -26,23 +26,23 @@ export default function DashboardHome() {
   return (
     <div className="p-6 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-on-surface">EraOwl-OPS</h1>
-        <p className="text-sm text-outline mt-1">AI-powered ERP platform — select a module to get started</p>
+        <h1 className="text-2xl font-bold text-[var(--on-surface)]">EraOwl-OPS</h1>
+        <p className="text-sm text-[var(--on-surface-variant)] mt-1">AI-powered ERP platform — select a module to get started</p>
       </div>
 
       {Object.keys(groupedAreas).length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-outline">
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--on-surface-variant)]">
           <span className="material-symbols-outlined text-[64px] mb-4">dashboard_customize</span>
-          <p className="text-lg font-semibold text-on-surface">Welcome to EraOwl-OPS</p>
-          <p className="text-sm mt-1">Use the sidebar to navigate, or press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-surface-container-high rounded border border-outline-variant">⌘K</kbd> for quick search.</p>
+          <p className="text-lg font-semibold text-[var(--on-surface)]">Welcome to EraOwl-OPS</p>
+          <p className="text-sm mt-1 text-[var(--on-surface-variant)]">Use the sidebar to navigate, or press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-surface-container-high rounded border border-outline-variant">⌘K</kbd> for quick search.</p>
         </div>
       ) : (
         Object.entries(groupedAreas).map(([areaId, area]) => (
           <section key={areaId}>
             <div className="flex items-center gap-2 mb-3">
               <span className="material-symbols-outlined text-[20px]" style={{ color: area.color }}>{area.icon}</span>
-              <h2 className="text-sm font-bold text-on-surface">{area.label}</h2>
-              <span className="text-[10px] text-outline bg-surface-container-high px-1.5 py-0.5 rounded-full">{area.modules.length}</span>
+              <h2 className="text-sm font-bold text-[var(--on-surface)]">{area.label}</h2>
+              <span className="text-[10px] text-[var(--on-surface-variant)] bg-surface-container-high px-1.5 py-0.5 rounded-full">{area.modules.length}</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {area.modules.map((mod) => (
@@ -51,8 +51,8 @@ export default function DashboardHome() {
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors" style={{ backgroundColor: `${area.color}15` }}>
                     <span className="material-symbols-outlined text-[22px]" style={{ color: area.color }}>{mod.icon}</span>
                   </div>
-                  <span className="text-[11px] font-semibold text-on-surface leading-tight">{mod.label}</span>
-                  <span className="text-[9px] text-outline leading-tight opacity-0 group-hover:opacity-100 transition-opacity">Open {mod.label}</span>
+                  <span className="text-[11px] font-semibold text-[var(--on-surface)] leading-tight">{mod.label}</span>
+                  <span className="text-[9px] text-[var(--on-surface-variant)] leading-tight opacity-0 group-hover:opacity-100 transition-opacity">Open {mod.label}</span>
                 </button>
               ))}
             </div>
@@ -61,7 +61,7 @@ export default function DashboardHome() {
       )}
 
       <div className="border-t border-outline-variant/50 pt-6 pb-10">
-        <p className="text-[10px] text-outline text-center">
+        <p className="text-[10px] text-[var(--on-surface-variant)] text-center">
           EraOwl-OPS v0.1.0 — {accessibleModules.length} modules available across {Object.keys(groupedAreas).length} functional areas
         </p>
       </div>
