@@ -73,69 +73,107 @@
   --font-mono: 'JetBrains Mono', monospace;
 }
 
-/* ── EraOwl Design System — Dark Mode ── */
+/* ── EraOwl Design System — Dark Mode (WCAG AAA — 7:1 min) ── */
 .dark {
-  --background: #10131b;
-  --foreground: #e0e2ed;
-  --surface: #10131b;
-  --surface-dim: #10131b;
-  --surface-bright: #363942;
-  --surface-container-lowest: #0b0e16;
-  --surface-container-low: #181c23;
-  --surface-container: #1c2027;
-  --surface-container-high: #272a32;
-  --surface-container-highest: #31353d;
-  --surface-variant: #31353d;
-  --on-surface: #e0e2ed;
-  --on-surface-variant: #c1c6d7;
-  --on-background: #e0e2ed;
-  --outline: #8b90a0;
-  --outline-variant: #414754;
+  /* ── Base Canvas ── */
+  --background: oklch(0.13 0.015 250);
+  --foreground: oklch(0.98 0.008 240);
+  --surface: oklch(0.13 0.015 250);
+  --surface-dim: oklch(0.11 0.015 250);
+  --surface-bright: oklch(0.28 0.015 250);
 
-  --primary: #adc7ff;
-  --primary-container: #4a8eff;
-  --on-primary: #002e68;
-  --on-primary-container: #00285b;
-  --primary-fixed: #d8e2ff;
-  --primary-fixed-dim: #adc7ff;
-  --on-primary-fixed: #001a41;
-  --on-primary-fixed-variant: #004493;
-  --inverse-primary: #005bc0;
+  /* ── Surface Hierarchy (darkest → lightest) ── */
+  --surface-container-lowest: oklch(0.09 0.015 250);
+  --surface-container-low: oklch(0.15 0.015 250);
+  --surface-container: oklch(0.18 0.015 250);
+  --surface-container-high: oklch(0.22 0.015 250);
+  --surface-container-highest: oklch(0.27 0.02 250);
+  --surface-variant: oklch(0.27 0.02 250);
 
-  --secondary: #bdf4ff;
-  --secondary-container: #00e3fd;
-  --on-secondary: #00363d;
-  --on-secondary-container: #00616d;
-  --secondary-fixed: #9cf0ff;
-  --secondary-fixed-dim: #00daf3;
-  --on-secondary-fixed: #001f24;
-  --on-secondary-fixed-variant: #004f58;
+  /* ── Text (WCAG AAA: 7:1 min on darkest bg #111) ── */
+  --on-surface: oklch(0.98 0.008 240);
+  --on-surface-variant: oklch(0.93 0.008 240);
+  --on-background: oklch(0.98 0.008 240);
 
-  --tertiary: #c0c1ff;
-  --tertiary-container: #8083ff;
-  --on-tertiary: #1000a9;
-  --on-tertiary-container: #0d0096;
-  --tertiary-fixed: #e1e0ff;
-  --tertiary-fixed-dim: #c0c1ff;
-  --on-tertiary-fixed: #07006c;
-  --on-tertiary-fixed-variant: #2f2ebe;
+  /* ── Borders & Outlines ── */
+  --outline: oklch(0.65 0.025 240);
+  --outline-variant: oklch(0.38 0.025 240);
 
-  --error: #ffb4ab;
-  --error-container: #93000a;
-  --on-error: #690005;
-  --on-error-container: #ffdad6;
+  /* ── Primary (Blue) ── */
+  --primary: oklch(0.78 0.14 250);
+  --primary-container: oklch(0.48 0.18 250);
+  --on-primary: oklch(0.18 0.04 250);
+  --on-primary-container: oklch(0.97 0.02 250);
+  --primary-fixed: oklch(0.88 0.06 250);
+  --primary-fixed-dim: oklch(0.78 0.10 250);
+  --on-primary-fixed: oklch(0.20 0.04 250);
+  --on-primary-fixed-variant: oklch(0.40 0.12 250);
+  --inverse-primary: oklch(0.50 0.16 250);
 
-  --inverse-surface: #e0e2ed;
-  --inverse-on-surface: #2d3039;
+  /* ── Secondary (Teal) ── */
+  --secondary: oklch(0.87 0.07 200);
+  --secondary-container: oklch(0.40 0.08 200);
+  --on-secondary: oklch(0.18 0.03 200);
+  --on-secondary-container: oklch(0.95 0.03 200);
+  --secondary-fixed: oklch(0.88 0.04 200);
+  --secondary-fixed-dim: oklch(0.78 0.06 200);
+  --on-secondary-fixed: oklch(0.20 0.03 200);
+  --on-secondary-fixed-variant: oklch(0.40 0.06 200);
 
-  --success: #6ddb8a;
-  --success-container: #005320;
-  --on-success: #003912;
-  --on-success-container: #a8f5b8;
-  --warning: #f5bf48;
-  --warning-container: #5c4200;
-  --on-warning: #271900;
-  --on-warning-container: #ffdea3;
+  /* ── Tertiary (Indigo) ── */
+  --tertiary: oklch(0.82 0.12 280);
+  --tertiary-container: oklch(0.50 0.14 280);
+  --on-tertiary: oklch(0.18 0.04 280);
+  --on-tertiary-container: oklch(0.96 0.03 280);
+  --tertiary-fixed: oklch(0.88 0.06 280);
+  --tertiary-fixed-dim: oklch(0.78 0.08 280);
+  --on-tertiary-fixed: oklch(0.20 0.04 280);
+  --on-tertiary-fixed-variant: oklch(0.40 0.10 280);
+
+  /* ── Error (Red) ── */
+  --error: oklch(0.77 0.20 25);
+  --error-container: oklch(0.30 0.10 25);
+  --on-error: oklch(0.20 0.06 25);
+  --on-error-container: oklch(0.95 0.04 25);
+
+  /* ── Semantic ── */
+  --inverse-surface: oklch(0.90 0.01 240);
+  --inverse-on-surface: oklch(0.20 0.015 250);
+
+  --success: oklch(0.75 0.20 150);
+  --success-container: oklch(0.30 0.10 150);
+  --on-success: oklch(0.18 0.04 150);
+  --on-success-container: oklch(0.93 0.04 150);
+
+  --warning: oklch(0.85 0.18 80);
+  --warning-container: oklch(0.35 0.10 80);
+  --on-warning: oklch(0.20 0.06 80);
+  --on-warning-container: oklch(0.94 0.04 80);
+
+  /* ── Override EODS static tokens (tokens.css hardcodes light values) ── */
+  --color-surface-page: var(--surface);
+  --color-surface-region: var(--surface-dim);
+  --color-surface-card: var(--surface-container-lowest);
+  --color-surface-overlay: var(--surface-container-high);
+  --color-surface-hover: var(--surface-container-low);
+
+  --border-color-default: var(--outline-variant);
+  --border-color-strong: var(--outline);
+
+  --eods-ig-header-bg: var(--surface-container-high);
+  --eods-ig-header-text: var(--on-surface);
+  --eods-ig-row-hover: oklch(0.17 0.02 250);
+  --eods-ig-row-selected: oklch(0.20 0.04 250);
+  --eods-ig-row-stripe: oklch(0.11 0.01 250);
+  --eods-ig-border: 1px solid var(--outline-variant);
+
+  --eods-form-label-color: var(--on-surface-variant);
+  --eods-form-control-bg: var(--surface-container-low);
+  --eods-form-control-border: var(--outline-variant);
+
+  --eods-card-bg: var(--surface-container-lowest);
+  --eods-card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --eods-nav-bg: oklch(0.10 0.01 250);
 }
 
 @theme inline {
@@ -224,6 +262,66 @@
 
 * { border-color: var(--outline-variant); }
 body { background: var(--background); color: var(--on-surface); font-family: var(--font-sans); }
+
+/* ── Dark Mode Table Enhancements ── */
+.dark .ig-table,
+.dark [class*="ig-"] {
+  --ig-header-bg: oklch(0.22 0.02 250);
+  --ig-header-text: oklch(0.98 0.008 240);
+  --ig-row-hover: oklch(0.175 0.02 250);
+  --ig-row-selected: oklch(0.20 0.04 250);
+  --ig-border: oklch(0.35 0.025 240);
+}
+
+.dark .ig-table thead th,
+.dark table thead th {
+  background: oklch(0.24 0.02 250);
+  color: oklch(0.98 0.008 240);
+  border-color: oklch(0.35 0.025 240);
+  font-weight: 600;
+}
+
+.dark .ig-table tbody td,
+.dark table tbody td {
+  color: oklch(0.97 0.006 240);
+  border-color: oklch(0.30 0.02 240);
+}
+
+.dark .ig-table tbody tr:hover,
+.dark table tbody tr:hover {
+  background: oklch(0.175 0.02 250);
+}
+
+/* ── Dark Mode Badge Contrast Fixes ── */
+.dark .eods-badge--primary.eods-badge--subtle {
+  background-color: oklch(0.30 0.10 250);
+  color: oklch(0.95 0.04 250);
+}
+
+.dark .eods-badge--success.eods-badge--subtle {
+  background-color: oklch(0.25 0.10 150);
+  color: oklch(0.92 0.06 150);
+}
+
+.dark .eods-badge--warning.eods-badge--subtle {
+  background-color: oklch(0.30 0.10 80);
+  color: oklch(0.94 0.06 80);
+}
+
+.dark .eods-badge--default.eods-badge--subtle {
+  background-color: oklch(0.25 0.02 250);
+  color: oklch(0.95 0.006 240);
+}
+
+.dark .eods-badge--danger.eods-badge--subtle {
+  background-color: oklch(0.30 0.12 25);
+  color: oklch(0.95 0.06 25);
+}
+
+.dark .eods-badge--info.eods-badge--subtle {
+  background-color: oklch(0.25 0.08 250);
+  color: oklch(0.93 0.04 250);
+}
 
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
