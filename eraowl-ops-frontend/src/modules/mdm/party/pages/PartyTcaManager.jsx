@@ -1,105 +1,243 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../../../../api/client'
 import { MasterDetailSplit } from '../../../../shared-ui-kit/components/ui/MasterDetailSplit'
-import { SegmentedControl } from '../../../../shared-ui-kit/components/ui/SegmentedControl'
-import { CardsRegion } from '../../../../shared-ui-kit/components/ui/CardsRegion'
-import { StatCard } from '../../../../shared-ui-kit/components/ui/StatCard'
 
 const PARTY_TYPE_OPTIONS = ['ALL', 'ORGANIZATION', 'PERSON']
 const ROLE_FILTERS = ['ALL', 'SUPPLIER', 'CUSTOMER']
+const SITE_USE_OPTIONS = ['BILL_TO', 'SHIP_TO', 'PAY_TO', 'OFFICE']
 
-const TABS = [
-  { value: 'profile', label: 'Profile' },
-  { value: 'roles', label: 'Business Roles' },
-  { value: 'sites', label: 'Addresses & Sites' },
-  { value: 'contacts', label: 'Contacts' },
-]
+function TreeNode({ node, depth = 0, selected, onSelect, onToggle, expanded }) {
+  const hasChildren = node.children && node.children.length > 0
+  const isOpen = expanded[node.node_id]
+  const isSelected = selected === node.node_id
+  const padLeft = depth * 20
+
+  const iconMap = {
+    profile: 'badge', role_group: 'assignment_ind', role_item: 'check_circle',
+    site_group: 'location_on', site_item: 'pin_drop', site_use: 'flag',
+  }
+
+  return (
+    <div>
+      <div
+        onClick={() => { if (hasChildren) onToggle(node.node_id); onSelect(node) }}
+        className={`flex items-center gap-2 px-3 py-2 cursor-pointer transition-all rounded-lg mx-1 text-sm group
+          ${isSelected ? 'bg-primary/10 text-primary font-semibold shadow-sm' : 'text-on-surface hover:bg-surface-container-low'}
+          ${depth === 0 ? 'mt-1' : ''}`}
+        style={{ paddingLeft: `${12 + padLeft}px` }}
+      >
+        {hasChildren ? (
+          <span className={`material-symbols-outlined text-[16px] text-outline transition-transform ${isOpen ? 'rotate-90' : ''}`}>
+            chevron_right
+          </span>
+        ) : <span className="w-4" />}
+        <span className="material-symbols-outlined text-[16px]" style={{ color: isSelected ? 'var(--color-primary)' : 'var(--color-outline)' }}>
+          {iconMap[node.node_type] || 'circle'}
+        </span>
+        <span className="flex-1 truncate">{node.label}</span>
+        {node.node_type === 'site_use' && node.entity?.is_primary && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-success/10 text-success font-semibold">PRIMARY</span>
+        )}
+      </div>
+      {hasChildren && isOpen && (
+        <div className="border-l-2 border-outline-variant/30 ml-5">
+          {node.children.map((child) => (
+            <TreeNode key={child.node_id} node={child} depth={depth + 1}
+              selected={selected} onSelect={onSelect} onToggle={onToggle} expanded={expanded} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ProfileForm({ node, onSave, onCancel }) {
+  const [form, setForm] = useState({ ...node.entity })
+  const handleChange = (k, v) => setForm((p) => ({ ...p, [k]: v }))
+  return (
+    <div className="space-y-3">
+      {['party_name', 'party_number', 'party_type', 'tax_reference'].map((f) => (
+        <div key={f}>
+          <label className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1 block">{f.replace('_', ' ')}</label>
+          <input type="text" value={form[f] || ''} onChange={(e) => handleChange(f, e.target.value)}
+            className="w-full px-3 py-2 bg-surface-bright border border-outline-variant rounded-lg text-sm text-on-surface outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+        </div>
+      ))}
+      <div className="flex gap-2 pt-2">
+        <button onClick={() => onSave('profile', 'update', form)}
+          className="flex-1 px-3 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold hover:opacity-90">Save</button>
+        <button onClick={onCancel} className="px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-outline">Cancel</button>
+      </div>
+    </div>
+  )
+}
+
+function RoleForm({ node, onDelete, onCancel }) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3 p-3 rounded-xl border border-outline-variant bg-surface-container-lowest">
+        <span className="material-symbols-outlined text-[24px] text-primary">
+          {node.label === 'SUPPLIER' ? 'conveyor_belt' : 'handshake'}
+        </span>
+        <div className="flex-1">
+          <div className="text-sm font-semibold text-on-surface">{node.label} Account</div>
+          <div className="text-[10px] text-outline">Active role for this party</div>
+        </div>
+        <span className="px-2 py-1 text-[10px] font-semibold rounded-full bg-success/10 text-success">ACTIVE</span>
+      </div>
+      <button onClick={() => { if (confirm(`Deactivate ${node.label} role?`)) onDelete(node) }}
+        className="w-full px-3 py-2 bg-error/10 text-error rounded-lg text-xs font-semibold hover:bg-error/20 transition-colors flex items-center justify-center gap-2">
+        <span className="material-symbols-outlined text-[16px]">block</span> Deactivate {node.label}
+      </button>
+      <button onClick={onCancel} className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-outline">Close</button>
+    </div>
+  )
+}
+
+function SiteForm({ node, onSave, onDelete, onCancel }) {
+  const [form, setForm] = useState({
+    site_name: node.entity?.site_name || '',
+    country: node.entity?.address?.country || '',
+    address_line1: node.entity?.address?.address_line1 || '',
+    city: node.entity?.address?.city || '',
+    state: node.entity?.address?.state || '',
+    postal_code: node.entity?.address?.postal_code || '',
+  })
+  return (
+    <div className="space-y-3">
+      {['site_name', 'country', 'address_line1', 'city', 'state', 'postal_code'].map((f) => (
+        <div key={f}>
+          <label className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1 block">{f.replace(/_/g, ' ')}</label>
+          <input type="text" value={form[f] || ''} onChange={(e) => setForm((p) => ({ ...p, [f]: e.target.value }))}
+            className="w-full px-3 py-2 bg-surface-bright border border-outline-variant rounded-lg text-sm text-on-surface outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+        </div>
+      ))}
+      <div className="flex gap-2 pt-2">
+        <button onClick={() => onSave('site_item', 'update', { ...form, party_site_id: node.entity?.party_site_id })}
+          className="flex-1 px-3 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold hover:opacity-90">Save</button>
+        <button onClick={() => { if (confirm('Delete this site?')) onDelete(node) }}
+          className="px-3 py-2 bg-error/10 text-error rounded-lg text-xs font-semibold hover:bg-error/20">Delete</button>
+        <button onClick={onCancel} className="px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-outline">Cancel</button>
+      </div>
+    </div>
+  )
+}
+
+function SiteUseForm({ node, onSave, onDelete, onCancel }) {
+  const [useType, setUseType] = useState(node.entity?.site_use_type || 'BILL_TO')
+  const [isPrimary, setIsPrimary] = useState(node.entity?.is_primary || false)
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1 block">Site Use Type</label>
+        <select value={useType} onChange={(e) => setUseType(e.target.value)}
+          className="w-full px-3 py-2 bg-surface-bright border border-outline-variant rounded-lg text-sm text-on-surface outline-none">
+          {SITE_USE_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+        </select>
+      </div>
+      <label className="flex items-center gap-2 text-sm text-on-surface cursor-pointer">
+        <input type="checkbox" checked={isPrimary} onChange={(e) => setIsPrimary(e.target.checked)} className="accent-primary w-4 h-4" />
+        Primary {useType}
+      </label>
+      <div className="flex gap-2 pt-2">
+        <button onClick={() => onSave('site_use', 'update', { site_use_id: node.entity?.site_use_id, site_use_type: useType, is_primary: isPrimary })}
+          className="flex-1 px-3 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold hover:opacity-90">Save</button>
+        <button onClick={() => { if (confirm('Remove this site use?')) onDelete(node) }}
+          className="px-3 py-2 bg-error/10 text-error rounded-lg text-xs font-semibold hover:bg-error/20">Remove</button>
+        <button onClick={onCancel} className="px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-outline">Close</button>
+      </div>
+    </div>
+  )
+}
 
 export default function PartyTcaManager() {
   const [parties, setParties] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedParty, setSelectedParty] = useState(null)
-  const [tcaView, setTcaView] = useState(null)
-  const [activeTab, setActiveTab] = useState('profile')
+  const [treeData, setTreeData] = useState([])
+  const [expanded, setExpanded] = useState({})
+  const [selectedNode, setSelectedNode] = useState(null)
+  const [showAddRole, setShowAddRole] = useState(false)
+  const [showAddSite, setShowAddSite] = useState(false)
+  const [addSiteForm, setAddSiteForm] = useState({ country: 'Thailand', address_line1: '', city: '', site_name: '' })
   const [partyFilter, setPartyFilter] = useState('ALL')
   const [roleFilter, setRoleFilter] = useState('ALL')
   const [searchQuery, setSearchQuery] = useState('')
+  const [treeVersion, setTreeVersion] = useState(0)
 
   const fetchParties = useCallback(async () => {
     setLoading(true)
-    try {
-      const { data } = await api.get('/party/parties', { params: { page: 1, page_size: 100 } })
-      setParties(data?.items || [])
+    try { const { data } = await api.get('/party/parties', { params: { page: 1, page_size: 100 } }); setParties(data?.items || [])
     } catch {} finally { setLoading(false) }
   }, [])
 
-  const fetchTcaView = useCallback(async (partyId) => {
+  const fetchTree = useCallback(async (partyId) => {
     if (!partyId) return
-    try {
-      const { data } = await api.get(`/party/parties/${partyId}/tca-view`)
-      setTcaView(data)
-    } catch { setTcaView(null) }
+    try { const { data } = await api.get(`/party/parties/${partyId}/tree`); setTreeData(data?.tree || [])
+    } catch { setTreeData([]) }
   }, [])
 
   useEffect(() => { fetchParties() }, [fetchParties])
 
   useEffect(() => {
-    if (selectedParty) fetchTcaView(selectedParty.party_id)
-  }, [selectedParty, fetchTcaView])
+    if (selectedParty) { fetchTree(selectedParty.party_id); setSelectedNode(null); setExpanded({}) }
+  }, [selectedParty, fetchTree, treeVersion])
+
+  const refresh = () => { setTreeVersion((v) => v + 1) }
+
+  const handleTreeNodeSelect = (node) => { setSelectedNode(node) }
+
+  const toggleExpand = (nodeId) => { setExpanded((p) => ({ ...p, [nodeId]: !p[nodeId] })) }
+
+  const handleTreeSave = async (nodeType, action, entity) => {
+    try {
+      await api.post(`/party/parties/${selectedParty.party_id}/tree/update-node`, { node_type: nodeType, action, entity })
+      refresh()
+    } catch (err) { alert(err.response?.data?.detail?.message || 'Failed to update') }
+  }
+
+  const handleTreeDelete = async (node) => {
+    if (node.node_type === 'role_item') {
+      await handleTreeSave('role_item', 'delete', { party_role_id: node.entity?.party_role_id })
+    } else if (node.node_type === 'site_item') {
+      await handleTreeSave('site_item', 'delete', { party_site_id: node.entity?.party_site_id })
+    } else if (node.node_type === 'site_use') {
+      await handleTreeSave('site_use', 'delete', { site_use_id: node.entity?.site_use_id })
+    }
+  }
+
+  const handleAddRole = async (roleType) => {
+    await handleTreeSave('role_item', 'add', { role_type: roleType })
+    setShowAddRole(false)
+  }
+
+  const handleAddSite = async () => {
+    await handleTreeSave('site_item', 'add', addSiteForm)
+    setShowAddSite(false)
+    setAddSiteForm({ country: 'Thailand', address_line1: '', city: '', site_name: '' })
+  }
 
   const filteredParties = parties.filter((p) => {
     if (partyFilter !== 'ALL' && p.party_type !== partyFilter) return false
-    if (roleFilter !== 'ALL') {
-      if (!tcaView || tcaView.party?.party_id !== p.party_id) return true
-    }
     return true
   }).filter((p) =>
     !searchQuery || p.party_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.party_number?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const siteCards = (tcaView?.sites || []).map((s) => ({
-    id: s.party_site_id,
-    title: s.site_name || s.party_site_number,
-    subtitle: s.address ? `${s.address.address_line1}, ${s.address.city}` : '',
-    badges: (s.site_uses || []).map((u) => ({
-      label: u.site_use_type,
-      color: u.is_primary ? 'oklch(0.55 0.14 150)' : 'oklch(0.55 0.03 260)',
-    })),
-    metadata: [
-      { label: 'Number', value: s.party_site_number },
-      ...(s.address?.state ? [{ label: 'State', value: s.address.state }] : []),
-      ...(s.address?.postal_code ? [{ label: 'Postal', value: s.address.postal_code }] : []),
-      ...(s.address?.country ? [{ label: 'Country', value: s.address.country }] : []),
-    ],
-  }))
-
-  const totalSupplierCredit = 0
-  const totalCustomerLimit = tcaView?.customer?.credit_limit || 0
-
-  const handleRefresh = () => {
-    if (selectedParty) fetchTcaView(selectedParty.party_id)
-    fetchParties()
-  }
-
-  const handleDeleteSiteUse = async (siteUseId) => {
-    if (!confirm('Remove this site use?')) return
-    try { await api.delete(`/party/party-site-uses/${siteUseId}`); handleRefresh() } catch {}
-  }
-
-  const handleSetPrimarySite = async (siteId, useType) => {
-    try {
-      const { data: uses } = await api.get(`/party/party-site-uses`, { params: { party_site_id: siteId } })
-      const items = uses?.items || []
-      for (const u of items) {
-        if (u.site_use_type === useType) {
-          await api.put(`/party/party-site-uses/${u.site_use_id}`, { is_primary: true })
-        } else if (u.is_primary && u.site_use_type === useType) {
-          await api.put(`/party/party-site-uses/${u.site_use_id}`, { is_primary: false })
-        }
-      }
-      handleRefresh()
-    } catch {}
+  const renderForm = () => {
+    if (!selectedNode) return (
+      <div className="flex flex-col items-center justify-center h-full text-outline">
+        <span className="material-symbols-outlined text-[48px]">touch_app</span>
+        <p className="text-sm mt-2">Select a tree node to manage</p>
+      </div>
+    )
+    const nt = selectedNode.node_type
+    if (nt === 'profile') return <ProfileForm node={selectedNode} onSave={handleTreeSave} onCancel={() => setSelectedNode(null)} />
+    if (nt === 'role_item') return <RoleForm node={selectedNode} onDelete={handleTreeDelete} onCancel={() => setSelectedNode(null)} />
+    if (nt === 'site_item') return <SiteForm node={selectedNode} onSave={handleTreeSave} onDelete={handleTreeDelete} onCancel={() => setSelectedNode(null)} />
+    if (nt === 'site_use') return <SiteUseForm node={selectedNode} onSave={handleTreeSave} onDelete={handleTreeDelete} onCancel={() => setSelectedNode(null)} />
+    return <div className="text-sm text-outline p-4">Select a node to edit</div>
   }
 
   return (
@@ -150,169 +288,87 @@ export default function PartyTcaManager() {
       detailContent={
         <div className="h-full flex flex-col">
           {!selectedParty ? (
-            <div className="flex items-center justify-center flex-1 text-outline text-sm">
-              Select a party from the list to view details
-            </div>
-          ) : !tcaView ? (
-            <div className="flex items-center justify-center flex-1 text-outline text-sm">Loading...</div>
+            <div className="flex items-center justify-center flex-1 text-outline text-sm">Select a party from the list</div>
           ) : (
-            <>
-              <div className="p-4 border-b border-outline-variant bg-surface-container-low/50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-lg font-bold text-on-surface">{tcaView.party.party_name}</h2>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-[11px] font-mono text-outline">{tcaView.party.party_number}</span>
-                      <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{tcaView.party.party_type}</span>
-                      {tcaView.party.tax_reference && (
-                        <span className="text-[11px] text-outline">Tax: {tcaView.party.tax_reference}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={handleRefresh} className="p-2 text-outline hover:text-primary transition-colors rounded-lg hover:bg-surface-container-high">
-                      <span className="material-symbols-outlined text-[18px]">refresh</span>
-                    </button>
-                  </div>
+            <div className="flex flex-1 overflow-hidden">
+              <div className="w-1/2 border-r border-outline-variant overflow-y-auto p-3 bg-surface-container-lowest/50">
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider">TCA Tree</h3>
+                  <button onClick={refresh} className="p-1 text-outline hover:text-primary rounded hover:bg-surface-container-high transition-colors">
+                    <span className="material-symbols-outlined text-[16px]">refresh</span>
+                  </button>
+                </div>
+                {treeData.length === 0 ? (
+                  <div className="text-sm text-outline py-8 text-center">Loading tree...</div>
+                ) : treeData.map((node) => (
+                  <TreeNode key={node.node_id} node={node} depth={0}
+                    selected={selectedNode?.node_id} onSelect={handleTreeNodeSelect}
+                    onToggle={toggleExpand} expanded={expanded} />
+                ))}
+                <div className="flex gap-2 mt-3 px-1">
+                  <button onClick={() => setShowAddRole(true)}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-[10px] font-semibold hover:bg-primary/20 transition-colors">
+                    <span className="material-symbols-outlined text-[14px]">add</span> Role
+                  </button>
+                  <button onClick={() => setShowAddSite(true)}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-[10px] font-semibold hover:bg-primary/20 transition-colors">
+                    <span className="material-symbols-outlined text-[14px]">add_location</span> Site
+                  </button>
                 </div>
               </div>
-
-              <SegmentedControl
-                options={TABS}
-                value={activeTab}
-                onChange={setActiveTab}
-              />
-
-              <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                {activeTab === 'profile' && (
-                  <div className="space-y-4 max-w-2xl">
-                    <div className="grid grid-cols-2 gap-4">
-                      <StatCard title="Party Name" value={tcaView.party.party_name} icon="badge" />
-                      <StatCard title="Party Number" value={tcaView.party.party_number} icon="pin" />
-                      <StatCard title="Tax Reference" value={tcaView.party.tax_reference || '—'} icon="receipt" />
-                      <StatCard title="Type" value={tcaView.party.party_type} icon="category" />
-                    </div>
-                    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                      <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-3">Registry Information</h3>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        {[
-                          ['Party ID', tcaView.party.party_id],
-                          ['Status', tcaView.party.is_active ? 'Active' : 'Inactive'],
-                          ['Created', new Date(tcaView.party.created_at).toLocaleDateString()],
-                          ['Updated', new Date(tcaView.party.updated_at).toLocaleDateString()],
-                        ].map(([label, value]) => (
-                          <div key={label}>
-                            <div className="text-[10px] font-semibold text-outline uppercase tracking-wider">{label}</div>
-                            <div className="text-sm text-on-surface mt-0.5 break-all">{value}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'roles' && (
-                  <div className="space-y-4 max-w-2xl">
-                    <div className="flex flex-wrap gap-2">
-                      {['SUPPLIER', 'CUSTOMER'].map((role) => {
-                        const hasRole = (tcaView.roles || []).some((r) => r.role_type === role)
-                        return (
-                          <div key={role}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition-colors ${
-                              hasRole ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-surface-container-low border-outline-variant text-outline'
-                            }`}>
-                            <span className="material-symbols-outlined text-[16px]">
-                              {role === 'SUPPLIER' ? 'conveyor_belt' : 'handshake'}
-                            </span>
-                            {role}
-                            {hasRole && <span className="text-[10px] text-primary/60">✔ Active</span>}
-                          </div>
-                        )
-                      })}
-                    </div>
-
-                    {tcaView.supplier && (
-                      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                        <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-3 flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[16px] text-primary">conveyor_belt</span> Supplier Profile
-                        </h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          {[
-                            ['Vendor Type', tcaView.supplier.vendor_type_lookup_code || '—'],
-                            ['Payment Method', tcaView.supplier.payment_method_code || '—'],
-                            ['Payment Terms', `${tcaView.supplier.payment_term_days} days`],
-                          ].map(([label, value]) => (
-                            <div key={label}>
-                              <div className="text-[10px] font-semibold text-outline uppercase tracking-wider">{label}</div>
-                              <div className="text-sm text-on-surface mt-0.5">{value}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {tcaView.customer && (
-                      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                        <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-3 flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[16px] text-primary">handshake</span> Customer Profile
-                        </h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          {[
-                            ['Class Code', tcaView.customer.customer_class_code || '—'],
-                            ['Credit Limit', tcaView.customer.credit_limit ? `${tcaView.customer.credit_limit.toLocaleString()} THB` : '—'],
-                            ['Payment Terms', `${tcaView.customer.payment_term_days} days`],
-                          ].map(([label, value]) => (
-                            <div key={label}>
-                              <div className="text-[10px] font-semibold text-outline uppercase tracking-wider">{label}</div>
-                              <div className="text-sm text-on-surface mt-0.5">{value}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {(!tcaView.supplier && !tcaView.customer) && (
-                      <p className="text-sm text-outline py-4">No business roles configured for this party.</p>
-                    )}
-                  </div>
-                )}
-
-                {activeTab === 'sites' && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-on-surface">Locations ({siteCards.length})</h3>
-                      <span className="text-[10px] text-outline bg-surface-container-high px-2 py-1 rounded-full">
-                        {siteCards.filter((s) => s.badges.some((b) => b.label === 'BILL_TO')).length} bill-to
-                      </span>
-                    </div>
-                    <CardsRegion
-                      items={siteCards}
-                      emptyMessage="No sites registered for this party."
-                      onAction={(action, item) => {
-                        if (action === 'delete-use') handleDeleteSiteUse(item.id)
-                        if (action === 'set-primary') handleSetPrimarySite(item.id, 'BILL_TO')
-                      }}
-                    />
-                  </div>
-                )}
-
-                {activeTab === 'contacts' && (
-                  <div className="space-y-4">
-                    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 text-center">
-                      <span className="material-symbols-outlined text-[48px] text-outline">contact_page</span>
-                      <h3 className="text-sm font-semibold text-on-surface mt-2">Contact Management</h3>
-                      <p className="text-sm text-outline mt-1 max-w-md mx-auto">
-                        Link operational contacts to this party account. Contact assignment will be available in the next release.
-                      </p>
-                    </div>
-                  </div>
-                )}
+              <div className="w-1/2 overflow-y-auto p-4 bg-surface-container-lowest">
+                <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-3">
+                  {selectedNode ? selectedNode.label : 'Node Details'}
+                </h3>
+                {renderForm()}
               </div>
-            </>
+            </div>
           )}
         </div>
       }
     />
+
+    {showAddRole && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowAddRole(false)}>
+        <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
+          <h2 className="text-sm font-bold text-on-surface mb-3">Add Business Role</h2>
+          <div className="space-y-2">
+            {['SUPPLIER', 'CUSTOMER'].map((r) => (
+              <button key={r} onClick={() => handleAddRole(r)}
+                className="w-full flex items-center gap-3 px-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl hover:bg-surface-container-low hover:border-primary/30 transition-all text-left">
+                <span className="material-symbols-outlined text-[20px] text-primary">{r === 'SUPPLIER' ? 'conveyor_belt' : 'handshake'}</span>
+                <div>
+                  <div className="text-sm font-semibold text-on-surface">{r}</div>
+                  <div className="text-[10px] text-outline">Register as a {r.toLowerCase()}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+          <button onClick={() => setShowAddRole(false)} className="w-full mt-3 px-3 py-2 bg-surface-container-low border border-outline-variant rounded-xl text-xs font-semibold text-outline">Cancel</button>
+        </div>
+      </div>
+    )}
+
+    {showAddSite && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowAddSite(false)}>
+        <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
+          <h2 className="text-sm font-bold text-on-surface mb-3">Add New Site</h2>
+          <div className="space-y-3">
+            {['site_name', 'country', 'address_line1', 'city', 'state', 'postal_code'].map((f) => (
+              <div key={f}>
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1 block">{f.replace(/_/g, ' ')}</label>
+                <input type="text" value={addSiteForm[f] || ''} onChange={(e) => setAddSiteForm((p) => ({ ...p, [f]: e.target.value }))}
+                  className="w-full px-3 py-2 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-end gap-3 mt-5">
+            <button onClick={() => setShowAddSite(false)} className="px-4 py-2 text-sm font-semibold text-on-surface-variant bg-surface-container-low border border-outline-variant rounded-xl">Cancel</button>
+            <button onClick={handleAddSite} className="px-4 py-2 text-sm font-semibold text-white bg-primary rounded-xl hover:opacity-90">Create Site</button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   )
 }
