@@ -565,7 +565,6 @@ class AdminService:
         if not user or not verify_password(password, user.hashed_password):
             raise UserNotFoundError()
         user.last_login_at = datetime.now(timezone.utc)
-        await self.db.commit()
         return user
 
     async def get_user_privileges(self, user_id: uuid.UUID) -> list[dict]:

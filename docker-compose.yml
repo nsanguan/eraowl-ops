@@ -19,7 +19,9 @@ services:
     restart: unless-stopped
 
   frontend:
-    build: ./eraowl-ops-frontend
+    build:
+      context: .
+      dockerfile: eraowl-ops-frontend/Dockerfile
     container_name: eraowlops-frontend
     ports:
       - "3001:80"
