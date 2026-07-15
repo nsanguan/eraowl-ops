@@ -213,7 +213,7 @@ export default function BomPage() {
           idKey="bom_header_id"
           searchable
           onRowClick={handleRowClick}
-          selectedIds={selectedBom ? [selectedBom.bom_header_id] : []}
+          selectedIds={selectedBom ? new Set([selectedBom.bom_header_id]) : new Set()}
           tableHeight="calc(100vh - 280px)"
         />
       </div>
