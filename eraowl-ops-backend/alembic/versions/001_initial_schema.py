@@ -421,7 +421,7 @@ def upgrade() -> None:
     )
 
     op.create_table(
-        "bom_lines",
+        "bom_components",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column("bom_header_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("bom.bom_headers.id"), nullable=False),
         sa.Column("component_item_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("mdm.items.id"), nullable=False),
@@ -469,7 +469,7 @@ def downgrade() -> None:
     # mdm schema — bom
     # =========================================================================
 
-    op.drop_table("bom_lines", schema="bom")
+    op.drop_table("bom_components", schema="bom")
     op.drop_table("bom_headers", schema="bom")
 
     # =========================================================================

@@ -4,12 +4,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, text
 from sqlalchemy.sql import func
 
-from app.modules.bom.models import BomHeader, BomLine
+from app.modules.bom.models import BomHeader, BomComponent
 from app.modules.bom.schemas import (
     BomHeaderCreate,
     BomHeaderUpdate,
-    BomLineCreate,
-    BomLineUpdate,
+    BomComponentCreate,
+    BomComponentUpdate,
     BomExplodeItem,
 )
 from app.modules.bom.exceptions import BomNotFoundError, BomCircularReferenceError
@@ -76,25 +76,25 @@ class BomService:
         await self._delete(BomHeader, entity_id)
 
     # --- Bom Lines ---
-    async def list_bom_lines(
+    async def list_bom_components(
         self, page: int = 1, page_size: int = 20, bom_header_id: uuid.UUID | None = None
     ):
         filters = {"bom_header_id": bom_header_id} if bom_header_id else None
-        return await self._paginate(BomLine, page, page_size, filters)
+        return await self._paginate(BomComponent, page, page_size, filters)
 
-    async def get_bom_line(self, entity_id: uuid.UUID):
-        return await self._get_by_id(BomLine, entity_id)
+    async def get_bom_component(self, entity_id: uuid.UUID):
+        return await self._get_by_id(BomComponent, entity_id)
 
-    async def create_bom_line(self, data: BomLineCreate):
+    async def create_bom_component(self, data: BomComponentCreate):
         header = await self._get_by_id(BomHeader, data.bom_header_id)
         await self.validate_no_circular_reference(header.item_id, data.component_item_id)
-        return await self._create(BomLine, data)
+        return await self._create(BomComponent, data)
 
-    async def update_bom_line(self, entity_id: uuid.UUID, data: BomLineUpdate):
-        return await self._update(BomLine, entity_id, data)
+    async def update_bom_component(self, entity_id: uuid.UUID, data: BomComponentUpdate):
+        return await self._update(BomComponent, entity_id, data)
 
-    async def delete_bom_line(self, entity_id: uuid.UUID):
-        await self._delete(BomLine, entity_id)
+    async def delete_bom_component(self, entity_id: uuid.UUID):
+        await self._delete(BomComponent, entity_id)
 
     async def validate_no_circular_reference(
         self, assembly_item_id: uuid.UUID, component_item_id: uuid.UUID
@@ -117,9 +117,9 @@ class BomService:
 
             for header in headers:
                 lines_result = await self.db.execute(
-                    select(BomLine).where(
-                        BomLine.bom_header_id == header.bom_header_id,
-                        BomLine.is_deleted == False,
+                    select(BomComponent).where(
+                        BomComponent.bom_header_id == header.bom_header_id,
+                        BomComponent.is_deleted == False,
                     )
                 )
                 lines = lines_result.scalars().all()
@@ -160,11 +160,11 @@ class BomService:
             items: list[BomExplodeItem] = []
             for header in headers:
                 lines_result = await self.db.execute(
-                    select(BomLine).where(
-                        BomLine.bom_header_id == header.bom_header_id,
-                        BomLine.is_deleted == False,
-                        BomLine.effective_date_from <= today,
-                        (BomLine.effective_date_to >= today) | (BomLine.effective_date_to == None),
+                    select(BomComponent).where(
+                        BomComponent.bom_header_id == header.bom_header_id,
+                        BomComponent.is_deleted == False,
+                        BomComponent.effective_date_from <= today,
+                        (BomComponent.effective_date_to >= today) | (BomComponent.effective_date_to == None),
                     )
                 )
                 lines = lines_result.scalars().all()

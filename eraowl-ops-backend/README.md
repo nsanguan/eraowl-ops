@@ -64,7 +64,7 @@ Full CRUD for all entities: corporates, companies, business-units, sites, wareho
 - `GET/POST/PUT/DELETE /bom-headers`, `/bom-headers/{id}`
 - `POST /bom-headers/{id}/approve` — Approve workflow
 - `GET /bom-headers/{id}/explode?quantity=` — Multi-level BOM explosion
-- `GET/POST/PUT/DELETE /bom-lines`, `/bom-lines/{id}`
+- `GET/POST/PUT/DELETE /bom-components`, `/bom-components/{id}`
 
 ### PO (`/api/v1/po/`)
 - `GET/POST/PUT/DELETE /po_headers`, `/po_lines`, `/po_shipments`, `/po_distributions`, etc.

@@ -5,7 +5,7 @@ import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/Interactiv
 
 const TABS = [
   { key: 'bomHeaders', label: 'BOM Headers', endpoint: '/bom/bom-headers', idKey: 'bom_header_id', nameField: 'item_id'             },
-  { key: 'bomLines',   label: 'BOM Lines',   endpoint: '/bom/bom-lines',   idKey: 'bom_line_id',   nameField: 'component_item_id' },
+  { key: 'bomComponents',   label: 'BOM Components',   endpoint: '/bom/bom-components',   idKey: 'bom_component_id',   nameField: 'component_item_id' },
 ]
 
 const COLUMNS = {

@@ -338,8 +338,8 @@ CREATE TABLE bom.bom_headers (
     updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
-CREATE TABLE bom.bom_lines (
-    bom_line_id UUID DEFAULT uuidv7() NOT NULL PRIMARY KEY,
+CREATE TABLE bom.bom_components (
+    bom_component_id UUID DEFAULT uuidv7() NOT NULL PRIMARY KEY,
     bom_header_id UUID NOT NULL REFERENCES bom.bom_headers(bom_header_id) ON DELETE CASCADE,
     component_item_id UUID NOT NULL REFERENCES mdm.items(item_id),
     quantity_per DOUBLE PRECISION NOT NULL,

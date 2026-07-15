@@ -258,7 +258,7 @@ async def seed():
         ), {"id": bom1, "iid": fg_item, "rev": "A", "status": "ACTIVE", "eff": date.today()})
         for comp, qty, uom, seq in [(rm_item, 25.0, kg_id, 10), (sa_item, 1.0, each_id, 20)]:
             await db.execute(text(
-                "INSERT INTO bom.bom_lines (id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES (:id, :bid, :cid, :qty, :uom, :seq, :eff)"
+                "INSERT INTO bom.bom_components (id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES (:id, :bid, :cid, :qty, :uom, :seq, :eff)"
             ), {"id": uuid.uuid4(), "bid": bom1, "cid": comp, "qty": qty, "uom": uom, "seq": seq, "eff": date.today()})
 
         bom2 = uuid.uuid4()
@@ -266,7 +266,7 @@ async def seed():
             "INSERT INTO bom.bom_headers (id, item_id, revision, status, effective_date_from) VALUES (:id, :iid, :rev, :status, :eff)"
         ), {"id": bom2, "iid": sa_item, "rev": "A", "status": "ACTIVE", "eff": date.today()})
         await db.execute(text(
-            "INSERT INTO bom.bom_lines (id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES (:id, :bid, :cid, :qty, :uom, :seq, :eff)"
+            "INSERT INTO bom.bom_components (id, bom_header_id, component_item_id, quantity_per, uom_id, operation_seq, effective_date_from) VALUES (:id, :bid, :cid, :qty, :uom, :seq, :eff)"
         ), {"id": uuid.uuid4(), "bid": bom2, "cid": rm_item, "qty": 5.0, "uom": kg_id, "seq": 10, "eff": date.today()})
 
         await db.commit()

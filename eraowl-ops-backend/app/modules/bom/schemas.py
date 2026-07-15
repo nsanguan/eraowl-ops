@@ -37,7 +37,7 @@ class BomHeaderOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class BomLineCreate(BaseModel):
+class BomComponentCreate(BaseModel):
     bom_header_id: uuid.UUID
     component_item_id: uuid.UUID
     quantity_per: float = 1.0
@@ -47,7 +47,7 @@ class BomLineCreate(BaseModel):
     effective_date_to: Optional[date] = None
 
 
-class BomLineUpdate(BaseModel):
+class BomComponentUpdate(BaseModel):
     component_item_id: Optional[uuid.UUID] = None
     quantity_per: Optional[float] = None
     uom_id: Optional[uuid.UUID] = None
@@ -56,8 +56,8 @@ class BomLineUpdate(BaseModel):
     effective_date_to: Optional[date] = None
 
 
-class BomLineOut(BaseModel):
-    bom_line_id: uuid.UUID
+class BomComponentOut(BaseModel):
+    bom_component_id: uuid.UUID
     bom_header_id: uuid.UUID
     component_item_id: uuid.UUID
     quantity_per: float

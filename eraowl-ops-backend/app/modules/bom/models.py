@@ -29,14 +29,14 @@ class BomHeader(SQLModel, table=True):
         sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     )
 
-    lines: list["BomLine"] = Relationship(back_populates="bom_header")
+    components: list["BomComponent"] = Relationship(back_populates="bom_header")
 
 
-class BomLine(SQLModel, table=True):
-    __tablename__ = "bom_lines"
+class BomComponent(SQLModel, table=True):
+    __tablename__ = "bom_components"
     __table_args__ = {"schema": "bom"}
 
-    bom_line_id: uuid.UUID = Field(
+    bom_component_id: uuid.UUID = Field(
         default_factory=uuid.uuid4,
         sa_column=Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
