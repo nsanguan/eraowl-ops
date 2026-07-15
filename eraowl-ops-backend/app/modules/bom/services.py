@@ -60,11 +60,69 @@ class BomService:
 
     # --- Bom Headers ---
     async def list_bom_headers(self, page: int = 1, page_size: int = 20, item_id: uuid.UUID | None = None):
-        filters = {"item_id": item_id} if item_id else None
-        return await self._paginate(BomHeader, page, page_size, filters)
+        from app.modules.mdm.item.models import Item
+
+        base_q = select(BomHeader).where(BomHeader.is_deleted == False)
+        if item_id:
+            base_q = base_q.where(BomHeader.item_id == item_id)
+
+        total = (await self.db.execute(
+            select(func.count()).select_from(base_q.subquery())
+        )).scalar() or 0
+
+        rows = (await self.db.execute(
+            base_q.offset((page - 1) * page_size).limit(page_size)
+        )).scalars().all()
+
+        if not rows:
+            return [], total
+
+        item_ids = [r.item_id for r in rows]
+        code_result = await self.db.execute(
+            select(Item.item_id, Item.item_code).where(Item.item_id.in_(item_ids))
+        )
+        code_map = {row[0]: row[1] for row in code_result.all()}
+
+        items = []
+        for row in rows:
+            items.append({
+                "bom_header_id": row.bom_header_id,
+                "item_id": row.item_id,
+                "item_code": code_map.get(row.item_id, "UNKNOWN"),
+                "alternate_bom_code": row.alternate_bom_code,
+                "revision": row.revision,
+                "status": row.status,
+                "effective_date_from": row.effective_date_from,
+                "effective_date_to": row.effective_date_to,
+                "is_deleted": row.is_deleted,
+                "created_at": row.created_at,
+                "updated_at": row.updated_at,
+            })
+
+        return items, total
 
     async def get_bom_header(self, entity_id: uuid.UUID):
-        return await self._get_by_id(BomHeader, entity_id)
+        from app.modules.mdm.item.models import Item
+
+        header = await self._get_by_id(BomHeader, entity_id)
+        code_result = await self.db.execute(
+            select(Item.item_code).where(Item.item_id == header.item_id)
+        )
+        item_code = code_result.scalar_one_or_none() or "UNKNOWN"
+
+        return {
+            "bom_header_id": header.bom_header_id,
+            "item_id": header.item_id,
+            "item_code": item_code,
+            "alternate_bom_code": header.alternate_bom_code,
+            "revision": header.revision,
+            "status": header.status,
+            "effective_date_from": header.effective_date_from,
+            "effective_date_to": header.effective_date_to,
+            "is_deleted": header.is_deleted,
+            "created_at": header.created_at,
+            "updated_at": header.updated_at,
+        }
 
     async def create_bom_header(self, data: BomHeaderCreate):
         return await self._create(BomHeader, data)

@@ -25,6 +25,7 @@ class BomHeaderUpdate(BaseModel):
 class BomHeaderOut(BaseModel):
     bom_header_id: uuid.UUID
     item_id: uuid.UUID
+    item_code: Optional[str] = None
     alternate_bom_code: Optional[str]
     revision: str
     status: str

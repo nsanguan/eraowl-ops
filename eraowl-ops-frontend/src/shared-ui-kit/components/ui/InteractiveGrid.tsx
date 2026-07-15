@@ -132,7 +132,7 @@ export function InteractiveGrid<T extends Record<string, any>>({
       )}
 
       {/* ── TOOLBAR ── */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-outline-variant/60 bg-surface-container-low/30 overflow-visible flex-wrap gap-y-2">
+      <div className="flex items-center justify-between pl-24 pr-3 py-2 border-b border-outline-variant/60 bg-surface-container-low/30 overflow-visible flex-wrap gap-y-2">
         <div className="flex items-center gap-3 min-w-max">
           {/* Search */}
           {customSearch ? (
@@ -338,7 +338,7 @@ export function InteractiveGrid<T extends Record<string, any>>({
       </div>
 
       {/* ── FOOTER ── */}
-      <div className="flex items-center justify-between px-4 py-2 border-t border-outline-variant bg-surface-container-lowest text-[11px] text-outline">
+      <div className="flex items-center justify-between pl-24 pr-4 py-2 border-t border-outline-variant bg-surface-container-lowest text-[11px] text-outline">
         <div>{actualSelectedIds.size ? `${actualSelectedIds.size} rows selected` : ''}</div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">

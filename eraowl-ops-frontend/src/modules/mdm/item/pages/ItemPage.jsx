@@ -14,7 +14,6 @@ const COLUMNS = {
     { key: 'item_code', header: 'Code',    width: '140px' },
     { key: 'item_name', header: 'Name',    width: '220px' },
     { key: 'item_type', header: 'Type',    width: '130px' },
-    { key: 'status',    header: 'Status',  width: '120px' },
     { key: 'is_active', header: 'Status',  width: '100px',
       render: (r) => r.is_active !== false
         ? <span className="text-success text-xs font-semibold">Active</span>

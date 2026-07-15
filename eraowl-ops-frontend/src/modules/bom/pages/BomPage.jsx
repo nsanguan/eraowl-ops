@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../../../api/client'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
-import { MasterDetailSplit } from '../../../shared-ui-kit/components/ui/MasterDetailSplit'
 import { TreeGrid } from '../../../shared-ui-kit/components/ui/TreeGrid'
 import { StatusChip } from '../../../shared-ui-kit/components/ui/StatusChip'
 import PermissionGuard from '../../../components/PermissionGuard'
@@ -14,7 +13,7 @@ const BOM_STATUS_MAP = {
 }
 
 const COLUMNS = [
-  { key: 'item_id', header: 'Item ID', width: '120px' },
+  { key: 'item_code', header: 'Item Number', width: '140px' },
   { key: 'revision', header: 'Revision', width: '100px' },
   { 
     key: 'status', 
@@ -156,18 +155,6 @@ export default function BomPage() {
     },
   ]
 
-  const masterContent = (
-    <InteractiveGrid
-      columns={COLUMNS}
-      data={bomHeaders}
-      loading={loading}
-      idKey="bom_header_id"
-      searchable
-      onRowClick={handleRowClick}
-      tableHeight="calc(100vh - 280px)"
-    />
-  )
-
   const detailHeader = (
     <div className="flex items-center justify-between px-4 py-3 bg-surface-container-low border-b border-outline-variant">
       <div className="flex items-center gap-3">
@@ -209,101 +196,6 @@ export default function BomPage() {
     </div>
   )
 
-  const detailContent = selectedBom ? (
-    <div className="flex flex-col h-full">
-      {detailHeader}
-      
-      <div className="p-4 bg-surface-container-lowest border-b border-outline-variant">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
-              BOM ID
-            </div>
-            <div className="text-xs text-on-surface font-mono">
-              {selectedBom.bom_header_id}
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
-              Item ID
-            </div>
-            <div className="text-xs text-on-surface font-mono">
-              {selectedBom.item_id}
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
-              Revision
-            </div>
-            <div className="text-xs text-on-surface font-semibold">
-              {selectedBom.revision}
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
-              Alternate Code
-            </div>
-            <div className="text-xs text-on-surface">
-              {selectedBom.alternate_bom_code || '-'}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-hidden">
-        <div className="px-4 py-2 bg-surface-container-low border-b border-outline-variant">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-[18px]">
-              account_tree
-            </span>
-            <span className="text-sm font-semibold text-on-surface">
-              Multi-Level Structure (Exploded View)
-            </span>
-          </div>
-        </div>
-        
-        <div className="h-full overflow-auto">
-          {exploding ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="flex items-center gap-3 text-outline">
-                <span className="material-symbols-outlined text-[24px] animate-spin">
-                  progress_activity
-                </span>
-                <span className="text-sm">Loading BOM structure...</span>
-              </div>
-            </div>
-          ) : treeData.length > 0 ? (
-            <TreeGrid
-              data={treeData}
-              columns={treeColumns}
-              nodeLabelAccessor={(row) => row.item_name || 'Unnamed Item'}
-              nodeIconAccessor={(row) => 
-                row.children && row.children.length > 0 ? 'inventory_2' : 'inventory'
-              }
-              nodeDescriptionAccessor={(row) => `Component: ${row.component_item_id}`}
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center py-12 text-outline">
-              <span className="material-symbols-outlined text-[48px] mb-2">
-                account_tree
-              </span>
-              <p className="text-sm">No components found in this BOM</p>
-              <p className="text-xs mt-1">Add components to see the structure</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  ) : (
-    <div className="flex flex-col items-center justify-center h-full text-outline">
-      <span className="material-symbols-outlined text-[64px] mb-3">
-        select_all
-      </span>
-      <p className="text-sm font-medium">Select a BOM to view details</p>
-      <p className="text-xs mt-1">Click on a row in the left panel</p>
-    </div>
-  )
-
   return (
     <div className="p-6 space-y-4">
       <div>
@@ -313,14 +205,103 @@ export default function BomPage() {
         </p>
       </div>
 
-      <MasterDetailSplit
-        masterContent={masterContent}
-        detailContent={detailContent}
-        masterTitle="BOM Headers"
-        detailTitle=""
-        masterWidth="45%"
-        className="h-[calc(100vh-200px)]"
-      />
+      <div className="border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest">
+        <InteractiveGrid
+          columns={COLUMNS}
+          data={bomHeaders}
+          loading={loading}
+          idKey="bom_header_id"
+          searchable
+          onRowClick={handleRowClick}
+          selectedIds={selectedBom ? [selectedBom.bom_header_id] : []}
+          tableHeight="calc(100vh - 280px)"
+        />
+      </div>
+
+      {selectedBom && (
+        <div className="border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest">
+          {detailHeader}
+          
+          <div className="p-4 bg-surface-container-lowest border-b border-outline-variant">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
+                  BOM ID
+                </div>
+                <div className="text-xs text-on-surface font-mono">
+                  {selectedBom.bom_header_id}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
+                  Item Number
+                </div>
+                <div className="text-xs text-on-surface font-semibold">
+                  {selectedBom.item_code || selectedBom.item_id}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
+                  Revision
+                </div>
+                <div className="text-xs text-on-surface font-semibold">
+                  {selectedBom.revision}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1">
+                  Alternate Code
+                </div>
+                <div className="text-xs text-on-surface">
+                  {selectedBom.alternate_bom_code || '-'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="px-4 py-2 bg-surface-container-low border-b border-outline-variant">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-[18px]">
+                account_tree
+              </span>
+              <span className="text-sm font-semibold text-on-surface">
+                Multi-Level Structure (Exploded View)
+              </span>
+            </div>
+          </div>
+          
+          <div className="h-[400px] overflow-auto">
+            {exploding ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center gap-3 text-outline">
+                  <span className="material-symbols-outlined text-[24px] animate-spin">
+                    progress_activity
+                  </span>
+                  <span className="text-sm">Loading BOM structure...</span>
+                </div>
+              </div>
+            ) : treeData.length > 0 ? (
+              <TreeGrid
+                data={treeData}
+                columns={treeColumns}
+                nodeLabelAccessor={(row) => row.item_name || 'Unnamed Item'}
+                nodeIconAccessor={(row) => 
+                  row.children && row.children.length > 0 ? 'inventory_2' : 'inventory'
+                }
+                nodeDescriptionAccessor={(row) => `Component: ${row.item_code || row.component_item_id}`}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-outline">
+                <span className="material-symbols-outlined text-[48px] mb-2">
+                  account_tree
+                </span>
+                <p className="text-sm">No components found in this BOM</p>
+                <p className="text-xs mt-1">Add components to see the structure</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
