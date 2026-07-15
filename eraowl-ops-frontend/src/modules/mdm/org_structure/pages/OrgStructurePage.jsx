@@ -351,8 +351,8 @@ export default function OrgStructurePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-on-surface">Org Structure</h1>
-          <p className="text-sm text-outline mt-1">Manage corporates, companies, business units, sites, warehouses, and locators</p>
+          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Org Structure</h1>
+          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage corporates, companies, business units, sites, warehouses, and locators</p>
         </div>
         <button onClick={openCreate}
           className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
@@ -411,7 +411,7 @@ export default function OrgStructurePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div className="flex items-center justify-between p-5 border-b border-outline-variant">
-              <h2 className="text-lg font-bold text-on-surface">{editingItem ? `Edit ${tab?.label}` : `Add ${tab?.label}`}</h2>
+              <h2 className="text-lg font-bold text-slate-900! dark:text-white!">{editingItem ? `Edit ${tab?.label}` : `Add ${tab?.label}`}</h2>
               <button onClick={closeModal} className="p-1.5 rounded-lg hover:bg-surface-container-high text-outline hover:text-on-surface transition-colors">
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>

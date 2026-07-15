@@ -59,8 +59,8 @@ export default function App() {
           <Route path="/collaboration/calendar" element={<CalendarPage />} />
           <Route path="/collaboration/todo" element={<TodoPage />} />
           <Route path="/collaboration/activities" element={<ActivitiesPage />} />
-          <Route path="/po" element={<div className="p-4"><h1 className="text-2xl font-bold text-on-surface">Purchase Orders</h1><p className="text-sm text-outline mt-2">Purchase order management coming soon.</p></div>} />
-          <Route path="/gl" element={<div className="p-4"><h1 className="text-2xl font-bold text-on-surface">General Ledger</h1><p className="text-sm text-outline mt-2">General ledger module coming soon.</p></div>} />
+          <Route path="/po" element={<div className="p-4"><h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Purchase Orders</h1><p className="text-sm text-slate-500! dark:text-slate-300! mt-2">Purchase order management coming soon.</p></div>} />
+          <Route path="/gl" element={<div className="p-4"><h1 className="text-2xl font-bold text-slate-900! dark:text-white!">General Ledger</h1><p className="text-sm text-slate-500! dark:text-slate-300! mt-2">General ledger module coming soon.</p></div>} />
         </Route>
       </Routes>
     </BrowserRouter>

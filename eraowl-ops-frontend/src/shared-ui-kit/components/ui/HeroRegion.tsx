@@ -58,11 +58,11 @@ export function HeroRegion({
             )}
             
             <div className="flex flex-col">
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-on-surface">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900! dark:text-white!">
                 {title}
               </h1>
               {subtitle && (
-                <p className="text-sm sm:text-base text-on-surface-variant mt-1 font-medium">
+                <p className="text-sm sm:text-base text-slate-500! dark:text-slate-300! mt-1 font-medium">
                   {subtitle}
                 </p>
               )}

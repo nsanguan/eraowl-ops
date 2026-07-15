@@ -49,7 +49,7 @@ export function Wizard({ steps, onComplete, onCancel, className = '', title = 'W
     <div className={`flex flex-col bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden ${className}`}>
       {/* Header */}
       <div className="bg-surface-container-low px-6 py-4 border-b border-outline-variant flex items-center justify-between">
-        <h2 className="font-bold text-lg text-on-surface">{title}</h2>
+        <h2 className="font-bold text-lg text-slate-900! dark:text-white!">{title}</h2>
         {onCancel && (
           <button 
             onClick={onCancel}

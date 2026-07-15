@@ -33,8 +33,8 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="bg-error/10 text-error p-4 rounded-full mb-6">
             <span className="material-symbols-outlined !text-[48px]">warning</span>
           </div>
-          <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
-          <p className="text-on-surface-variant max-w-md mb-8">
+          <h1 className="text-2xl font-bold mb-2 text-slate-900! dark:text-white!">Something went wrong</h1>
+          <p className="text-slate-500! dark:text-slate-300! max-w-md mb-8">
             {this.state.error?.message || 'An unexpected error occurred while rendering this component.'}
           </p>
           <button

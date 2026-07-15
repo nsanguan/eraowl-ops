@@ -210,7 +210,7 @@ export default function RoleManagement() {
           )}
           <div className="p-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-bold text-on-surface">Roles</h2>
+              <h2 className="text-sm font-bold text-slate-900! dark:text-white!">Roles</h2>
               <button onClick={openCreateModal}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-[11px] font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
                 <Plus size={14} /> Create Role
@@ -237,7 +237,7 @@ export default function RoleManagement() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-outline-variant shrink-0">
-              <h2 className="text-lg font-bold text-on-surface">{editingRole ? 'Edit Role' : 'Create Role'}</h2>
+              <h2 className="text-lg font-bold text-slate-900! dark:text-white!">{editingRole ? 'Edit Role' : 'Create Role'}</h2>
               <button onClick={closeModal} className="p-1.5 rounded-lg hover:bg-surface-container-high text-outline hover:text-on-surface transition-colors">
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>

@@ -130,8 +130,8 @@ export function FilterModal({
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-2xl text-primary">tune</span>
             <div>
-              <h2 className="text-lg font-bold text-on-surface">Advanced Filters</h2>
-              <p className="text-xs text-outline">Refine results by any field</p>
+              <h2 className="text-lg font-bold text-slate-900! dark:text-white!">Advanced Filters</h2>
+              <p className="text-xs text-slate-500! dark:text-slate-300!">Refine results by any field</p>
             </div>
           </div>
           <button onClick={onClose} className="w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-outline hover:text-on-surface transition-colors">

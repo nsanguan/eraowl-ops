@@ -117,7 +117,7 @@ export default function DiscussPage() {
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowCreate(false)}>
           <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-on-surface mb-4">Create Channel</h2>
+            <h2 className="text-lg font-bold text-slate-900! dark:text-white! mb-4">Create Channel</h2>
             <div className="space-y-3">
               <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Channel name"
                 className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none" />

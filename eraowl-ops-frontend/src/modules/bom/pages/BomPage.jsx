@@ -253,8 +253,8 @@ export default function BomPage() {
   return (
     <div className="p-6 space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-on-surface">Bill of Materials</h1>
-        <p className="text-sm text-outline mt-1">Manage BOM structures and multi-level component hierarchies</p>
+        <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Bill of Materials</h1>
+        <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage BOM structures and multi-level component hierarchies</p>
       </div>
 
       <div className="border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest">
@@ -332,7 +332,7 @@ export default function BomPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={closeModal}>
           <div className="bg-surface-container-highest rounded-xl shadow-xl max-w-lg w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-on-surface">
+              <h2 className="text-lg font-bold text-slate-900! dark:text-white!">
                 {editingBom ? 'Edit BOM Header' : 'Add BOM Header'}
               </h2>
               <button onClick={closeModal} className="text-outline hover:text-on-surface">

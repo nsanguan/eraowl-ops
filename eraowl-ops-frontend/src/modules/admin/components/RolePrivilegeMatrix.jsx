@@ -113,8 +113,8 @@ export default function RolePrivilegeMatrix() {
     <div className="eods-matrix space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-on-surface">Permission Matrix</h2>
-          <p className="text-sm text-outline mt-0.5">Manage permissions across all roles. Toggle switches to grant or revoke access.</p>
+          <h2 className="text-lg font-bold text-slate-900! dark:text-white!">Permission Matrix</h2>
+          <p className="text-sm text-slate-500! dark:text-slate-300! mt-0.5">Manage permissions across all roles. Toggle switches to grant or revoke access.</p>
         </div>
         <button onClick={handleSave} disabled={saving || !changed}
           className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-primary/20">

@@ -36,8 +36,8 @@ export default function ActivitiesPage() {
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-on-surface">Activities</h1>
-          <p className="text-sm text-outline mt-1">Track and manage activities across the system</p>
+          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Activities</h1>
+          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Track and manage activities across the system</p>
         </div>
         <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 flex items-center gap-2">
           <span className="material-symbols-outlined text-[18px]">add</span> Schedule Activity
@@ -72,7 +72,7 @@ export default function ActivitiesPage() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowForm(false)}>
           <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-on-surface mb-4">Schedule Activity</h2>
+            <h2 className="text-lg font-bold text-slate-900! dark:text-white! mb-4">Schedule Activity</h2>
             <div className="space-y-3">
               <select value={form.activity_type} onChange={(e) => setForm({...form, activity_type: e.target.value})} className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface outline-none">
                 <option value="task">Task</option><option value="meeting">Meeting</option><option value="call">Call</option><option value="email">Email</option><option value="follow_up">Follow Up</option>

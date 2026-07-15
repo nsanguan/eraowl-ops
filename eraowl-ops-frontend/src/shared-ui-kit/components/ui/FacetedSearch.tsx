@@ -77,7 +77,7 @@ export function FacetedSearch({
     <div className={`flex flex-col bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden ${className}`}>
       {/* Header */}
       <div className="bg-surface-container-low px-4 py-3 flex items-center justify-between border-b border-outline-variant">
-        <h2 className="font-bold text-on-surface flex items-center gap-2">
+        <h2 className="font-bold text-slate-900! dark:text-white! flex items-center gap-2">
           <span className="material-symbols-outlined !text-[20px]">filter_alt</span>
           {title}
         </h2>

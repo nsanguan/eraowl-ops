@@ -204,8 +204,8 @@ export default function SupplierPage() {
       <div className="h-[calc(100vh-6.5rem)] flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 border-b border-outline-variant">
           <div>
-            <h1 className="text-[32px] font-semibold leading-10 tracking-tight text-on-surface">Suppliers</h1>
-            <p className="text-sm text-outline mt-1">{suppliersLoading ? 'Loading...' : `${suppliers.length} supplier${suppliers.length !== 1 ? 's' : ''}`}</p>
+            <h1 className="text-[32px] font-semibold leading-10 tracking-tight text-slate-900! dark:text-white!">Suppliers</h1>
+            <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">{suppliersLoading ? 'Loading...' : `${suppliers.length} supplier${suppliers.length !== 1 ? 's' : ''}`}</p>
           </div>
           <button onClick={() => navigate('/party/suppliers', { state: { creating: true } })}
             className="px-4 py-2 bg-primary text-primary-foreground text-[11px] font-semibold rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center gap-1.5">
@@ -295,9 +295,9 @@ export default function SupplierPage() {
             className="p-2 text-outline hover:text-primary transition-colors rounded-lg hover:bg-primary/5" title="Back to list">
             <span className="material-symbols-outlined !text-[20px]">arrow_back</span></button>
           <div>
-            <h1 className="text-[32px] font-semibold leading-10 tracking-tight text-on-surface">
+            <h1 className="text-[32px] font-semibold leading-10 tracking-tight text-slate-900! dark:text-white!">
               {isEdit ? (existingSupplier?.supplier_code || 'Edit Supplier') : 'New Supplier'}</h1>
-            <p className="text-sm text-outline mt-1">Configure supplier details and sites</p>
+            <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Configure supplier details and sites</p>
           </div>
         </div>
         <button type="button" onClick={handleSave} disabled={saving}

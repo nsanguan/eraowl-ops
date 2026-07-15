@@ -158,8 +158,8 @@ export function EntityPage({
     >
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 style={{ fontSize: '32px', lineHeight: '40px', letterSpacing: '-0.01em', fontWeight: 600 }} className="text-on-surface">{title}</h1>
-          <p style={{ fontSize: '14px', lineHeight: '20px' }} className="text-outline mt-1">
+          <h1 style={{ fontSize: '32px', lineHeight: '40px', letterSpacing: '-0.01em', fontWeight: 600 }} className="text-slate-900! dark:text-white!">{title}</h1>
+          <p style={{ fontSize: '14px', lineHeight: '20px' }} className="text-slate-500! dark:text-slate-300! mt-1">
             {isLoading ? 'Loading...' : `${filteredRecords.length} ${title.toLowerCase()} record${filteredRecords.length !== 1 ? 's' : ''}`}
           </p>
         </div>

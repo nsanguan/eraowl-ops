@@ -47,8 +47,8 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-black text-sm">AX</div>
           <div>
-            <h2 className="text-lg font-semibold text-on-surface">Axon OS</h2>
-            <p className="text-[10px] uppercase tracking-widest text-outline">Enterprise Sign In</p>
+            <h2 className="text-lg font-semibold text-slate-900! dark:text-white!">Axon OS</h2>
+            <p className="text-[10px] uppercase tracking-widest text-slate-500! dark:text-slate-300!">Enterprise Sign In</p>
           </div>
         </div>
 

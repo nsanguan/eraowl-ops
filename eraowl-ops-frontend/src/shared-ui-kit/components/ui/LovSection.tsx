@@ -64,7 +64,7 @@ export function LovSection({ isOpen, onClose, onSelect, title, columns, data, se
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant bg-surface-container-low rounded-t-xl">
-          <h2 className="text-lg font-bold text-on-surface tracking-tight">Search and Select: {title}</h2>
+          <h2 className="text-lg font-bold text-slate-900! dark:text-white! tracking-tight">Search and Select: {title}</h2>
           <button onClick={onClose} className="p-1 text-outline hover:text-on-surface hover:bg-outline-variant/30 rounded-lg transition-colors">
             <span className="material-symbols-outlined !text-[20px]">close</span>
           </button>

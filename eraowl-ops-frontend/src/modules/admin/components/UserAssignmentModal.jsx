@@ -83,8 +83,8 @@ export default function UserAssignmentModal({ user, onClose, onSaved }) {
       <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-5 border-b border-outline-variant shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-on-surface">User Assignments</h2>
-            <p className="text-sm text-outline mt-0.5">{user?.username || user?.email}</p>
+            <h2 className="text-lg font-bold text-slate-900! dark:text-white!">User Assignments</h2>
+            <p className="text-sm text-slate-500! dark:text-slate-300! mt-0.5">{user?.username || user?.email}</p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-surface-container-high text-outline hover:text-on-surface transition-colors">
             <span className="material-symbols-outlined text-[18px]">close</span>

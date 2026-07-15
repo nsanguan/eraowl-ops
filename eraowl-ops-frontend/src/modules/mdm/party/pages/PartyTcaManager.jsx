@@ -209,7 +209,7 @@ export default function PartyTcaManager() {
       masterContent={
         <div className="h-full flex flex-col">
           <div className="p-4 border-b border-outline-variant space-y-3">
-            <h2 className="text-sm font-bold text-on-surface">Trading Community</h2>
+            <h2 className="text-sm font-bold text-slate-900! dark:text-white!">Trading Community</h2>
             <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by name or number..."
               className="w-full px-3 py-2 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none" />
             <div className="flex gap-2">
@@ -281,7 +281,7 @@ export default function PartyTcaManager() {
     {showAddRole && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowAddRole(false)}>
         <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
-          <h2 className="text-sm font-bold text-on-surface mb-3">Add Business Role</h2>
+          <h2 className="text-sm font-bold text-slate-900! dark:text-white! mb-3">Add Business Role</h2>
           <div className="space-y-3">
             {['SUPPLIER', 'CUSTOMER'].map((r) => (
               <div key={r} className={`border rounded-xl p-3 transition-all ${r === 'SUPPLIER' ? 'border-primary/30 bg-primary/5' : 'border-outline-variant'}`}>
@@ -323,7 +323,7 @@ export default function PartyTcaManager() {
     {showAddSite && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowAddSite(false)}>
         <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
-          <h2 className="text-sm font-bold text-on-surface mb-3">Add New Site</h2>
+          <h2 className="text-sm font-bold text-slate-900! dark:text-white! mb-3">Add New Site</h2>
           <div className="space-y-3">
             {['site_name', 'country', 'address_line1', 'city', 'state', 'postal_code'].map((f) => (
               <div key={f}>

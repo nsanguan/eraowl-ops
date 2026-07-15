@@ -140,7 +140,7 @@ export function InteractiveGrid<T extends Record<string, any>>({
     <div className="border border-outline-variant rounded bg-surface-container-lowest flex flex-col overflow-hidden mb-6 shadow-sm eods-ig" style={{ fontFamily: 'var(--font-sans, Inter, sans-serif)' }}>
       {title && (
         <div className="px-4 py-2 border-b border-outline-variant/50 bg-surface-container-low/50">
-          <h2 className="text-[13px] font-bold text-on-surface tracking-tight">{title}</h2>
+          <h2 className="text-[13px] font-bold text-slate-900! dark:text-white! tracking-tight">{title}</h2>
         </div>
       )}
 
@@ -363,7 +363,7 @@ export function InteractiveGrid<T extends Record<string, any>>({
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onClick={() => setSingleRowView(null)}>
           <div className="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-xl flex flex-col w-full max-w-3xl max-h-[90vh] overflow-hidden" style={{ fontFamily: 'var(--font-sans, Inter, sans-serif)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant bg-surface-container-low shrink-0">
-              <h2 className="text-[14px] font-bold text-on-surface tracking-tight">Row Details</h2>
+              <h2 className="text-[14px] font-bold text-slate-900! dark:text-white! tracking-tight">Row Details</h2>
               <button onClick={() => setSingleRowView(null)} className="p-1 hover:bg-surface-container-highest rounded-full text-outline transition-colors flex items-center justify-center">
                 <span className="material-symbols-outlined !text-[18px]">close</span>
               </button>

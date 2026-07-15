@@ -177,8 +177,8 @@ export default function UserManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-on-surface">Users</h1>
-          <p className="text-sm text-outline mt-1">Manage user accounts and role assignments</p>
+          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Users</h1>
+          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage user accounts and role assignments</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={handleExportCSV}
@@ -241,7 +241,7 @@ export default function UserManagement() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div className="flex items-center justify-between p-5 border-b border-outline-variant">
-              <h2 className="text-lg font-bold text-on-surface">{editingUser ? 'Edit User' : 'Create User'}</h2>
+              <h2 className="text-lg font-bold text-slate-900! dark:text-white!">{editingUser ? 'Edit User' : 'Create User'}</h2>
               <button onClick={closeModal} className="p-1.5 rounded-lg hover:bg-surface-container-high text-outline hover:text-on-surface transition-colors">
               <span className="material-symbols-outlined text-[18px]">close</span>
               </button>

@@ -44,8 +44,8 @@ export default function CalendarPage() {
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-on-surface">Calendar</h1>
-          <p className="text-sm text-outline mt-1">{monthNames[month]} {year}</p>
+          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Calendar</h1>
+          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">{monthNames[month]} {year}</p>
         </div>
         <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 flex items-center gap-2">
           <span className="material-symbols-outlined text-[18px]">add</span> Add Event
@@ -112,7 +112,7 @@ export default function CalendarPage() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowForm(false)}>
           <div className="bg-surface-container rounded-2xl border border-outline-variant shadow-2xl w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-on-surface mb-4">Add Event</h2>
+            <h2 className="text-lg font-bold text-slate-900! dark:text-white! mb-4">Add Event</h2>
             <div className="space-y-3">
               <input type="text" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} placeholder="Event title" className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none" />
               <select value={form.event_type} onChange={(e) => setForm({...form, event_type: e.target.value})} className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface outline-none">

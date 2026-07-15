@@ -105,8 +105,8 @@ export default function PermissionMatrix() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-on-surface">Permission Matrix</h2>
-          <p className="text-sm text-outline mt-0.5">
+          <h2 className="text-lg font-bold text-slate-900! dark:text-white!">Permission Matrix</h2>
+          <p className="text-sm text-slate-500! dark:text-slate-300! mt-0.5">
             Manage permissions across all roles. Toggle switches to grant or revoke access.
           </p>
         </div>

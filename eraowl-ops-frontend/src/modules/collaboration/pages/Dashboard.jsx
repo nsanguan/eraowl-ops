@@ -37,8 +37,8 @@ export default function CollaborationDashboard() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold text-on-surface">Collaboration</h1>
-        <p className="text-sm text-outline mt-1">Team communication and productivity tools</p>
+        <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Collaboration</h1>
+        <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Team communication and productivity tools</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -48,7 +48,7 @@ export default function CollaborationDashboard() {
       </div>
 
       <div>
-        <h2 className="text-sm font-bold text-on-surface mb-3">Quick Access</h2>
+        <h2 className="text-sm font-bold text-slate-900! dark:text-white! mb-3">Quick Access</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           {QUICK_LINKS.map((link) => (
             <button key={link.path} onClick={() => navigate(link.path)}

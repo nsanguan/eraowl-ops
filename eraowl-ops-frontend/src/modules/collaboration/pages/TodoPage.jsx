@@ -45,8 +45,8 @@ export default function TodoPage() {
   return (
     <div className="p-6 max-w-2xl space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-on-surface">To-Do</h1>
-        <p className="text-sm text-outline mt-1">Personal task management</p>
+        <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">To-Do</h1>
+        <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Personal task management</p>
       </div>
 
       <div className="flex gap-2">
