@@ -194,52 +194,44 @@ export default function RoleManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-on-surface">Roles</h1>
-          <p className="text-sm text-outline mt-1">Define user roles with granular permissions</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={openCreateModal}
-            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
-            <Plus size={15} /> Create Role
-          </button>
-        </div>
-      </div>
+      <RolePrivilegeMatrix />
 
-      {error && (
-        <div className="bg-error-container text-error p-4 rounded-xl text-sm font-medium border border-error/20">{error}</div>
-      )}
-
-      <InteractiveGrid
-        columns={columns}
-        data={roles}
-        loading={loading}
-        idKey="role_id"
-        searchable
-        onRowClick={(row) => setSelectedRoleId(roleId(row) === selectedRoleId ? null : roleId(row))}
-        onEdit={(row) => openEditModal(row)}
-        onDelete={(row) => handleDelete(row)}
-        onAddRow={openCreateModal}
-        addLabel="Add Role"
-        tableHeight="calc(100vh - 280px)"
-      />
-
-      {selectedRoleId && (
-        <div className="neo-card p-4 flex items-center justify-between">
-          <p className="text-sm text-on-surface font-medium">
-            Selected: {roles.find((r) => roleId(r) === selectedRoleId)?.role_name || roles.find((r) => roleId(r) === selectedRoleId)?.name || ''}
-          </p>
-          <div className="flex items-center gap-2">
-            <button onClick={() => { const r = roles.find((r) => roleId(r) === selectedRoleId); if (r) openEditModal(r) }}
-              className="neo-button px-3 py-1.5 text-xs font-semibold text-primary">Edit</button>
-            <button onClick={() => { const r = roles.find((r) => roleId(r) === selectedRoleId); if (r) handleDelete(r) }}
-              className="neo-button px-3 py-1.5 text-xs font-semibold text-error">Delete</button>
+      <details className="border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest group">
+        <summary className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-surface-container-low transition-colors text-sm font-semibold text-outline group-open:text-on-surface list-none">
+          <span className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">settings</span>
+            Role Configuration
+          </span>
+          <span className="material-symbols-outlined text-[18px] transition-transform group-open:rotate-180">expand_more</span>
+        </summary>
+        <div className="border-t border-outline-variant">
+          {error && (
+            <div className="bg-error-container text-error p-4 text-sm font-medium border-b border-outline-variant/30">{error}</div>
+          )}
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold text-on-surface">Roles</h2>
+              <button onClick={openCreateModal}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-[11px] font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+                <Plus size={14} /> Create Role
+              </button>
+            </div>
+            <InteractiveGrid
+              columns={columns}
+              data={roles}
+              loading={loading}
+              idKey="role_id"
+              searchable
+              tableHeight="300px"
+              onRowClick={(row) => setSelectedRoleId(roleId(row) === selectedRoleId ? null : roleId(row))}
+              onEdit={(row) => openEditModal(row)}
+              onDelete={(row) => handleDelete(row)}
+              onAddRow={openCreateModal}
+              addLabel="Add Role"
+            />
           </div>
         </div>
-      )}
-
-      <RolePrivilegeMatrix />
+      </details>
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
