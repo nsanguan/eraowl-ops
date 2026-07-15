@@ -22,10 +22,11 @@ const COLUMNS = {
     },
   ],
   parties: [
-    { key: 'party_code',  header: 'Code',   width: '120px' },
-    { key: 'party_name',  header: 'Name',   width: '220px' },
-    { key: 'party_type',  header: 'Type',   width: '130px' },
-    { key: 'is_active',   header: 'Status', width: '100px',
+    { key: 'party_code',    header: 'Code',      width: '120px' },
+    { key: 'party_name',    header: 'Name',      width: '220px' },
+    { key: 'party_type',    header: 'Type',      width: '130px' },
+    { key: 'tax_reference', header: 'Tax ID',    width: '130px' },
+    { key: 'is_active',     header: 'Status',    width: '100px',
       render: (r) => r.is_active !== false
         ? <span className="text-success text-xs font-semibold">Active</span>
         : <span className="text-outline text-xs">Inactive</span>,
@@ -53,10 +54,10 @@ const FIELDS = {
     { key: 'country_code',   label: 'Country Code' },
   ],
   parties: [
-    { key: 'party_code', label: 'Party Code' },
-    { key: 'party_name', label: 'Party Name', required: true },
-    { key: 'party_type', label: 'Party Type', required: true },
-    { key: 'tax_id',     label: 'Tax ID' },
+    { key: 'party_code',    label: 'Party Code' },
+    { key: 'party_name',    label: 'Party Name', required: true },
+    { key: 'party_type',    label: 'Party Type', required: true },
+    { key: 'tax_reference', label: 'Tax ID' },
   ],
   customers: [
     { key: 'customer_code',    label: 'Customer Code',    required: true },
