@@ -32,6 +32,18 @@ const COLUMNS = {
         : <span className="text-outline text-xs">Inactive</span>,
     },
   ],
+  suppliers: [
+    { key: 'party_code',      header: 'Party Code',    width: '120px' },
+    { key: 'party_name',      header: 'Party Name',    width: '180px' },
+    { key: 'supplier_code',   header: 'Supplier Code', width: '140px' },
+    { key: 'currency_code',   header: 'Currency',      width: '100px' },
+    { key: 'payment_term_days', header: 'Payment Terms', width: '140px' },
+    { key: 'is_active',        header: 'Status',        width: '100px',
+      render: (r) => r.is_active !== false
+        ? <span className="text-success text-xs font-semibold">Active</span>
+        : <span className="text-outline text-xs">Inactive</span>,
+    },
+  ],
   customers: [
     { key: 'customer_code',    header: 'Code',        width: '140px' },
     { key: 'credit_limit',     header: 'Credit Limit', width: '130px' },

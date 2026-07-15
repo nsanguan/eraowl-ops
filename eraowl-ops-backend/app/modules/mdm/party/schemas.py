@@ -175,6 +175,8 @@ class SupplierOut(BaseModel):
     supplier_id: uuid.UUID
     party_id: uuid.UUID
     party_role_id: Optional[uuid.UUID]
+    party_code: Optional[str] = None
+    party_name: Optional[str] = None
     supplier_code: Optional[str]
     currency_code: Optional[str]
     vendor_type_lookup_code: Optional[str]

@@ -13,9 +13,9 @@ from app.modules.mdm.party.schemas import (
     PartySiteCreate, PartySiteUpdate,
     PartySiteUseCreate, PartySiteUseUpdate,
     PartyRoleCreate, PartyRoleUpdate,
-    SupplierCreate, SupplierUpdate,
+    SupplierCreate, SupplierUpdate, SupplierOut,
     SupplierSiteCreate, SupplierSiteUpdate,
-    CustomerCreate, CustomerUpdate,
+    CustomerCreate, CustomerUpdate, CustomerOut,
     CustomerSiteCreate, CustomerSiteUpdate,
 )
 from app.modules.mdm.party.exceptions import PartyNotFoundError
@@ -151,7 +151,26 @@ class PartyService:
     # --- Suppliers ---
     async def list_suppliers(self, page: int = 1, page_size: int = 20, party_id: uuid.UUID | None = None):
         filters = {"party_id": party_id} if party_id else None
-        return await self._paginate(Supplier, page, page_size, filters)
+        items, total = await self._paginate(Supplier, page, page_size, filters)
+
+        if not items:
+            return items, total
+
+        party_ids = list({s.party_id for s in items})
+        from sqlalchemy import select
+        result = await self.db.execute(select(Party).where(Party.party_id.in_(party_ids)))
+        party_map = {p.party_id: p for p in result.scalars().all()}
+
+        enriched = []
+        for s in items:
+            out = SupplierOut.model_validate(s)
+            party = party_map.get(s.party_id)
+            if party:
+                out.party_code = party.party_code
+                out.party_name = party.party_name
+            enriched.append(out)
+
+        return enriched, total
 
     async def get_supplier(self, entity_id: uuid.UUID):
         return await self._get_by_id(Supplier, entity_id)
