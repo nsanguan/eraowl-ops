@@ -3,7 +3,7 @@ import uuid
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings as app_settings
@@ -379,6 +379,45 @@ async def refresh_token(
 async def logout(data: schemas.LogoutRequest, svc: AdminService = Depends(get_service)):
     token_hash = hashlib.sha256(data.refresh_token.encode()).hexdigest()
     await svc.revoke_refresh_token(token_hash)
+
+
+# ---------------------------------------------------------------------------
+# Objects — code-level object catalog
+# ---------------------------------------------------------------------------
+
+@router.get("/objects")
+async def list_objects(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=500),
+    object_type: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("admin", "view_audit_logs"),
+):
+    conditions = ["TRUE"]
+    params: dict[str, str | int] = {}
+    if object_type:
+        conditions.append("object_type = :obj_type")
+        params["obj_type"] = object_type
+    where = " AND ".join(conditions)
+    count_q = text(f"SELECT count(*) FROM admin.objects WHERE {where}")
+    total = (await db.execute(count_q, params)).scalar() or 0
+    offset = (page - 1) * page_size
+    data_q = text(
+        f"SELECT object_id, object_type, module_name, object_name, parent_object_id, description, metadata, "
+        f"is_active, is_deleted, created_at, updated_at "
+        f"FROM admin.objects WHERE {where} ORDER BY created_at DESC LIMIT :lim OFFSET :off"
+    )
+    params["lim"] = page_size
+    params["off"] = offset
+    rows = (await db.execute(data_q, params)).mappings().all()
+    total_pages = max(1, (total + page_size - 1) // page_size)
+    return {
+        "items": [dict(r) for r in rows],
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages,
+    }
 
 
 # ---------------------------------------------------------------------------

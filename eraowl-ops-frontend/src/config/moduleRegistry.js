@@ -51,6 +51,16 @@ export const MODULE_REGISTRY = [
     keywords: ['role', 'permission', 'access', 'security'],
   },
   {
+    id: 'objects',
+    label: 'Code Objects',
+    icon: 'data_exploration',
+    path: '/admin/objects',
+    area: 'admin',
+    module: 'admin',
+    action: 'view_audit_logs',
+    keywords: ['object', 'catalog', 'metadata', 'code', 'scanner'],
+  },
+  {
     id: 'org_structure',
     label: 'Org Structure',
     icon: 'account_tree',

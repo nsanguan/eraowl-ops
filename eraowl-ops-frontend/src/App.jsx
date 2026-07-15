@@ -6,6 +6,7 @@ import Layout from './components/Layout'
 import Login from './modules/admin/pages/Login'
 import UserManagement from './modules/admin/pages/UserManagement'
 import RoleManagement from './modules/admin/pages/RoleManagement'
+import ObjectsPage from './modules/admin/pages/ObjectsPage'
 import OrgStructurePage from './modules/mdm/org_structure/pages/OrgStructurePage'
 import PartyPage from './modules/mdm/party/pages/PartyPage'
 import ItemPage from './modules/mdm/item/pages/ItemPage'
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/" element={<div className="p-4"><h1 className="text-2xl font-bold text-on-surface">Welcome to EraOwl-OPS</h1><p className="text-sm text-outline mt-2">Use the sidebar to navigate between modules, or press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-surface-container-high rounded border border-outline-variant">⌘K</kbd> for quick search.</p></div>} />
           <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/roles" element={<RoleManagement />} />
+          <Route path="/admin/objects" element={<ObjectsPage />} />
           <Route path="/org-structure" element={<OrgStructurePage />} />
           <Route path="/party" element={<PartyPage />} />
           <Route path="/items" element={<ItemPage />} />
