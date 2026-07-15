@@ -13,7 +13,10 @@ import ItemPage from './modules/mdm/item/pages/ItemPage'
 import BomPage from './modules/bom/pages/BomPage'
 import CollaborationDashboard from './modules/collaboration/pages/Dashboard'
 import DiscussPage from './modules/collaboration/pages/DiscussPage'
+import ChatPage from './modules/collaboration/pages/ChatPage'
+import CalendarPage from './modules/collaboration/pages/CalendarPage'
 import TodoPage from './modules/collaboration/pages/TodoPage'
+import ActivitiesPage from './modules/collaboration/pages/ActivitiesPage'
 
 export default function App() {
   const checkAuth = useAuthStore((s) => s.checkAuth)
@@ -43,7 +46,10 @@ export default function App() {
           <Route path="/bom" element={<BomPage />} />
           <Route path="/collaboration" element={<CollaborationDashboard />} />
           <Route path="/collaboration/discuss" element={<DiscussPage />} />
+          <Route path="/collaboration/chat" element={<ChatPage />} />
+          <Route path="/collaboration/calendar" element={<CalendarPage />} />
           <Route path="/collaboration/todo" element={<TodoPage />} />
+          <Route path="/collaboration/activities" element={<ActivitiesPage />} />
           <Route path="/po" element={<div className="p-4"><h1 className="text-2xl font-bold text-on-surface">Purchase Orders</h1><p className="text-sm text-outline mt-2">Purchase order management coming soon.</p></div>} />
           <Route path="/gl" element={<div className="p-4"><h1 className="text-2xl font-bold text-on-surface">General Ledger</h1><p className="text-sm text-outline mt-2">General ledger module coming soon.</p></div>} />
         </Route>
