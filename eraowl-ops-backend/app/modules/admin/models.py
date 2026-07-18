@@ -176,3 +176,127 @@ class UserUiPersonalization(SQLModel, table=True):
     updated_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     )
+
+
+# ---------------------------------------------------------------------------
+# User Profiles (Oracle EBS Profile Options)
+# ---------------------------------------------------------------------------
+
+
+class ProfileLevel(SQLModel, table=True):
+    """Defines the hierarchy levels a profile option value can be set at.
+
+    Mirrors FND_PROFILE_LEVELS.  Precedence (most specific wins) is encoded by
+    the ``precedence`` integer: lower number = higher priority.
+    Site < Application < Role < User.
+    """
+
+    __tablename__ = "profile_levels"
+    __table_args__ = {"schema": "admin"}
+
+    profile_level_id: int = Field(sa_column=Column(Integer, primary_key=True))
+    level_code: str = Field(sa_column=Column(String(30), unique=True, nullable=False, index=True))
+    name: str = Field(sa_column=Column(String(100), nullable=False))
+    description: Optional[str] = Field(default=None, sa_column=Column(Text, nullable=True))
+    precedence: int = Field(default=100, sa_column=Column(Integer, nullable=False))
+
+
+class ProfileOption(SQLModel, table=True):
+    """A named, global setting (EBS Profile Option).
+
+    Its value can be set independently at multiple levels.  ``value_type``
+    drives validation/rendering: text | number | date | checkbox | url.
+    The per-level visibility/changeability flags mirror EBS' enabled flags.
+    """
+
+    __tablename__ = "profile_options"
+    __table_args__ = {"schema": "admin"}
+
+    profile_option_id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    )
+    profile_option_name: str = Field(
+        sa_column=Column(String(255), unique=True, index=True, nullable=False),
+        description="Internal name, e.g. GL_SET_OF_BKS_ID",
+    )
+    user_profile_option_name: str = Field(sa_column=Column(String(255), nullable=False))
+    description: Optional[str] = Field(default=None, sa_column=Column(Text, nullable=True))
+    value_type: str = Field(
+        default="text",
+        sa_column=Column(String(20), nullable=False),
+        description="text | number | date | checkbox | url",
+    )
+    sql_validation: Optional[str] = Field(default=None, sa_column=Column(Text, nullable=True))
+    site_enabled: bool = Field(default=True, sa_column=Column(Boolean, default=True, nullable=False))
+    application_enabled: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
+    role_enabled: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
+    user_enabled: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
+    is_system: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
+    is_deleted: bool = Field(default=False, sa_column=Column(Boolean, default=False, nullable=False))
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    )
+
+    translations: list["ProfileOptionTL"] = Relationship(
+        back_populates="profile_option", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    values: list["ProfileOptionValue"] = Relationship(
+        back_populates="profile_option", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+
+
+class ProfileOptionTL(SQLModel, table=True):
+    """Translated display name / description per language (EBS _TL table)."""
+
+    __tablename__ = "profile_options_tl"
+    __table_args__ = {"schema": "admin"}
+
+    profile_option_id: uuid.UUID = Field(
+        foreign_key="admin.profile_options.profile_option_id", primary_key=True
+    )
+    language: str = Field(sa_column=Column(String(10), primary_key=True))
+    user_profile_option_name: str = Field(sa_column=Column(String(255), nullable=False))
+    description: Optional[str] = Field(default=None, sa_column=Column(Text, nullable=True))
+    source_lang: str = Field(default="en", sa_column=Column(String(10), nullable=False))
+
+    profile_option: "ProfileOption" = Relationship(back_populates="translations")
+
+
+class ProfileOptionValue(SQLModel, table=True):
+    """A single value set for a profile option at a given level (EBS
+    FND_PROFILE_OPTION_VALUES).
+
+    The ``level`` references ``profile_levels.level_code``.  ``level_key``
+    identifies the concrete target:
+      - site      -> NULL
+      - application -> module string (e.g. 'mdm')
+      - role      -> role_id (UUID)
+      - user      -> user_id (UUID)
+    The value is always stored as text and cast by the option's value_type.
+    """
+
+    __tablename__ = "profile_option_values"
+    __table_args__ = {"schema": "admin"}
+
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    )
+    profile_option_id: uuid.UUID = Field(
+        foreign_key="admin.profile_options.profile_option_id", nullable=False, index=True
+    )
+    level: str = Field(sa_column=Column(String(30), nullable=False, index=True))
+    level_key: Optional[str] = Field(default=None, sa_column=Column(String(255), nullable=True))
+    profile_option_value: str = Field(sa_column=Column(Text, nullable=False))
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    )
+
+    profile_option: "ProfileOption" = Relationship(back_populates="values")

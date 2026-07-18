@@ -62,6 +62,7 @@ export const MODULE_REGISTRY = [
   { id: 'roles', label: 'Roles', icon: 'shield', path: '/admin/roles', area: 'admin', module: 'admin', action: 'manage_roles', keywords: ['role', 'permission', 'access', 'security'] },
   { id: 'objects', label: 'Code Objects', icon: 'data_exploration', path: '/admin/objects', area: 'admin', module: 'admin', action: 'view_audit_logs', keywords: ['object', 'catalog', 'metadata', 'code', 'scanner'] },
   { id: 'personalize', label: 'User Personalize', icon: 'tune', path: '/admin/personalize', area: 'admin', module: 'admin', action: 'personalize', keywords: ['personalize', 'ui', 'layout', 'theme', 'personalization', 'page', 'component'] },
+  { id: 'user_profiles', label: 'User Profiles', icon: 'tune', path: '/admin/user-profiles', area: 'admin', module: 'admin', action: 'manage_profiles', keywords: ['profile', 'option', 'setting', 'preference', 'ebs', 'site', 'level'] },
   { id: 'org_structure', label: 'Org Structure', icon: 'account_tree', path: '/org-structure', area: 'admin', module: 'org_structure', action: 'view', keywords: ['organization', 'company', 'business unit', 'department', 'hierarchy'] },
   { id: 'core', label: 'Core', icon: 'settings', path: '/core', area: 'admin', module: 'core', action: 'view', keywords: ['core', 'central', 'reference', 'identity'] },
   { id: 'items', label: 'Items', icon: 'inventory_2', path: '/items', area: 'mdm', module: 'item', action: 'view', keywords: ['item', 'product', 'material', 'goods', 'sku', 'catalog'] },

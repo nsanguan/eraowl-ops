@@ -19,7 +19,12 @@ from app.core.security import (
 )
 from app.modules.admin import schemas
 from app.modules.admin.models import UserBusinessUnit
-from app.modules.admin.services import AdminService, AdminGenericService, PersonalizeService
+from app.modules.admin.services import (
+    AdminService,
+    AdminGenericService,
+    PersonalizeService,
+    ProfileService,
+)
 from app.shared.pagination import PaginatedResponse
 
 router = APIRouter()
@@ -588,3 +593,141 @@ async def ui_personalize_template_detail(
 
         raise HTTPException(status_code=404, detail=f"Template '{page_key}' not found")
     return detail
+
+
+# ---------------------------------------------------------------------------
+# User Profiles (Oracle EBS Profile Options)
+# ---------------------------------------------------------------------------
+
+
+async def get_profile_service(db: AsyncSession = Depends(get_db)) -> ProfileService:
+    return ProfileService(db)
+
+
+@router.get("/profile-levels", response_model=list[schemas.ProfileLevelOut])
+async def list_profile_levels(
+    svc: ProfileService = Depends(get_profile_service),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    """The hierarchy levels a profile value can be set at (Site→App→Role→User)."""
+    return await svc.list_levels()
+
+
+@router.get("/profile-options", response_model=PaginatedResponse[schemas.ProfileOptionOut])
+async def list_profile_options(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=200),
+    search: Optional[str] = Query(None),
+    svc: ProfileService = Depends(get_profile_service),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    result = await svc.list_options(page=page, page_size=page_size, search=search)
+    return result
+
+
+@router.post(
+    "/profile-options",
+    response_model=schemas.ProfileOptionOut,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_profile_option(
+    data: schemas.ProfileOptionCreate,
+    svc: ProfileService = Depends(get_profile_service),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    return await svc.create_option(data)
+
+
+@router.get("/profile-options/{profile_option_id}", response_model=schemas.ProfileOptionOut)
+async def get_profile_option(
+    profile_option_id: uuid.UUID,
+    svc: ProfileService = Depends(get_profile_service),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    return await svc.get_option(profile_option_id)
+
+
+@router.put("/profile-options/{profile_option_id}", response_model=schemas.ProfileOptionOut)
+async def update_profile_option(
+    profile_option_id: uuid.UUID,
+    data: schemas.ProfileOptionUpdate,
+    svc: ProfileService = Depends(get_profile_service),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    return await svc.update_option(profile_option_id, data)
+
+
+@router.delete(
+    "/profile-options/{profile_option_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_profile_option(
+    profile_option_id: uuid.UUID,
+    svc: ProfileService = Depends(get_profile_service),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    await svc.delete_option(profile_option_id)
+
+
+@router.get(
+    "/profile-options/{profile_option_id}/values",
+    response_model=list[schemas.ProfileOptionValueOut],
+)
+async def list_profile_option_values(
+    profile_option_id: uuid.UUID,
+    svc: ProfileService = Depends(get_profile_service),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    """All stored values for an option, across every level."""
+    return await svc.list_values(profile_option_id)
+
+
+@router.put(
+    "/profile-options/{profile_option_id}/values",
+    response_model=schemas.ProfileOptionValueOut,
+)
+async def set_profile_option_value(
+    profile_option_id: uuid.UUID,
+    data: schemas.ProfileValueSetRequest,
+    svc: ProfileService = Depends(get_profile_service),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    """Upsert a value at a given level (site/application/role/user)."""
+    return await svc.set_value(
+        profile_option_id, data.level, data.level_key, data.profile_option_value
+    )
+
+
+@router.delete(
+    "/profile-options/{profile_option_id}/values",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_profile_option_value(
+    profile_option_id: uuid.UUID,
+    level: str = Query(...),
+    level_key: Optional[str] = Query(None),
+    svc: ProfileService = Depends(get_profile_service),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    await svc.delete_value(profile_option_id, level, level_key)
+
+
+@router.get("/profile-values/effective", response_model=schemas.EffectiveProfileValueOut)
+async def get_effective_profile_value(
+    profile_option_name: str = Query(..., description="Internal profile option name"),
+    user_id: Optional[uuid.UUID] = Query(None),
+    svc: ProfileService = Depends(get_profile_service),
+    _user=Depends(get_current_user),
+    _priv=check_privilege("admin", "manage_profiles"),
+):
+    """Resolve the effective value for the current (or given) user following
+    the EBS precedence: User > Role > Application > Site."""
+    from app.modules.admin.models import UserRole as _UR
+
+    if user_id is None and _user is not None:
+        user_id = _user.user_id
+    role_ids = []
+    if user_id is not None:
+        rr = await svc.db.execute(select(_UR.role_id).where(_UR.user_id == user_id))
+        role_ids = [r[0] for r in rr.all()]
+    return await svc.get_effective_value(profile_option_name, user_id=user_id, role_ids=role_ids)

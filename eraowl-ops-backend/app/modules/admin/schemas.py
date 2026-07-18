@@ -196,3 +196,95 @@ class UiTemplateDetailOut(BaseModel):
     component_count: int
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# User Profiles (EBS Profile Options)
+# ---------------------------------------------------------------------------
+
+
+class ProfileOptionCreate(BaseModel):
+    profile_option_name: str
+    user_profile_option_name: str
+    description: Optional[str] = None
+    value_type: str = "text"  # text | number | date | checkbox | url
+    sql_validation: Optional[str] = None
+    site_enabled: bool = True
+    application_enabled: bool = False
+    role_enabled: bool = False
+    user_enabled: bool = False
+    is_system: bool = False
+
+
+class ProfileOptionUpdate(BaseModel):
+    user_profile_option_name: Optional[str] = None
+    description: Optional[str] = None
+    value_type: Optional[str] = None
+    sql_validation: Optional[str] = None
+    site_enabled: Optional[bool] = None
+    application_enabled: Optional[bool] = None
+    role_enabled: Optional[bool] = None
+    user_enabled: Optional[bool] = None
+    is_system: Optional[bool] = None
+
+
+class ProfileOptionOut(BaseModel):
+    profile_option_id: uuid.UUID
+    profile_option_name: str
+    user_profile_option_name: str
+    description: Optional[str] = None
+    value_type: str
+    sql_validation: Optional[str] = None
+    site_enabled: bool
+    application_enabled: bool
+    role_enabled: bool
+    user_enabled: bool
+    is_system: bool
+    is_deleted: bool
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ProfileLevelOut(BaseModel):
+    profile_level_id: int
+    level_code: str
+    name: str
+    description: Optional[str] = None
+    precedence: int
+
+    model_config = {"from_attributes": True}
+
+
+class ProfileOptionValueOut(BaseModel):
+    id: uuid.UUID
+    profile_option_id: uuid.UUID
+    level: str
+    level_key: Optional[str] = None
+    profile_option_value: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ProfileValueSetRequest(BaseModel):
+    """Set (upsert) a profile option value at a given level.
+
+    ``level`` must be one of: site, application, role, user.
+    ``level_key`` is required for application/role/user and identifies the
+    concrete target (module string, role_id, or user_id).  For site it is null.
+    """
+
+    level: str
+    level_key: Optional[str] = None
+    profile_option_value: str
+
+
+class EffectiveProfileValueOut(BaseModel):
+    profile_option_name: str
+    effective_value: Optional[str] = None
+    resolved_level: Optional[str] = None
+    level_key: Optional[str] = None
+    is_default: bool = False

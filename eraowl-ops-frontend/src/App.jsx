@@ -8,6 +8,7 @@ import UserManagement from './modules/admin/pages/UserManagement'
 import RoleManagement from './modules/admin/pages/RoleManagement'
 import ObjectsPage from './modules/admin/pages/ObjectsPage'
 import PersonalizeManagement from './modules/admin/pages/PersonalizeManagement'
+import UserProfileProfiles from './modules/admin/pages/UserProfileProfiles'
 import OrgStructurePage from './modules/mdm/org_structure/pages/OrgStructurePage'
 import PartyPage from './modules/mdm/party/pages/PartyPage'
 import PartyTcaManager from './modules/mdm/party/pages/PartyTcaManager'
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/admin/roles" element={<RoleManagement />} />
           <Route path="/admin/objects" element={<ObjectsPage />} />
           <Route path="/admin/personalize" element={<PersonalizeManagement />} />
+          <Route path="/admin/user-profiles" element={<UserProfileProfiles />} />
           <Route path="/org-structure" element={<OrgStructurePage />} />
           <Route path="/party" element={<PartyPage />} />
           <Route path="/party/tca" element={<PartyTcaManager />} />

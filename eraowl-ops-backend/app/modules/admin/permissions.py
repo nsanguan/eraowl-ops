@@ -7,4 +7,5 @@ PRIVILEGES = [
     {"action": "assign_privileges", "description": "Assign privileges to roles"},
     {"action": "view_audit_logs", "description": "View audit logs"},
     {"action": "personalize", "description": "Access UI personalization editor"},
+    {"action": "manage_profiles", "description": "Manage user profile options (EBS-style)"},
 ]
