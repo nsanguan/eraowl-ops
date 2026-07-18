@@ -5,6 +5,8 @@ WORKDIR /app
 COPY pyproject.toml .
 COPY app/ ./app/
 RUN pip install --no-cache-dir --break-system-packages .
+# Drop compiled bytecode so the runner always imports from fresh source
+RUN find /usr/local/lib/python3.12/site-packages/app -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
 
 FROM python:3.12-slim AS runner
 

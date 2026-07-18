@@ -595,6 +595,43 @@ async def ui_personalize_template_detail(
     return detail
 
 
+@router.get("/ui-personalize/theme")
+async def ui_personalize_theme_load(
+    user=Depends(get_current_user),
+    svc: PersonalizeService = Depends(get_personalize_service),
+    _priv=check_privilege("admin", "personalize"),
+):
+    """Resolve the active global Theme Roller tokens for the current user/role."""
+    role_ids = await svc.get_user_role_ids(user.user_id)
+    return await svc.load_theme(user.user_id, role_ids)
+
+
+@router.put("/ui-personalize/theme")
+@router.post("/ui-personalize/theme")
+async def ui_personalize_theme_save(
+    data: schemas.UiThemeSaveRequest,
+    user=Depends(get_current_user),
+    svc: PersonalizeService = Depends(get_personalize_service),
+    _priv=check_privilege("admin", "personalize"),
+):
+    if not data.target_user_id and not data.target_role_id:
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=400,
+            detail="At least one of target_user_id or target_role_id must be set",
+        )
+    result = await svc.save_theme(
+        target_user_id=data.target_user_id,
+        target_role_id=data.target_role_id,
+        tokens=data.tokens,
+        actor_user_id=user.user_id,
+    )
+    role_ids = await svc.get_user_role_ids(user.user_id)
+    merged = await svc.load_theme(user.user_id, role_ids)
+    return {"saved": result, **merged}
+
+
 # ---------------------------------------------------------------------------
 # User Profiles (Oracle EBS Profile Options)
 # ---------------------------------------------------------------------------

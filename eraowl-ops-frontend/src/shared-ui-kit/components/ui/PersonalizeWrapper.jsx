@@ -45,6 +45,28 @@ export default function PersonalizeWrapper({
   const rawOverrides = componentOverrides() || {}
   const isActive = activeComponentId === componentId
 
+  // Read component metadata (APEX-style: visibility, label, required)
+  const componentMeta = usePersonalizeStore((s) => {
+    const find = (node) => {
+      if (!node || typeof node !== 'object') return null
+      if (node.id === componentId) return node.meta || null
+      if (node.children) {
+        for (const c of node.children) {
+          const f = find(c)
+          if (f) return f
+        }
+      }
+      return null
+    }
+    return find(s.pageSchema)
+  })
+
+  const meta = componentMeta || {}
+  // APEX "Personalize = hide component" — when visible === false the component
+  // is removed from the rendered UI entirely (except in design mode, where it
+  // stays selectable so an admin can re-show it).
+  if (meta.visible === false && !isDesignMode) return null
+
   // Translate high-level style keys into real CSS. `gridSpan` is converted to
   // a CSS grid column span; `fontColor` is normalized to `color`.
   const overrides = { ...rawOverrides }

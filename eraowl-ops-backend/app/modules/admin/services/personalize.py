@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.admin.models import (
     UiStandardTemplate,
     UserUiPersonalization,
+    UiTheme,
     UserRole,
     AuditLog,
 )
@@ -89,7 +90,10 @@ def _compute_delta(base: dict, current: dict) -> dict:
         if not node or not isinstance(node, dict):
             return
         if node.get("id") is not None:
-            base_by_id[node["id"]] = node.get("styles") or {}
+            base_by_id[node["id"]] = {
+                "styles": node.get("styles") or {},
+                "meta": node.get("meta") or {},
+            }
         for child in node.get("children") or []:
             _index(child)
 
@@ -99,21 +103,29 @@ def _compute_delta(base: dict, current: dict) -> dict:
         if not node or not isinstance(node, dict):
             return None
         node_id = node.get("id")
-        base_styles = base_by_id.get(node_id, {})
+        base_entry = base_by_id.get(node_id, {"styles": {}, "meta": {}})
+        base_styles = base_entry.get("styles", {})
+        base_meta = base_entry.get("meta", {})
         cur_styles = node.get("styles") or {}
+        cur_meta = node.get("meta") or {}
         diff_styles = {
             k: v for k, v in cur_styles.items() if not _equal(base_styles.get(k), v)
+        }
+        diff_meta = {
+            k: v for k, v in cur_meta.items() if not _equal(base_meta.get(k), v)
         }
         kept_children = []
         for child in node.get("children") or []:
             d = _diff(child)
             if d is not None:
                 kept_children.append(d)
-        if not diff_styles and not kept_children:
+        if not diff_styles and not diff_meta and not kept_children:
             return None
         result: dict = {"id": node_id}
         if diff_styles:
             result["styles"] = diff_styles
+        if diff_meta:
+            result["meta"] = diff_meta
         if kept_children:
             result["children"] = kept_children
         return result
@@ -227,23 +239,6 @@ class PersonalizeService:
             "created_at": template.created_at.isoformat() if template.created_at else None,
             "updated_at": template.updated_at.isoformat() if template.updated_at else None,
         }
-
-
-def _count_components(layout: dict) -> int:
-    """Count component nodes (those carrying an ``id``) in a layout tree."""
-    count = 0
-
-    def walk(node: dict) -> None:
-        if not node or not isinstance(node, dict):
-            return
-        if node.get("id") is not None:
-            nonlocal count
-            count += 1
-        for child in node.get("children") or []:
-            walk(child)
-
-    walk(layout)
-    return count
 
     async def load_personalization(
         self, page_key: str, user_id: uuid.UUID, role_ids: list[uuid.UUID]
@@ -376,6 +371,7 @@ def _count_components(layout: dict) -> int:
             await self.db.flush()
             entity_id = entry.id
 
+        await self.db.commit()
         await self._write_audit_log(
             actor_user_id=actor_user_id,
             action="upsert" if old_value is not None else "create",
@@ -391,3 +387,89 @@ def _count_components(layout: dict) -> int:
             "user_id": str(target_user_id) if target_user_id else None,
             "role_id": str(target_role_id) if target_role_id else None,
         }
+
+    async def load_theme(self, user_id: uuid.UUID, role_ids: list[uuid.UUID]) -> dict:
+        """Resolve global theme tokens: role-level then user-level (user wins)."""
+        tokens = {}
+        source = "default"
+        if role_ids:
+            row = await self.db.execute(
+                select(UiTheme)
+                .where(UiTheme.role_id.in_(role_ids), UiTheme.user_id.is_(None))
+                .order_by(UiTheme.updated_at.desc())
+            )
+            role_theme = row.scalar_one_or_none()
+            if role_theme and role_theme.tokens:
+                tokens = {**tokens, **role_theme.tokens}
+                source = "role"
+        if user_id:
+            row = await self.db.execute(
+                select(UiTheme).where(UiTheme.user_id == user_id)
+            )
+            user_theme = row.scalar_one_or_none()
+            if user_theme and user_theme.tokens:
+                tokens = {**tokens, **user_theme.tokens}
+                source = "user"
+        return {"tokens": tokens, "source": source}
+
+    async def save_theme(
+        self,
+        target_user_id: uuid.UUID | None,
+        target_role_id: uuid.UUID | None,
+        tokens: dict | None,
+        actor_user_id: uuid.UUID | None,
+    ) -> dict:
+        if not target_user_id and not target_role_id:
+            raise ValueError("At least one of target_user_id or target_role_id must be set")
+        conditions = []
+        if target_user_id:
+            conditions.append(UiTheme.user_id == target_user_id)
+        else:
+            conditions.append(UiTheme.user_id.is_(None))
+        if target_role_id:
+            conditions.append(UiTheme.role_id == target_role_id)
+        else:
+            conditions.append(UiTheme.role_id.is_(None))
+
+        row = await self.db.execute(select(UiTheme).where(and_(*conditions)))
+        existing = row.scalar_one_or_none()
+
+        old_value = None
+        if existing:
+            old_value = existing.tokens
+            existing.tokens = tokens or {}
+            existing.updated_at = datetime.now(timezone.utc)
+            entity_id = existing.id
+        else:
+            entry = UiTheme(user_id=target_user_id, role_id=target_role_id, tokens=tokens or {})
+            self.db.add(entry)
+            await self.db.flush()
+            entity_id = entry.id
+
+        await self.db.commit()
+        await self._write_audit_log(
+            actor_user_id=actor_user_id,
+            action="upsert" if old_value is not None else "create",
+            target_entity="UiTheme",
+            target_id=entity_id,
+            old_value=old_value,
+            new_value=tokens,
+        )
+        return {"id": str(entity_id), "user_id": str(target_user_id) if target_user_id else None, "role_id": str(target_role_id) if target_role_id else None}
+
+
+def _count_components(layout: dict) -> int:
+    """Count component nodes (those carrying an ``id``) in a layout tree."""
+    count = 0
+
+    def walk(node: dict) -> None:
+        if not node or not isinstance(node, dict):
+            return
+        if node.get("id") is not None:
+            nonlocal count
+            count += 1
+        for child in node.get("children") or []:
+            walk(child)
+
+    walk(layout)
+    return count

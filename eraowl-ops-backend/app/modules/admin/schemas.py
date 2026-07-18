@@ -159,6 +159,12 @@ class UiPersonalizationSaveRequest(BaseModel):
     as_delta: bool = True
 
 
+class UiThemeSaveRequest(BaseModel):
+    target_user_id: Optional[uuid.UUID] = None
+    target_role_id: Optional[uuid.UUID] = None
+    tokens: Optional[dict] = None
+
+
 class UiStandardTemplateOut(BaseModel):
     id: uuid.UUID
     page_key: str

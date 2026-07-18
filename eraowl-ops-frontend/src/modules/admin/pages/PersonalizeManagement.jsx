@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import api from '../../../api/client'
 import usePersonalizeStore from '../../../store/usePersonalizeStore'
 import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import ThemeRoller from '../../../shared-ui-kit/components/ui/ThemeRoller'
 
 import UserManagement from '../pages/UserManagement'
 import RoleManagement from '../pages/RoleManagement'
@@ -17,6 +18,55 @@ import ChatPage from '../../collaboration/pages/ChatPage'
 import CalendarPage from '../../collaboration/pages/CalendarPage'
 import TodoPage from '../../collaboration/pages/TodoPage'
 import ActivitiesPage from '../../collaboration/pages/ActivitiesPage'
+
+// APEX-style component inspector: edit visibility, label, required, order for
+// the currently selected personalizable component.
+function ComponentInspector({ componentId }) {
+  const meta = usePersonalizeStore((s) => {
+    const find = (node) => {
+      if (!node || typeof node !== 'object') return null
+      if (node.id === componentId) return node.meta || {}
+      if (node.children) {
+        for (const c of node.children) {
+          const f = find(c)
+          if (f) return f
+        }
+      }
+      return null
+    }
+    return find(s.pageSchema)
+  }) || {}
+  const setComponentVisibility = usePersonalizeStore((s) => s.setComponentVisibility)
+  const setComponentLabel = usePersonalizeStore((s) => s.setComponentLabel)
+  const setComponentRequired = usePersonalizeStore((s) => s.setComponentRequired)
+  const moveComponent = usePersonalizeStore((s) => s.moveComponent)
+
+  return (
+    <div className="space-y-3 border-t border-outline-variant! pt-3">
+      <div className="text-[10px] font-mono text-secondary! truncate">{componentId}</div>
+      <label className="flex items-center justify-between text-xs text-on-surface!">
+        <span>Visible</span>
+        <input type="checkbox" checked={meta.visible !== false} onChange={(e) => setComponentVisibility(componentId, e.target.checked)} className="rounded accent-primary! w-4 h-4" />
+      </label>
+      <div>
+        <label className="block text-[10px] font-semibold uppercase tracking-wider text-outline! mb-1">Label Override</label>
+        <input
+          value={meta.label || ''}
+          placeholder="(default)"
+          onChange={(e) => setComponentLabel(componentId, e.target.value || undefined)}
+          className="w-full px-2 py-1.5 text-xs bg-surface-bright! border border-outline-variant! rounded-lg text-on-surface! outline-none focus:border-primary!" />
+      </div>
+      <label className="flex items-center justify-between text-xs text-on-surface!">
+        <span>Required</span>
+        <input type="checkbox" checked={!!meta.required} onChange={(e) => setComponentRequired(componentId, e.target.checked)} className="rounded accent-primary! w-4 h-4" />
+      </label>
+      <div className="flex gap-2">
+        <button onClick={() => moveComponent(componentId, -1)} className="flex-1 px-2 py-1.5 text-[11px] font-semibold bg-surface-container-highest! text-on-surface! rounded-lg hover:bg-surface-variant!">Move Up</button>
+        <button onClick={() => moveComponent(componentId, 1)} className="flex-1 px-2 py-1.5 text-[11px] font-semibold bg-surface-container-highest! text-on-surface! rounded-lg hover:bg-surface-variant!">Move Down</button>
+      </div>
+    </div>
+  )
+}
 
 // Map a personalizable page_key to its REAL page component so the personalize
 // preview renders exactly what the live page shows (full instrumentation).
@@ -113,6 +163,7 @@ export default function PersonalizeManagement() {
     api.get('/admin/roles', { params: { page: 1, page_size: 200 } })
       .then((r) => setRoles(r.data.items || [])).catch(() => setRoles([]))
   }, [])
+  useEffect(() => { loadTheme() }, [loadTheme])
 
   const selectPage = useCallback(async (pageKey) => {
     setSelected(pageKey); setStatus(null); await loadTemplate(pageKey)
@@ -298,43 +349,7 @@ export default function PersonalizeManagement() {
           </nav>
 
           {tab === 'theme' && (
-            <div className="space-y-5">
-              {/* Color Palette */}
-              <section className="space-y-2">
-                <div className="flex items-center gap-1 text-primary!">
-                  <span className="material-symbols-outlined text-sm">palette</span>
-                  <h4 className="text-sm font-semibold">Color Palette</h4>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {SWATCHES.map((c) => (
-                    <button key={c} onClick={() => setColor(c)} title={c}
-                      className="w-full aspect-square rounded-full border-2 border-white shadow-sm"
-                      style={{ background: c, outline: hex === c ? `2px solid ${c}` : 'none', outlineOffset: 1 }} />
-                  ))}
-                </div>
-                <div className="flex items-center gap-1 bg-surface-container-low! px-2 py-1 rounded border border-outline-variant!">
-                  <span className="text-xs font-mono">HEX:</span>
-                  <input value={hex} onChange={(e) => setHex(e.target.value)}
-                    onBlur={() => setColor(hex)}
-                    className="bg-transparent border-none p-0 font-mono text-xs w-full text-primary! outline-none" />
-                </div>
-              </section>
-              {/* Typography */}
-              <section className="space-y-2">
-                <div className="flex items-center gap-1 text-primary!">
-                  <span className="material-symbols-outlined text-sm">format_size</span>
-                  <h4 className="text-sm font-semibold">Typography</h4>
-                </div>
-                <div className="relative">
-                  <select value={activeStyles.fontFamily || 'Inter'}
-                    onChange={(e) => setFont(e.target.value)}
-                    className="w-full bg-surface-container-low! border border-outline-variant! rounded-lg p-2 text-sm text-on-surface! appearance-none focus:ring-2 focus:ring-primary!">
-                    {FONTS.map((f) => (<option key={f.id} value={f.stack}>{f.label}</option>))}
-                  </select>
-                  <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-outline! text-sm">expand_more</span>
-                </div>
-              </section>
-            </div>
+            <ThemeRoller targetRoleId={targetRoleId || null} targetUserId={null} />
           )}
 
           {tab === 'layout' && (
@@ -404,8 +419,8 @@ export default function PersonalizeManagement() {
           )}
 
           {tab === 'components' && (
-            <div className="space-y-1">
-              <h4 className="text-sm font-semibold text-primary! mb-2">Components</h4>
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-primary!">Components</h4>
               {children.map((node) => (
                 <button key={node.id} onClick={() => usePersonalizeStore.getState().setActiveComponent(node.id)}
                   className={`w-full text-left px-2 py-1.5 rounded text-xs font-mono truncate ${
@@ -414,6 +429,10 @@ export default function PersonalizeManagement() {
                   {node.id}
                 </button>
               ))}
+
+              {activeComponentId && (
+                <ComponentInspector key={activeComponentId} componentId={activeComponentId} />
+              )}
             </div>
           )}
 

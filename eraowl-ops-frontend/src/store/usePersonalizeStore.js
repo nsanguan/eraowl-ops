@@ -8,6 +8,10 @@ const usePersonalizeStore = create((set, get) => ({
   pageSchema: {},        // editable draft (template + unsaved changes)
   baseSchema: {},        // immutable base template, kept for delta calc
 
+  // APEX-style Global Theme Roller tokens (applied as CSS variables on :root)
+  themeTokens: null,     // { primary, surface, font, radius, spacing } or null = default
+  themeSource: 'default',
+
   // ── Actions ──
 
   /** Toggle design mode on/off (clears selection when exiting) */
@@ -19,6 +23,32 @@ const usePersonalizeStore = create((set, get) => ({
 
   /** Set the currently inspected component */
   setActiveComponent: (id) => set({ activeComponentId: id }),
+
+  /** APEX-style component metadata (beyond CSS styles): visibility, label,
+   *  required flag, display order. Stored on node.meta and persisted in the
+   *  same override tree alongside node.styles. */
+  updateComponentMeta: (id, metaPatch) =>
+    set((s) => {
+      const pageSchema = { ...s.pageSchema }
+      const walk = (node) => {
+        if (!node || typeof node !== 'object') return
+        if (node.id === id) {
+          node.meta = { ...(node.meta || {}), ...metaPatch }
+          return
+        }
+        if (node.children) node.children.forEach(walk)
+      }
+      walk(pageSchema)
+      return { pageSchema }
+    }),
+
+  setComponentVisibility: (id, visible) => get().updateComponentMeta(id, { visible }),
+  setComponentLabel: (id, label) => get().updateComponentMeta(id, { label }),
+  setComponentRequired: (id, required) => get().updateComponentMeta(id, { required }),
+
+  /** Apply global theme tokens (Theme Roller). Persisted separately. */
+  applyThemeTokens: (tokens) => set({ themeTokens: tokens, themeSource: 'custom' }),
+  resetThemeTokens: () => set({ themeTokens: null, themeSource: 'default' }),
 
   /** Update a component's style overrides (delta merge) */
   updateComponentStyles: (id, styleObject) =>
@@ -220,30 +250,35 @@ const usePersonalizeStore = create((set, get) => ({
   },
 
   /** Compute the diff between a base layout and the current (edited) layout.
-   *  Only nodes whose styles differ from base are kept — matches the
+   *  Only nodes whose styles OR meta differ from base are kept — matches the
    *  backend delta model so stored overrides carry just the changes. */
   computeDelta: (base, current) => {
     if (!base || !current || !current.children) return current
     const baseById = {}
     const index = (node) => {
       if (!node || typeof node !== 'object') return
-      if (node.id != null) baseById[node.id] = node.styles || {}
+      if (node.id != null) baseById[node.id] = { styles: node.styles || {}, meta: node.meta || {} }
       ;(node.children || []).forEach(index)
     }
     index(base)
     const diff = (node) => {
       if (!node || typeof node !== 'object') return null
-      const baseStyles = baseById[node.id] || {}
+      const baseEntry = baseById[node.id] || { styles: {}, meta: {} }
       const curStyles = node.styles || {}
       const diffStyles = Object.fromEntries(
-        Object.entries(curStyles).filter(([k, v]) => !_eq(baseStyles[k], v))
+        Object.entries(curStyles).filter(([k, v]) => !_eq(baseEntry.styles[k], v))
+      )
+      const curMeta = node.meta || {}
+      const diffMeta = Object.fromEntries(
+        Object.entries(curMeta).filter(([k, v]) => !_eq(baseEntry.meta[k], v))
       )
       const keptChildren = (node.children || [])
         .map(diff)
         .filter((c) => c !== null)
-      if (!Object.keys(diffStyles).length && !keptChildren.length) return null
+      if (!Object.keys(diffStyles).length && !Object.keys(diffMeta).length && !keptChildren.length) return null
       const result = { id: node.id }
       if (Object.keys(diffStyles).length) result.styles = diffStyles
+      if (Object.keys(diffMeta).length) result.meta = diffMeta
       if (keptChildren.length) result.children = keptChildren
       return result
     }
@@ -272,6 +307,34 @@ const usePersonalizeStore = create((set, get) => ({
       return data
     } catch (err) {
       console.error('Failed to save personalization:', err)
+      return null
+    }
+  },
+
+  /** Load the saved global theme tokens for the current user/role. */
+  loadTheme: async () => {
+    try {
+      const { data } = await api.get('/admin/ui-personalize/theme')
+      if (data && data.tokens) set({ themeTokens: data.tokens, themeSource: data.source || 'custom' })
+      return data
+    } catch (err) {
+      console.error('Failed to load theme:', err)
+      return null
+    }
+  },
+
+  /** Persist global theme tokens (Theme Roller) for a target user/role. */
+  saveTheme: async (targetUserId, targetRoleId) => {
+    const { themeTokens } = get()
+    try {
+      const { data } = await api.put('/admin/ui-personalize/theme', {
+        target_user_id: targetUserId || null,
+        target_role_id: targetRoleId || null,
+        tokens: themeTokens,
+      })
+      return data
+    } catch (err) {
+      console.error('Failed to save theme:', err)
       return null
     }
   },

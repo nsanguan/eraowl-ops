@@ -29,7 +29,7 @@
 
 INSERT INTO admin.ui_standard_templates (id, page_key, schema_version, base_layout_json)
 SELECT 'c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c10001', 'admin.users', '1.0.0',
-       '{"id":"admin.users","children":[{"id":"header:users","styles":{}},{"id":"grid:users","styles":{}}]}'
+       '{"id":"admin.users","children":[{"id":"header:users","styles":{}},{"id":"grid:users","styles":{}},{"id":"form:user","styles":{},"children":[{"id":"field:user.username","meta":{"label":"Username","required":true}},{"id":"field:user.email","meta":{"label":"Email"}},{"id":"field:user.password","meta":{"label":"Password"}},{"id":"field:user.is_active","meta":{"label":"Active"}},{"id":"field:user.roles","meta":{"label":"Roles"}}]}]}'
 WHERE NOT EXISTS (SELECT 1 FROM admin.ui_standard_templates WHERE page_key = 'admin.users');
 
 INSERT INTO admin.ui_standard_templates (id, page_key, schema_version, base_layout_json)

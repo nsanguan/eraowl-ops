@@ -3,6 +3,7 @@ import api from '../../../api/client'
 import { Plus, Download } from 'lucide-react'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
 import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import PersonalizeField from '../../../shared-ui-kit/components/ui/PersonalizeField'
 import usePersonalizeStore from '../../../store/usePersonalizeStore'
 import UserAssignmentModal from '../components/UserAssignmentModal'
 
@@ -262,51 +263,71 @@ export default function UserManagement() {
             </div>
             <form onSubmit={handleSave} className="p-5 space-y-4">
               {formError && <div className="bg-error-container text-error p-3 rounded-xl text-sm font-medium">{formError}</div>}
-              <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-1.5">Username *</label>
-                <input type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition" required />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-1.5">Email</label>
-                <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition" />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-1.5">
-                  Password {editingUser ? '(leave blank to keep)' : '*'}
-                </label>
-                <div className="relative">
-                  <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    className="w-full px-3 py-2.5 pr-10 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition" required={!editingUser} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-outline hover:text-on-surface-variant transition-colors">
-                    <span className="material-symbols-outlined text-[16px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
-                  </button>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <button type="button" role="switch" aria-checked={form.is_active}
-                  onClick={() => setForm({ ...form, is_active: !form.is_active })}
-                  className={`relative w-10 h-6 rounded-full transition-colors ${form.is_active ? 'bg-success' : 'bg-outline-variant'}`}>
-                  <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${form.is_active ? 'left-5' : 'left-1'}`} />
-                </button>
-                <label className="text-sm font-medium text-on-surface cursor-pointer" onClick={() => setForm({ ...form, is_active: !form.is_active })}>Active</label>
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-2">Roles</label>
-                <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar border border-outline-variant rounded-xl p-2">
-                  {availableRoles.map((role) => {
-                    const rid = role.role_id || role.id
-                    return (
-                      <label key={rid} className="flex items-center gap-3 text-sm cursor-pointer py-1.5 px-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                        <input type="checkbox" checked={form.roles.includes(rid)} onChange={() => handleRoleToggle(rid)} className="rounded accent-primary w-4 h-4" />
-                        <span className="text-on-surface">{role.role_name || role.name}</span>
-                      </label>
-                    )
-                  })}
-                </div>
-              </div>
+              <PersonalizeField componentId="field:user.username" label="Username" required>
+                {(lbl, req) => (
+                  <div>
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-1.5">{lbl} {req && '*'}</label>
+                    <input type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition" required={req} />
+                  </div>
+                )}
+              </PersonalizeField>
+              <PersonalizeField componentId="field:user.email" label="Email">
+                {(lbl, req) => (
+                  <div>
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-1.5">{lbl} {req && '*'}</label>
+                    <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition" required={req} />
+                  </div>
+                )}
+              </PersonalizeField>
+              <PersonalizeField componentId="field:user.password" label="Password" required={!editingUser}>
+                {(lbl, req) => (
+                  <div>
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-1.5">
+                      {lbl} {editingUser ? '(leave blank to keep)' : (req ? '*' : '')}
+                    </label>
+                    <div className="relative">
+                      <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
+                        className="w-full px-3 py-2.5 pr-10 bg-surface-bright border border-outline-variant rounded-xl text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition" required={req && !editingUser} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-outline hover:text-on-surface-variant transition-colors">
+                        <span className="material-symbols-outlined text-[16px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </PersonalizeField>
+              <PersonalizeField componentId="field:user.is_active" label="Active">
+                {() => (
+                  <div className="flex items-center gap-3">
+                    <button type="button" role="switch" aria-checked={form.is_active}
+                      onClick={() => setForm({ ...form, is_active: !form.is_active })}
+                      className={`relative w-10 h-6 rounded-full transition-colors ${form.is_active ? 'bg-success' : 'bg-outline-variant'}`}>
+                      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${form.is_active ? 'left-5' : 'left-1'}`} />
+                    </button>
+                    <label className="text-sm font-medium text-on-surface cursor-pointer" onClick={() => setForm({ ...form, is_active: !form.is_active })}>Active</label>
+                  </div>
+                )}
+              </PersonalizeField>
+              <PersonalizeField componentId="field:user.roles" label="Roles">
+                {(lbl) => (
+                  <div>
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-outline mb-2">{lbl}</label>
+                    <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar border border-outline-variant rounded-xl p-2">
+                      {availableRoles.map((role) => {
+                        const rid = role.role_id || role.id
+                        return (
+                          <label key={rid} className="flex items-center gap-3 text-sm cursor-pointer py-1.5 px-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                            <input type="checkbox" checked={form.roles.includes(rid)} onChange={() => handleRoleToggle(rid)} className="rounded accent-primary w-4 h-4" />
+                            <span className="text-on-surface">{role.role_name || role.name}</span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </PersonalizeField>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={closeModal}
                   className="neo-button px-5 py-2.5 text-sm font-semibold text-on-surface-variant">Cancel</button>

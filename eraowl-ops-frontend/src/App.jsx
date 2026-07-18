@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useEffect } from 'react'
 import useAuthStore from './store/authStore'
+import usePersonalizeStore from './store/usePersonalizeStore'
+import { applyThemeToRoot } from './shared-ui-kit/components/ui/ThemeRoller'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import Login from './modules/admin/pages/Login'
@@ -25,6 +27,20 @@ import CalendarPage from './modules/collaboration/pages/CalendarPage'
 import TodoPage from './modules/collaboration/pages/TodoPage'
 import ActivitiesPage from './modules/collaboration/pages/ActivitiesPage'
 
+function ThemeBridge() {
+  const themeTokens = usePersonalizeStore((s) => s.themeTokens)
+  const loadTheme = usePersonalizeStore((s) => s.loadTheme)
+  const isDesignMode = usePersonalizeStore((s) => s.isDesignMode)
+  const authed = useAuthStore((s) => s.user)
+  useEffect(() => {
+    if (authed) loadTheme()
+  }, [authed, loadTheme])
+  useEffect(() => {
+    applyThemeToRoot(themeTokens)
+  }, [themeTokens, isDesignMode])
+  return null
+}
+
 export default function App() {
   const checkAuth = useAuthStore((s) => s.checkAuth)
 
@@ -34,6 +50,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ThemeBridge />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
