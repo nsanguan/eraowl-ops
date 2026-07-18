@@ -9,6 +9,7 @@ import RoleManagement from './modules/admin/pages/RoleManagement'
 import ObjectsPage from './modules/admin/pages/ObjectsPage'
 import PersonalizeManagement from './modules/admin/pages/PersonalizeManagement'
 import UserProfileProfiles from './modules/admin/pages/UserProfileProfiles'
+import AdminHome from './modules/admin/pages/AdminHome'
 import OrgStructurePage from './modules/mdm/org_structure/pages/OrgStructurePage'
 import PartyPage from './modules/mdm/party/pages/PartyPage'
 import PartyTcaManager from './modules/mdm/party/pages/PartyTcaManager'
@@ -43,6 +44,7 @@ export default function App() {
           }
         >
           <Route path="/" element={<DashboardHome />} />
+          <Route path="/admin" element={<AdminHome />} />
           <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/roles" element={<RoleManagement />} />
           <Route path="/admin/objects" element={<ObjectsPage />} />

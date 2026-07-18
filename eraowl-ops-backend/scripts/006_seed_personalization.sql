@@ -80,4 +80,14 @@ WHERE NOT EXISTS (SELECT 1 FROM admin.ui_standard_templates WHERE page_key = 'co
 INSERT INTO admin.ui_standard_templates (id, page_key, schema_version, base_layout_json)
 SELECT 'c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c10011', 'dashboard.home', '1.0.0',
        '{"id":"dashboard.home","children":[{"id":"header:dashboard","styles":{}}]}'
-WHERE NOT EXISTS (SELECT 1 FROM admin.ui_standard_templates WHERE page_key = 'dashboard.home');
+ WHERE NOT EXISTS (SELECT 1 FROM admin.ui_standard_templates WHERE page_key = 'dashboard.home');
+
+INSERT INTO admin.ui_standard_templates (id, page_key, schema_version, base_layout_json)
+SELECT 'c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c10012', 'admin.home', '1.0.0',
+       '{"id":"admin.home","children":[{"id":"header:admin-home","styles":{}}]}'
+WHERE NOT EXISTS (SELECT 1 FROM admin.ui_standard_templates WHERE page_key = 'admin.home');
+
+INSERT INTO admin.ui_standard_templates (id, page_key, schema_version, base_layout_json)
+SELECT 'c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c10013', 'admin.user_profiles', '1.0.0',
+       '{"id":"admin.user_profiles","children":[{"id":"header:user-profiles","styles":{}},{"id":"grid:user-profiles","styles":{}},{"id":"panel:user-profiles-detail","styles":{}}]}'
+WHERE NOT EXISTS (SELECT 1 FROM admin.ui_standard_templates WHERE page_key = 'admin.user_profiles');
