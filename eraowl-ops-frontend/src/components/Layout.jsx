@@ -172,7 +172,11 @@ export default function Layout() {
         </div>
       </div>
 
-      <PropertyInspector />
+      {/* The /admin/personalize page renders its own full editor panel
+          (THEME / LAYOUT / COMPONENTS). The global inspector would
+          overlay it (z-100, fixed right) and block all interaction, so
+          suppress it there. */}
+      {!location.pathname.startsWith('/admin/personalize') && <PropertyInspector />}
 
       <CommandBar
         open={commandBarOpen}

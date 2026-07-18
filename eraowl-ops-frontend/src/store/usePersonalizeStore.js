@@ -224,7 +224,12 @@ const usePersonalizeStore = create((set, get) => ({
         `/admin/ui-personalize/templates/${encodeURIComponent(pageKey)}`
       )
       const layout = data.base_layout_json || {}
-      set({ pageSchema: layout, baseSchema: layout })
+      // Deep-clone the base reference: pageSchema is the editable draft and
+      // baseSchema is the immutable delta baseline. A shallow copy would share
+      // nested node objects, so mutating a node's meta/styles in the draft
+      // would also mutate the baseline and the computed save delta would come
+      // out empty.
+      set({ pageSchema: structuredClone(layout), baseSchema: structuredClone(layout) })
       return data
     } catch (err) {
       console.error('Failed to load template:', err)
@@ -241,7 +246,7 @@ const usePersonalizeStore = create((set, get) => ({
         params: { page_key: pageKey },
       })
       const layout = data.layout || {}
-      set({ pageSchema: layout, baseSchema: layout })
+      set({ pageSchema: structuredClone(layout), baseSchema: structuredClone(layout) })
       return data
     } catch (err) {
       console.error('Failed to load personalization:', err)

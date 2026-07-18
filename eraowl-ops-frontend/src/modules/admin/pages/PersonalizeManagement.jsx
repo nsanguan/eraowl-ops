@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import api from '../../../api/client'
 import usePersonalizeStore from '../../../store/usePersonalizeStore'
+import useAuthStore from '../../../store/authStore'
 import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
 import ThemeRoller from '../../../shared-ui-kit/components/ui/ThemeRoller'
 
@@ -21,11 +22,17 @@ import ActivitiesPage from '../../collaboration/pages/ActivitiesPage'
 
 // APEX-style component inspector: edit visibility, label, required, order for
 // the currently selected personalizable component.
+// Stable empty-meta reference so the store selector never returns a fresh
+// object (Zustand v5 + useSyncExternalStore throws "getSnapshot should be
+// cached" / "Maximum update depth" when a selector returns a new object on
+// every call — this was crashing the inspector with React error #185).
+const EMPTY_META = {}
+
 function ComponentInspector({ componentId }) {
   const meta = usePersonalizeStore((s) => {
     const find = (node) => {
       if (!node || typeof node !== 'object') return null
-      if (node.id === componentId) return node.meta || {}
+      if (node.id === componentId) return node.meta || EMPTY_META
       if (node.children) {
         for (const c of node.children) {
           const f = find(c)
@@ -34,8 +41,8 @@ function ComponentInspector({ componentId }) {
       }
       return null
     }
-    return find(s.pageSchema)
-  }) || {}
+    return find(s.pageSchema) || EMPTY_META
+  }) || EMPTY_META
   const setComponentVisibility = usePersonalizeStore((s) => s.setComponentVisibility)
   const setComponentLabel = usePersonalizeStore((s) => s.setComponentLabel)
   const setComponentRequired = usePersonalizeStore((s) => s.setComponentRequired)
@@ -175,7 +182,12 @@ export default function PersonalizeManagement() {
   const handleSave = async () => {
     if (!selected) return
     setStatus(null)
-    const res = await savePersonalization(selected, null, targetRoleId || null, { asDelta: true })
+    // A personalisation must target a role OR a user. When no role is picked
+    // (the "No role (user draft)" option) we save against the current user so
+    // the backend's "at least one target" rule is satisfied.
+    const currentUserId = useAuthStore.getState().user?.user_id || null
+    const targetUserId = targetRoleId ? null : currentUserId
+    const res = await savePersonalization(selected, targetUserId, targetRoleId || null, { asDelta: true })
     setStatus(res ? { ok: true, msg: 'Saved personalization.' } : { ok: false, msg: 'Save failed.' })
   }
   const handleReset = async () => {
@@ -234,7 +246,11 @@ export default function PersonalizeManagement() {
       </aside>
 
       {/* ── Center: WYSIWYG editor ── */}
-      <section className="flex-1 min-w-0 flex flex-col">
+      {/* When the right Personalization Panel is open (design mode + a page
+          selected) it is position:fixed and overlaps the section's right edge,
+          which would hide the SAVE CHANGES button. Reserve that width so the
+          canvas (and its Save button) stay clear of the panel. */}
+      <section className={`flex-1 min-w-0 flex flex-col ${isDesignMode && selected ? 'xl:pr-80' : ''}`}>
         {/* Top app bar (v2) */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -323,7 +339,7 @@ export default function PersonalizeManagement() {
 
         {/* Drag hint */}
         {isDesignMode && selected && (
-          <div className="fixed bottom-6 left-[360px] bg-primary! text-on-primary! px-4 py-2 rounded-full shadow-2xl flex items-center gap-2 z-40 border border-secondary!">
+          <div className="fixed bottom-6 left-[360px] bg-primary! text-on-primary! px-4 py-2 rounded-full shadow-2xl flex items-center gap-2 z-40 border border-secondary! pointer-events-none">
             <span className="material-symbols-outlined">drag_indicator</span>
             <span className="text-sm font-bold">Drag components to rearrange your workspace</span>
           </div>
