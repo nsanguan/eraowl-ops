@@ -136,6 +136,7 @@ export default function PersonalizeManagement() {
   const toggleDesignMode = usePersonalizeStore((s) => s.toggleDesignMode)
   const listTemplates = usePersonalizeStore((s) => s.listTemplates)
   const loadTemplate = usePersonalizeStore((s) => s.loadTemplate)
+  const loadTheme = usePersonalizeStore((s) => s.loadTheme)
   const savePersonalization = usePersonalizeStore((s) => s.savePersonalization)
   const updateComponentStyles = usePersonalizeStore((s) => s.updateComponentStyles)
   const applyGlobalTheme = usePersonalizeStore((s) => s.applyGlobalTheme)
