@@ -22,7 +22,6 @@ import hashlib
 import json
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
 
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
@@ -346,7 +345,7 @@ class DASCacheManager:
         """Drop all cached entries for a user whose DAS rules changed."""
         if self._redis is None:
             return
-        pattern = f"das:v1:*"
+        pattern = "das:v1:*"
         cursor = 0
         while True:
             cursor, keys = await self._redis.scan(  # type: ignore[union-attr]

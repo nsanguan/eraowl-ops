@@ -1,4 +1,4 @@
-from app.core.exceptions import AppError, NotFoundError, ConflictError
+from app.core.exceptions import NotFoundError, ConflictError
 
 
 class UserNotFoundError(NotFoundError):

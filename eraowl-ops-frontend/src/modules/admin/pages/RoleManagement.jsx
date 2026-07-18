@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import api from '../../../api/client'
 import { Plus } from 'lucide-react'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
+import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../../../store/usePersonalizeStore'
 import RolePrivilegeMatrix from '../components/RolePrivilegeMatrix'
 
 export default function RoleManagement() {
@@ -38,6 +40,8 @@ export default function RoleManagement() {
     } catch {}
   }, [])
 
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+  useEffect(() => { loadPersonalization('admin.roles') }, [loadPersonalization])
   useEffect(() => { fetchRoles(); fetchPrivileges() }, [fetchRoles, fetchPrivileges])
 
   const openCreateModal = () => {
@@ -194,8 +198,11 @@ export default function RoleManagement() {
 
   return (
     <div className="space-y-6">
-      <RolePrivilegeMatrix />
+      <PersonalizeWrapper componentId="header:roles">
+        <RolePrivilegeMatrix />
+      </PersonalizeWrapper>
 
+      <PersonalizeWrapper componentId="grid:roles">
       <details className="border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest group">
         <summary className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-surface-container-low transition-colors text-sm font-semibold text-outline group-open:text-on-surface list-none">
           <span className="flex items-center gap-2">
@@ -232,6 +239,7 @@ export default function RoleManagement() {
           </div>
         </div>
       </details>
+      </PersonalizeWrapper>
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">

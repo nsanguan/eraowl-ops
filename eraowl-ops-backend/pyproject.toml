@@ -34,6 +34,19 @@ dev = [
 asyncio_mode = "auto"
 testpaths = ["tests"]
 
+[tool.ruff]
+[tool.ruff.lint]
+# E712: `Model.col == False/True` is the correct SQLAlchemy filter idiom;
+# ruff's suggested `not Model.col` would break SQL expression building.
+ignore = ["E712"]
+
+[tool.ruff.lint.per-file-ignores]
+# alembic/env.py imports models after sys.path setup — intentional E402.
+"alembic/env.py" = ["E402"]
+
 [build-system]
 requires = ["setuptools>=75.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]

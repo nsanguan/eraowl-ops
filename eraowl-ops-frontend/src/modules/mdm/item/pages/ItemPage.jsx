@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import api from '../../../../api/client'
 import { Plus } from 'lucide-react'
 import { InteractiveGrid } from '../../../../shared-ui-kit/components/ui/InteractiveGrid'
+import PersonalizeWrapper from '../../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../../../../store/usePersonalizeStore'
 
 const TABS = [
   { key: 'items',          label: 'Items',           endpoint: '/item/items',           idKey: 'item_id',            nameField: 'item_name'        },
@@ -71,6 +73,9 @@ export default function ItemPage() {
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState(null)
   const [form, setForm] = useState({})
+
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+  useEffect(() => { loadPersonalization('mdm.item') }, [loadPersonalization])
   const searchTimeout = useRef({})
 
   const tab = TABS.find((t) => t.key === activeTab)
@@ -165,17 +170,20 @@ export default function ItemPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Item Master</h1>
-          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage items, categories, and units of measure</p>
+      <PersonalizeWrapper componentId="header:item-master">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Item Master</h1>
+            <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage items, categories, and units of measure</p>
+          </div>
+          <button onClick={openCreate}
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+            <Plus size={15} /> Add {tab?.label}
+          </button>
         </div>
-        <button onClick={openCreate}
-          className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
-          <Plus size={15} /> Add {tab?.label}
-        </button>
-      </div>
+      </PersonalizeWrapper>
 
+      <PersonalizeWrapper componentId="tabs:items">
       <div className="flex items-center gap-1 border-b border-outline-variant overflow-x-auto">
         {TABS.map((t) => (
           <button key={t.key} onClick={() => setActiveTab(t.key)}
@@ -194,21 +202,25 @@ export default function ItemPage() {
         ))}
       </div>
 
+      </PersonalizeWrapper>
+
       {tab && (
-        <InteractiveGrid
-          key={tab.key}
-          columns={COLUMNS[tab.key]}
-          data={rawData}
-          loading={loading[activeTab]}
-          idKey={tab.idKey}
-          searchable
-          onSearch={handleSearch}
-          onAddRow={openCreate}
-          onEdit={(row) => openEdit(row)}
-          onDelete={(row) => handleDelete(row)}
-          addLabel={`Add ${tab.label}`}
-          tableHeight="calc(100vh - 320px)"
-        />
+        <PersonalizeWrapper componentId={`grid:${tab.key}`}>
+          <InteractiveGrid
+            key={tab.key}
+            columns={COLUMNS[tab.key]}
+            data={rawData}
+            loading={loading[activeTab]}
+            idKey={tab.idKey}
+            searchable
+            onSearch={handleSearch}
+            onAddRow={openCreate}
+            onEdit={(row) => openEdit(row)}
+            onDelete={(row) => handleDelete(row)}
+            addLabel={`Add ${tab.label}`}
+            tableHeight="calc(100vh - 320px)"
+          />
+        </PersonalizeWrapper>
       )}
 
       {modalOpen && (

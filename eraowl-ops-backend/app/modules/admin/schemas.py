@@ -119,10 +119,12 @@ class TokenResponse(BaseModel):
 
 class RefreshRequest(BaseModel):
     refresh_token: str
+    access_token: str | None = None
 
 
 class LogoutRequest(BaseModel):
     refresh_token: str
+    access_token: str | None = None
 
 
 class PermissionMatrixResponse(BaseModel):
@@ -133,3 +135,64 @@ class PermissionMatrixResponse(BaseModel):
 
 class PermissionMatrixSync(BaseModel):
     matrix: dict[str, list[str]]
+
+
+# ── UI Personalization Schemas ──
+
+
+class UiPersonalizationLoadRequest(BaseModel):
+    page_key: str
+
+
+class UiPersonalizationLoadResponse(BaseModel):
+    page_key: str
+    schema_version: str
+    layout: dict
+    source: str = "template"  # "template" | "user" | "role"
+
+
+class UiPersonalizationSaveRequest(BaseModel):
+    page_key: str
+    target_user_id: Optional[uuid.UUID] = None
+    target_role_id: Optional[uuid.UUID] = None
+    override_json: dict
+    as_delta: bool = True
+
+
+class UiStandardTemplateOut(BaseModel):
+    id: uuid.UUID
+    page_key: str
+    schema_version: str
+    base_layout_json: dict
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class UserUiPersonalizationOut(BaseModel):
+    id: uuid.UUID
+    page_key: str
+    user_id: Optional[uuid.UUID] = None
+    role_id: Optional[uuid.UUID] = None
+    override_json: dict
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class UiTemplateSummaryOut(BaseModel):
+    page_key: str
+    schema_version: str
+    component_count: int
+
+
+class UiTemplateDetailOut(BaseModel):
+    id: str
+    page_key: str
+    schema_version: str
+    base_layout_json: dict
+    component_count: int
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None

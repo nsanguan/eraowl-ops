@@ -7,6 +7,7 @@ export default function SidebarNav({
   onAreaChange,
   user,
   userInitials,
+  collapsed = false,
 }) {
   const location = useLocation()
   const areaKeys = Object.keys(groupedModules)
@@ -17,7 +18,7 @@ export default function SidebarNav({
   const userRoles = user?.roles?.map((r) => r.role_name).join(', ') || 'User'
 
   return (
-    <aside className="eods-snav">
+    <aside className={`eods-snav${collapsed ? ' eods-snav--collapsed' : ''}`}>
       <div className="eods-snav__header">
         <div className="eods-snav__brand">
           <div className="eods-snav__logo">EO</div>

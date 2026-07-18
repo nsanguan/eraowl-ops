@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, cloneElement } from 'react'
 import useAuthStore from '../store/authStore'
 
 /**
@@ -87,7 +87,6 @@ export default function PermissionGuard({
 
     // ถ้า children เป็น element เดียว ให้เพิ่ม props
     if (typeof children === 'object' && children.props) {
-      const { cloneElement } = require('react')
       return cloneElement(children, {
         disabled: true,
         'aria-disabled': true,

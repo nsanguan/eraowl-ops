@@ -1,9 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../../../api/client'
+import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../../../store/usePersonalizeStore'
 
 const EVENT_COLORS = { meeting: 'oklch(0.55 0.14 290)', call: 'oklch(0.55 0.14 200)', email: 'oklch(0.55 0.14 260)', task: 'oklch(0.55 0.14 80)', reminder: 'oklch(0.55 0.14 150)' }
 
 export default function CalendarPage() {
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+  useEffect(() => { loadPersonalization('collaboration.calendar') }, [loadPersonalization])
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
@@ -42,15 +46,17 @@ export default function CalendarPage() {
 
   return (
     <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Calendar</h1>
-          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">{monthNames[month]} {year}</p>
+      <PersonalizeWrapper componentId="header:calendar">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Calendar</h1>
+            <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">{monthNames[month]} {year}</p>
+          </div>
+          <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">add</span> Add Event
+          </button>
         </div>
-        <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px]">add</span> Add Event
-        </button>
-      </div>
+      </PersonalizeWrapper>
 
       <div className="flex items-center gap-2">
         <button onClick={handlePrev} className="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm hover:bg-surface-container-low">&larr; Prev</button>

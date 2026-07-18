@@ -12,14 +12,12 @@ context from the admin security tables.
 from __future__ import annotations
 
 import uuid
-from typing import Optional
 
 from fastapi import Depends, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.dependencies import get_current_user
 from app.shared.das_filters import (
     # Schemas
     AccessLevel,

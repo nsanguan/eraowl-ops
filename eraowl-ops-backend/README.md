@@ -95,9 +95,11 @@ uvicorn app.main:app --reload --port 8000
 
 PostgreSQL schemas for namespace isolation:
 
-- `mdm` — Unified master data: org_structure, party, item, bom
-- `admin` — Users, roles, privileges, audit, refresh_tokens
+- `admin` — Users, roles, privileges, audit, refresh_tokens, objects, UI personalization
+- `mdm` — Unified master data: org_structure, party, item
+- `bom` — Bill of Materials
 - `po` — Purchase Orders
+- `collab` — Collaboration (todos, activities, calendar events, channels, DMs)
 
 ## Migration
 

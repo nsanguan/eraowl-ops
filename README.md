@@ -26,6 +26,7 @@ Every module under `app/modules/{name}/` has: `models.py`, `schemas.py`, `router
 | `mdm/item` | ✅ Complete | UOM, UOMConversion, ItemCategory, Item, ItemCategoryAssignment, ItemOrganization, ItemSupplierXref | Full CRUD per entity |
 | `bom` | ✅ Complete | BomHeader, BomLine | CRUD + approve + multi-level explode with circular ref validation |
 | `po` | ✅ Complete (backend) | PoHeader, PoLine, PoShipment, PoDistribution, PoRelease, PoAmendment, PoApproval | Full CRUD per entity + composite CRUD + generic CRUD |
+| `collaboration` | ✅ Complete (backend) | Todo, Activity, CalendarEvent, Channel, ChannelMessage, DmConversation, DmMessage | Full CRUD per entity + channel/DM messaging |
 | `gl` | 🔜 Placeholder | — | — |
 | `om` | 🔜 Placeholder | — | — |
 
@@ -34,7 +35,7 @@ Every module under `app/modules/{name}/` has: `models.py`, `schemas.py`, `router
 - **CRUD**: `BaseCRUDService<T>` from `app/shared/module_base/crud.py` for generic list/get/create/update/delete with soft-delete, pagination, search, filters
 - **Permissions**: Declarative `permissions.py` per module — guarded by `check_privilege(module, action)` from `app/core/dependencies.py`
 - **Auth**: `get_current_user()` dependency checks JWT + permission version. `check_privilege()` does DB-level RBAC verification (not token-only)
-- **DB**: 3 PostgreSQL schemas (`mdm`, `admin`, `po`), single Alembic migration chain
+- **DB**: 5 PostgreSQL schemas (`admin`, `mdm`, `bom`, `po`, `collab`), single Alembic migration chain
 
 ## Frontend Pages
 
@@ -79,9 +80,11 @@ Every module under `app/modules/{name}/` has: `models.py`, `schemas.py`, `router
 PostgreSQL schemas for namespace isolation:
 
 ```
-mdm             — Unified master data: org_structure (6) + party (7) + item (7) + bom (2)
-admin           — Users, roles, privileges, audit, refresh_tokens
-po              — Purchase Order headers, lines, shipments, distributions
+admin           — Users, roles, privileges, audit, refresh_tokens, objects, UI personalization
+mdm             — Unified master data: org_structure (6) + party (7) + item (7)
+bom             — Bill of Materials headers + components
+po              — Purchase Order headers, lines, shipments, distributions, releases, amendments, approvals
+collab          — Collaboration: todos, activities, calendar events, channels, direct messages
 ```
 
 Connection: `postgresql+asyncpg://eraowlopsadmin@{password}@202.71.1.13:5435/eraowlops`
@@ -125,6 +128,7 @@ eraowl-ops/
 │   │       ├── mdm/                # Master Data (org_structure, party, item)
 │   │       ├── bom/                # Bill of Materials
 │   │       ├── po/                 # Purchase Orders
+│   │       ├── collaboration/      # Todos, activities, calendar, channels, DMs
 │   │       ├── gl/                 # (placeholder)
 │   │       └── om/                 # (placeholder)
 │   ├── alembic/                    # DB migrations (single chain)
@@ -164,7 +168,7 @@ docker compose up -d
 
 # Backend
 cd eraowl-ops-backend
-pip install -r requirements.txt  # or: pip install -e .
+pip install -e ".[dev]"          # installs app + dev tools (pytest, testcontainers)
 alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 

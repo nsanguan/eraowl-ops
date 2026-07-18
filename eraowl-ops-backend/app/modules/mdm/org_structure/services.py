@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import inspect, select
+from sqlalchemy import select
 from sqlalchemy.sql import func
 
 from app.modules.mdm.org_structure.models import (

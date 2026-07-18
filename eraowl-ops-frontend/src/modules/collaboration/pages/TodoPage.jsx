@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../../../api/client'
+import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../../../store/usePersonalizeStore'
 
 export default function TodoPage() {
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+  useEffect(() => { loadPersonalization('collaboration.todo') }, [loadPersonalization])
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [title, setTitle] = useState('')
@@ -44,10 +48,12 @@ export default function TodoPage() {
 
   return (
     <div className="p-6 max-w-2xl space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">To-Do</h1>
-        <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Personal task management</p>
-      </div>
+      <PersonalizeWrapper componentId="header:todo">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">To-Do</h1>
+          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Personal task management</p>
+        </div>
+      </PersonalizeWrapper>
 
       <div className="flex gap-2">
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}

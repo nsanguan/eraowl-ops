@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import api from '../../../api/client'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
 import { TreeGrid } from '../../../shared-ui-kit/components/ui/TreeGrid'
+import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../../../store/usePersonalizeStore'
 import { StatusChip } from '../../../shared-ui-kit/components/ui/StatusChip'
 import { LovSection } from '../../../shared-ui-kit/components/ui/LovSection'
 import PermissionGuard from '../../../components/PermissionGuard'
@@ -40,6 +42,8 @@ const EMPTY_FORM = {
 }
 
 export default function BomPage() {
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+  useEffect(() => { loadPersonalization('bom.bom') }, [loadPersonalization])
   const [bomHeaders, setBomHeaders] = useState([])
   const [loading, setLoading] = useState(false)
   const [selectedBom, setSelectedBom] = useState(null)
@@ -252,11 +256,14 @@ export default function BomPage() {
 
   return (
     <div className="p-6 space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Bill of Materials</h1>
-        <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage BOM structures and multi-level component hierarchies</p>
-      </div>
+      <PersonalizeWrapper componentId="header:bom">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Bill of Materials</h1>
+          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage BOM structures and multi-level component hierarchies</p>
+        </div>
+      </PersonalizeWrapper>
 
+      <PersonalizeWrapper componentId="grid:bom-headers">
       <div className="border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest">
         <InteractiveGrid
           columns={COLUMNS}
@@ -273,8 +280,10 @@ export default function BomPage() {
           tableHeight="calc(100vh - 280px)"
         />
       </div>
+      </PersonalizeWrapper>
 
       {selectedBom && (
+        <PersonalizeWrapper componentId="grid:bom-lines">
         <div className="border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest">
           {detailHeader}
           <div className="p-4 bg-surface-container-lowest border-b border-outline-variant">
@@ -326,6 +335,7 @@ export default function BomPage() {
             )}
           </div>
         </div>
+        </PersonalizeWrapper>
       )}
 
       {modalOpen && (

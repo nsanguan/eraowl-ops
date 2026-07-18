@@ -9,7 +9,6 @@ Verifies:
   * Deny-all default when no rules exist
 """
 
-import uuid
 
 import pandas as pd
 import pytest
@@ -19,7 +18,6 @@ from app.shared.das_filters import (
     DASRule,
     DASRuleType,
     DataAccessSetContext,
-    DASSQLPredicate,
     apply_das_sql_predicate,
     das_sqlalchemy_filter,
     filter_ledger_balances_df,

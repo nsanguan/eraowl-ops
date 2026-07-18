@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import api from '../../../api/client'
 import { Plus, Download } from 'lucide-react'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
+import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../../../store/usePersonalizeStore'
 import UserAssignmentModal from '../components/UserAssignmentModal'
 
 export default function UserManagement() {
@@ -40,6 +42,14 @@ export default function UserManagement() {
       setAvailableRoles(data.items || data.data || [])
     } catch {}
   }, [])
+
+  const isDesignMode = usePersonalizeStore((s) => s.isDesignMode)
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+
+  // Apply any saved UI personalization for this page (design mode or not).
+  useEffect(() => {
+    loadPersonalization('admin.users')
+  }, [loadPersonalization])
 
   useEffect(() => { fetchUsers(); fetchRoles() }, [fetchUsers, fetchRoles])
 
@@ -175,41 +185,45 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Users</h1>
-          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage user accounts and role assignments</p>
+      <PersonalizeWrapper componentId="header:users">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Users</h1>
+            <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage user accounts and role assignments</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={handleExportCSV}
+              className="neo-button flex items-center gap-1.5 px-3 py-2 text-on-surface-variant font-medium text-xs hover:text-primary">
+              <Download size={14} /> Export
+            </button>
+            <button onClick={openCreateModal}
+              className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+              <Plus size={15} /> Create User
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={handleExportCSV}
-            className="neo-button flex items-center gap-1.5 px-3 py-2 text-on-surface-variant font-medium text-xs hover:text-primary">
-            <Download size={14} /> Export
-          </button>
-          <button onClick={openCreateModal}
-            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
-            <Plus size={15} /> Create User
-          </button>
-        </div>
-      </div>
+      </PersonalizeWrapper>
 
       {error && (
         <div className="bg-error-container text-error p-4 rounded-xl text-sm font-medium border border-error/20">{error}</div>
       )}
 
-      <InteractiveGrid
-        columns={columns}
-        data={users}
-        loading={loading}
-        idKey="user_id"
-        searchable
-        onSearch={handleSearch}
-        onRowClick={(row) => setSelectedUserId(userId(row) === selectedUserId ? null : userId(row))}
-        onEdit={(row) => openEditModal(row)}
-        onDelete={(row) => handleDelete(row)}
-        onAddRow={openCreateModal}
-        addLabel="Add User"
-        tableHeight="calc(100vh - 280px)"
-      />
+      <PersonalizeWrapper componentId="grid:users">
+        <InteractiveGrid
+          columns={columns}
+          data={users}
+          loading={loading}
+          idKey="user_id"
+          searchable
+          onSearch={handleSearch}
+          onRowClick={(row) => setSelectedUserId(userId(row) === selectedUserId ? null : userId(row))}
+          onEdit={(row) => openEditModal(row)}
+          onDelete={(row) => handleDelete(row)}
+          onAddRow={openCreateModal}
+          addLabel="Add User"
+          tableHeight="calc(100vh - 280px)"
+        />
+      </PersonalizeWrapper>
 
       {selectedUserId && (
         <div className="neo-card p-4 flex items-center justify-between">

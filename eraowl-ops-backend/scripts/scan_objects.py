@@ -8,7 +8,6 @@ import json
 import os
 import re
 import uuid
-from datetime import date
 from pathlib import Path
 
 import asyncpg
@@ -113,18 +112,6 @@ def parse_endpoints(filepath: Path, module_name: str) -> list[dict]:
         method = match.group(1)
         path = match.group(2)
         full_path = f"/api/v1/{module_name}{path}"
-        desc = ""
-        # Try to find the docstring/comment
-        lines = src[: match.start()].split("\n")
-        for line in reversed(lines[-10:]):
-            m = re.search(r'description\s*=\s*["\']([^"\']+)["\']', line)
-            if m:
-                desc = m.group(1)
-                break
-            m = re.search(r'#\s*(.+)$', line)
-            if m:
-                desc = m.group(1).strip()
-                break
         objects.append({
             "id": str(uuid.uuid4()),
             "type": "ENDPOINT",
@@ -244,7 +231,6 @@ async def main():
                 submodules.append(sub)
 
         for sm in submodules:
-            sm_rel = sm.relative_to(BACKEND_MODULES).as_posix()
             sm_name = sm.name  # Use leaf name for API routes (e.g., org_structure not mdm/org_structure)
 
             # Models

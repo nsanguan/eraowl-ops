@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../../../api/client'
 import { InteractiveGrid } from '../../../shared-ui-kit/components/ui/InteractiveGrid'
+import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../../../store/usePersonalizeStore'
+
+const PAGE_KEY = 'admin.objects'
 
 const COLUMNS = [
   { key: 'object_type', header: 'Type', width: '120px' },
@@ -14,6 +18,14 @@ export default function ObjectsPage() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
+
+  const isDesignMode = usePersonalizeStore((s) => s.isDesignMode)
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+
+  // Restore any persisted personalization overrides for this page
+  useEffect(() => {
+    if (isDesignMode) loadPersonalization(PAGE_KEY)
+  }, [isDesignMode, loadPersonalization])
 
   const fetchObjects = useCallback(async () => {
     setLoading(true)
@@ -32,21 +44,25 @@ export default function ObjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Code Objects</h1>
-        <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">
-          Catalog of {total} code-level objects (tables, endpoints, permissions, pages, components) discovered across the system.
-        </p>
-      </div>
+      <PersonalizeWrapper componentId="header:code-objects">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Code Objects</h1>
+          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">
+            Catalog of {total} code-level objects (tables, endpoints, permissions, pages, components) discovered across the system.
+          </p>
+        </div>
+      </PersonalizeWrapper>
 
-      <InteractiveGrid
-        columns={COLUMNS}
-        data={items}
-        loading={loading}
-        idKey="object_id"
-        searchable
-        tableHeight="calc(100vh - 240px)"
-      />
+      <PersonalizeWrapper componentId="grid:code-objects">
+        <InteractiveGrid
+          columns={COLUMNS}
+          data={items}
+          loading={loading}
+          idKey="object_id"
+          searchable
+          tableHeight="calc(100vh - 240px)"
+        />
+      </PersonalizeWrapper>
     </div>
   )
 }

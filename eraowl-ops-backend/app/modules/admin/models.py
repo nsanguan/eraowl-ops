@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Boolean, Column, DateTime, String, Text, Integer, func
+from sqlalchemy import Boolean, Column, DateTime, String, Text, Integer, ForeignKey, func, text
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -114,3 +114,65 @@ class RefreshToken(SQLModel, table=True):
     created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
 
     user: "User" = Relationship(back_populates="refresh_tokens")
+
+
+class UiStandardTemplate(SQLModel, table=True):
+    """Immutable base UI layout template for pages (site-level).
+
+    Read-only for normal users; populated via seed data or admin tooling.
+    """
+
+    __tablename__ = "ui_standard_templates"
+    __table_args__ = {"schema": "admin"}
+
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    )
+    page_key: str = Field(
+        sa_column=Column(String(255), unique=True, nullable=False, index=True)
+    )
+    schema_version: str = Field(sa_column=Column(String(50), nullable=False))
+    base_layout_json: dict = Field(
+        default_factory=dict, sa_column=Column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
+    )
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    )
+
+
+class UserUiPersonalization(SQLModel, table=True):
+    """Per-user or per-role UI personalisation overrides (delta on top of template).
+
+    user_id and role_id are both nullable but at least one must be set.
+    User-specific overrides take precedence over role-level overrides.
+    """
+
+    __tablename__ = "user_ui_personalizations"
+    __table_args__ = {"schema": "admin"}
+
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    )
+    page_key: str = Field(sa_column=Column(String(255), nullable=False, index=True))
+    user_id: Optional[uuid.UUID] = Field(
+        default=None,
+        sa_column=Column(UUID(as_uuid=True), ForeignKey("admin.users.user_id", ondelete="CASCADE"), nullable=True),
+    )
+    role_id: Optional[uuid.UUID] = Field(
+        default=None,
+        sa_column=Column(UUID(as_uuid=True), ForeignKey("admin.roles.role_id", ondelete="CASCADE"), nullable=True),
+    )
+    override_json: dict = Field(
+        default_factory=dict, sa_column=Column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
+    )
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    )

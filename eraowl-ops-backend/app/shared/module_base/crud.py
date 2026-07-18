@@ -17,7 +17,7 @@ import uuid
 from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel
-from sqlalchemy import and_, func, select, text, update as sa_update
+from sqlalchemy import and_, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import SQLModel
 

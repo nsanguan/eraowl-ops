@@ -1,4 +1,5 @@
 import { type ReactNode, useState, useRef, useEffect, useCallback } from 'react';
+import usePersonalizeStore from '../../../store/usePersonalizeStore';
 
 export interface GridColumn<T> {
   key: string;
@@ -81,6 +82,9 @@ export function InteractiveGrid<T extends Record<string, any>>({
   const closeRowMenu = useCallback(() => { setRowMenuId(null); }, []);
   useClickOutside(actionsRef, closeActions);
   useClickOutside(rowMenuRef, closeRowMenu);
+
+  const isDesignMode = usePersonalizeStore((s) => s.isDesignMode);
+  const toggleDesignMode = usePersonalizeStore((s) => s.toggleDesignMode);
 
   const handleResizeStart = (e: React.MouseEvent, colKey: string) => {
     e.preventDefault();
@@ -206,6 +210,16 @@ export function InteractiveGrid<T extends Record<string, any>>({
                   <span className="material-symbols-outlined !text-[16px] text-outline">chevron_right</span>
                 </button>
                 <div className="h-px bg-outline-variant/50 my-1 mx-2" />
+                <button onClick={() => { toggleDesignMode(); setOpenActions(false); }}
+                  className="px-3 py-1.5 text-[12px] text-on-surface hover:bg-surface-container-low transition-colors flex items-center justify-between w-full">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined !text-[16px] text-outline">tune</span>Personalize
+                  </div>
+                  <div className={`w-7 h-4 rounded-full transition-colors relative ${isDesignMode ? 'bg-primary' : 'bg-outline-variant'}`}>
+                    <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform ${isDesignMode ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+                  </div>
+                </button>
+                <div className="h-px bg-outline-variant/50 my-1 mx-2" />
                 <button className="px-3 py-1.5 text-[12px] text-on-surface hover:bg-surface-container-low transition-colors flex items-center justify-between w-full">
                   <div className="flex items-center gap-2"><span className="material-symbols-outlined !text-[16px] text-outline">download</span>Download</div>
                 </button>
@@ -297,7 +311,8 @@ export function InteractiveGrid<T extends Record<string, any>>({
                     {rowMenuId === rid && (
                       <div ref={rowMenuRef}
                         className="fixed bg-surface-container-highest border border-outline-variant shadow-lg rounded flex flex-col py-1 z-[60] min-w-[160px]"
-                        style={{ left: rowMenuPos.left, top: rowMenuPos.top }}>
+                        style={{ left: rowMenuPos.left, top: rowMenuPos.top }}
+                        onClick={e => e.stopPropagation()}>
                         <button type="button" onClick={() => { setSingleRowView(row); setRowMenuId(null); }}
                           className="px-3 py-1.5 text-[12px] text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-2 text-left w-full">
                           <span className="material-symbols-outlined !text-[16px]">visibility</span> View Details

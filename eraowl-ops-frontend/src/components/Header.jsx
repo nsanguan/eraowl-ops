@@ -7,6 +7,9 @@ export default function Header({
   userLabel = 'User',
   userInitials = 'U',
   onOpenCommandBar,
+  isDesignMode = false,
+  onToggleDesignMode,
+  canPersonalize = false,
 }) {
   const [helpOpen, setHelpOpen] = useState(false)
   const [theme, setTheme] = useState(() =>
@@ -112,6 +115,30 @@ export default function Header({
               {theme === 'dark' ? 'light_mode' : 'dark_mode'}
             </span>
           </button>
+
+          {canPersonalize && (
+            <button
+              onClick={onToggleDesignMode}
+              title={isDesignMode ? 'Exit Personalize Mode' : 'Enter Personalize Mode'}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[12px] font-semibold transition-colors ${
+                isDesignMode
+                  ? 'bg-primary text-on-primary border-primary'
+                  : 'text-on-surface-variant border-outline-variant hover:text-primary hover:border-primary'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                {isDesignMode ? 'tune' : 'tune'}
+              </span>
+              <span className="hidden md:inline">
+                {isDesignMode ? 'Exit Personalize' : 'Personalize'}
+              </span>
+              <span
+                className={`w-2 h-2 rounded-full ml-0.5 ${
+                  isDesignMode ? 'bg-on-primary' : 'bg-outline-variant'
+                }`}
+              />
+            </button>
+          )}
 
           <div className="relative" ref={helpRef}>
             <button

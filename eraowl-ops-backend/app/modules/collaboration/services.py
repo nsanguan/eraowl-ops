@@ -1,8 +1,6 @@
 import uuid
-from datetime import date
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, delete
-from app.shared.pagination import PaginatedResponse
+from sqlalchemy import select, func
 from app.modules.collaboration.models import (
     Todo, Activity, CalendarEvent, Channel, ChannelMessage,
     DmConversation, DmMessage,

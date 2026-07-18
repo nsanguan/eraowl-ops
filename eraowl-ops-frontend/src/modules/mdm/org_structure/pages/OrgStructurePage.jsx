@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import api from '../../../../api/client'
 import { Plus } from 'lucide-react'
 import { InteractiveGrid } from '../../../../shared-ui-kit/components/ui/InteractiveGrid'
+import PersonalizeWrapper from '../../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../../../../store/usePersonalizeStore'
 import { TreeGrid } from '../../../../shared-ui-kit/components/ui/TreeGrid'
 
 const TABS = [
@@ -259,6 +261,9 @@ export default function OrgStructurePage() {
     fetchAllTreeData()
   }, [fetchAllTreeData])
 
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+  useEffect(() => { loadPersonalization('mdm.org_structure') }, [loadPersonalization])
+
   useEffect(() => {
     const tabCfg = TABS.find((t) => t.key === activeTab)
     if (!tabCfg) return
@@ -349,17 +354,20 @@ export default function OrgStructurePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Org Structure</h1>
-          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage corporates, companies, business units, sites, warehouses, and locators</p>
+      <PersonalizeWrapper componentId="header:org-structure">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Org Structure</h1>
+            <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Manage corporates, companies, business units, sites, warehouses, and locators</p>
+          </div>
+          <button onClick={openCreate}
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+            <Plus size={15} /> Add {tab?.label}
+          </button>
         </div>
-        <button onClick={openCreate}
-          className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
-          <Plus size={15} /> Add {tab?.label}
-        </button>
-      </div>
+      </PersonalizeWrapper>
 
+      <PersonalizeWrapper componentId="tabs:org-structure">
       <div className="flex items-center gap-1 border-b border-outline-variant overflow-x-auto">
         {TABS.map((t) => (
           <button key={t.key} onClick={() => setActiveTab(t.key)}
@@ -376,21 +384,25 @@ export default function OrgStructurePage() {
         ))}
       </div>
 
+      </PersonalizeWrapper>
+
       {tab && (
-        <InteractiveGrid
-          key={tab.key}
-          columns={COLUMNS[tab.key]}
-          data={filteredData}
-          loading={loading[activeTab]}
-          idKey={tab.idKey}
-          searchable
-          onSearch={handleSearch}
-          onAddRow={openCreate}
-          onEdit={(row) => openEdit(row)}
-          onDelete={(row) => handleDelete(row)}
-          addLabel={`Add ${tab.label}`}
-          tableHeight="calc(100vh - 320px)"
-        />
+        <PersonalizeWrapper componentId={`grid:${tab.key}`}>
+          <InteractiveGrid
+            key={tab.key}
+            columns={COLUMNS[tab.key]}
+            data={filteredData}
+            loading={loading[activeTab]}
+            idKey={tab.idKey}
+            searchable
+            onSearch={handleSearch}
+            onAddRow={openCreate}
+            onEdit={(row) => openEdit(row)}
+            onDelete={(row) => handleDelete(row)}
+            addLabel={`Add ${tab.label}`}
+            tableHeight="calc(100vh - 320px)"
+          />
+        </PersonalizeWrapper>
       )}
 
       {/* ── ORG TREE VIEW ── */}

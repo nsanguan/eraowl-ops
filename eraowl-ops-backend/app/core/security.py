@@ -44,3 +44,13 @@ def decode_token(token: str) -> dict:
         return jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
     except JWTError:
         return {}
+
+
+def token_remaining_seconds(token: str) -> int:
+    """Seconds until the token's ``exp``; 0 if expired or invalid."""
+    payload = decode_token(token)
+    exp = payload.get("exp")
+    if not exp:
+        return 0
+    remaining = int(exp - datetime.now(timezone.utc).timestamp())
+    return max(remaining, 0)

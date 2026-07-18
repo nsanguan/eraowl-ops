@@ -2,17 +2,24 @@ import hashlib
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings as app_settings
 from app.core.database import get_db
 from app.core.dependencies import check_privilege, get_current_user
-from app.core.security import create_access_token, create_refresh_token, decode_token
+from app.core.rate_limit import limiter
+from app.core.redis_blacklist import blacklist_token
+from app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    token_remaining_seconds,
+)
 from app.modules.admin import schemas
 from app.modules.admin.models import UserBusinessUnit
-from app.modules.admin.services import AdminService, AdminGenericService
+from app.modules.admin.services import AdminService, AdminGenericService, PersonalizeService
 from app.shared.pagination import PaginatedResponse
 
 router = APIRouter()
@@ -313,7 +320,12 @@ async def list_audit_logs(
 
 
 @router.post("/login")
-async def login(data: schemas.LoginRequest, svc: AdminService = Depends(get_service)):
+@limiter.limit("10/minute")
+async def login(
+    data: schemas.LoginRequest,
+    request: Request,
+    svc: AdminService = Depends(get_service),
+):
     user = await svc.authenticate(data.username, data.password)
     role_ids = [r.role_id for r in await svc.get_user_roles(user.user_id)]
     access_token = create_access_token(
@@ -343,8 +355,10 @@ async def login(data: schemas.LoginRequest, svc: AdminService = Depends(get_serv
 
 
 @router.post("/refresh")
+@limiter.limit("20/minute")
 async def refresh_token(
     data: schemas.RefreshRequest,
+    request: Request,
     svc: AdminService = Depends(get_service),
 ):
     payload = decode_token(data.refresh_token)
@@ -357,6 +371,12 @@ async def refresh_token(
         raise HTTPException(status_code=401, detail="Token revoked or expired")
 
     await svc.revoke_refresh_token(token_hash)
+
+    # Blacklist the old access token for its remaining lifetime only
+    if data.access_token:
+        remaining = token_remaining_seconds(data.access_token)
+        if remaining:
+            await blacklist_token(data.access_token, remaining)
 
     user_id = uuid.UUID(payload["sub"])
     user = await svc.get_user(user_id)
@@ -376,9 +396,18 @@ async def refresh_token(
 
 
 @router.post("/logout", status_code=204)
-async def logout(data: schemas.LogoutRequest, svc: AdminService = Depends(get_service)):
+async def logout(
+    data: schemas.LogoutRequest,
+    svc: AdminService = Depends(get_service),
+):
     token_hash = hashlib.sha256(data.refresh_token.encode()).hexdigest()
     await svc.revoke_refresh_token(token_hash)
+
+    # Blacklist the access token for its remaining lifetime only
+    if data.access_token:
+        remaining = token_remaining_seconds(data.access_token)
+        if remaining:
+            await blacklist_token(data.access_token, remaining)
 
 
 # ---------------------------------------------------------------------------
@@ -481,3 +510,81 @@ async def generic_delete(
     _priv=check_privilege("admin", "manage_users"),
 ):
     await svc.delete(table_name, entity_id)
+
+
+# ---------------------------------------------------------------------------
+# UI Personalization — load / save merged layout overrides
+# ---------------------------------------------------------------------------
+
+
+async def get_personalize_service(
+    db: AsyncSession = Depends(get_db),
+) -> PersonalizeService:
+    return PersonalizeService(db)
+
+
+@router.get("/ui-personalize/load")
+async def ui_personalize_load(
+    page_key: str = Query(..., description="Page key e.g. 'mdm.item_form'"),
+    user=Depends(get_current_user),
+    svc: PersonalizeService = Depends(get_personalize_service),
+    _priv=check_privilege("admin", "personalize"),
+):
+    role_ids = await svc.get_user_role_ids(user.user_id)
+    return await svc.load_personalization(page_key, user.user_id, role_ids)
+
+
+@router.put("/ui-personalize/save")
+@router.post("/ui-personalize/save")
+async def ui_personalize_save(
+    data: schemas.UiPersonalizationSaveRequest,
+    user=Depends(get_current_user),
+    svc: PersonalizeService = Depends(get_personalize_service),
+    _priv=check_privilege("admin", "personalize"),
+):
+    if not data.target_user_id and not data.target_role_id:
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=400,
+            detail="At least one of target_user_id or target_role_id must be set",
+        )
+    result = await svc.save_personalization(
+        page_key=data.page_key,
+        target_user_id=data.target_user_id,
+        target_role_id=data.target_role_id,
+        override_json=data.override_json,
+        actor_user_id=user.user_id,
+        as_delta=data.as_delta,
+    )
+    # Return updated full merged layout
+    role_ids = await svc.get_user_role_ids(user.user_id)
+    merged = await svc.load_personalization(data.page_key, user.user_id, role_ids)
+    return {"saved": result, "layout": merged["layout"], "source": merged["source"]}
+
+
+@router.get("/ui-personalize/templates")
+async def ui_personalize_list_templates(
+    search: Optional[str] = Query(None, description="Filter by page_key / schema_version"),
+    user=Depends(get_current_user),
+    svc: PersonalizeService = Depends(get_personalize_service),
+    _priv=check_privilege("admin", "personalize"),
+):
+    """Catalogue of all personalizable pages (standard templates)."""
+    return await svc.list_templates(search=search)
+
+
+@router.get("/ui-personalize/templates/{page_key:path}")
+async def ui_personalize_template_detail(
+    page_key: str,
+    user=Depends(get_current_user),
+    svc: PersonalizeService = Depends(get_personalize_service),
+    _priv=check_privilege("admin", "personalize"),
+):
+    """Full base-template record (component tree) for a single page."""
+    detail = await svc.get_template_detail(page_key)
+    if detail is None:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail=f"Template '{page_key}' not found")
+    return detail

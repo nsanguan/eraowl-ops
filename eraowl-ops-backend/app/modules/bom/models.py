@@ -1,8 +1,7 @@
 import uuid
 from datetime import date, datetime
-from typing import Optional
 
-from sqlalchemy import Boolean, Column, Date, DateTime, String, func
+from sqlalchemy import Boolean, Column, Date, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlmodel import Field, Relationship, SQLModel
 

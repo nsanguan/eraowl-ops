@@ -210,7 +210,7 @@ class BomService:
                     BomHeader.status == "ACTIVE",
                     BomHeader.is_deleted == False,
                     BomHeader.effective_date_from <= today,
-                    (BomHeader.effective_date_to >= today) | (BomHeader.effective_date_to == None),
+                    (BomHeader.effective_date_to >= today) | (BomHeader.effective_date_to.is_(None)),
                 )
             )
             headers = result.scalars().all()
@@ -222,7 +222,7 @@ class BomService:
                         BomComponent.bom_header_id == header.bom_header_id,
                         BomComponent.is_deleted == False,
                         BomComponent.effective_date_from <= today,
-                        (BomComponent.effective_date_to >= today) | (BomComponent.effective_date_to == None),
+                        (BomComponent.effective_date_to >= today) | (BomComponent.effective_date_to.is_(None)),
                     )
                 )
                 lines = lines_result.scalars().all()

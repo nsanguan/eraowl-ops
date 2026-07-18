@@ -1,6 +1,5 @@
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import Field
 from app.shared.module_base.mixins import AuditMixin, SoftDeleteMixin, UUIDPKMixin
-import uuid
 from typing import Optional
 
 

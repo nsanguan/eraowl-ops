@@ -1,9 +1,7 @@
 import uuid
-from datetime import datetime, timezone
 from sqlalchemy import Boolean, Column, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import declared_attr
-from sqlmodel import SQLModel, Field
 
 
 class TimestampMixin:

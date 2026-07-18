@@ -26,6 +26,7 @@ async def list_bom_headers(
     page_size: int = Query(20, ge=1, le=100),
     item_id: uuid.UUID | None = Query(None),
     db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "view"),
 ):
     svc = BomService(db)
     items, total = await svc.list_bom_headers(page, page_size, item_id)
@@ -34,25 +35,42 @@ async def list_bom_headers(
 
 
 @router.get("/bom-headers/{entity_id}", response_model=BomHeaderOut)
-async def get_bom_header(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def get_bom_header(
+    entity_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "view"),
+):
     svc = BomService(db)
     return await svc.get_bom_header(entity_id)
 
 
 @router.post("/bom-headers", response_model=BomHeaderOut, status_code=201)
-async def create_bom_header(data: BomHeaderCreate, db: AsyncSession = Depends(get_db)):
+async def create_bom_header(
+    data: BomHeaderCreate,
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "create"),
+):
     svc = BomService(db)
     return await svc.create_bom_header(data)
 
 
 @router.put("/bom-headers/{entity_id}", response_model=BomHeaderOut)
-async def update_bom_header(entity_id: uuid.UUID, data: BomHeaderUpdate, db: AsyncSession = Depends(get_db)):
+async def update_bom_header(
+    entity_id: uuid.UUID,
+    data: BomHeaderUpdate,
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "edit"),
+):
     svc = BomService(db)
     return await svc.update_bom_header(entity_id, data)
 
 
 @router.delete("/bom-headers/{entity_id}", status_code=204)
-async def delete_bom_header(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def delete_bom_header(
+    entity_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "edit"),
+):
     svc = BomService(db)
     await svc.delete_bom_header(entity_id)
 
@@ -72,6 +90,7 @@ async def explode_bom(
     entity_id: uuid.UUID,
     quantity: float = Query(1.0, ge=0),
     db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "view"),
 ):
     svc = BomService(db)
     header = await svc.get_bom_header(entity_id)
@@ -85,6 +104,7 @@ async def list_bom_components(
     page_size: int = Query(20, ge=1, le=100),
     bom_header_id: uuid.UUID | None = Query(None),
     db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "view"),
 ):
     svc = BomService(db)
     items, total = await svc.list_bom_components(page, page_size, bom_header_id)
@@ -93,24 +113,41 @@ async def list_bom_components(
 
 
 @router.get("/bom-components/{entity_id}", response_model=BomComponentOut)
-async def get_bom_component(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def get_bom_component(
+    entity_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "view"),
+):
     svc = BomService(db)
     return await svc.get_bom_component(entity_id)
 
 
 @router.post("/bom-components", response_model=BomComponentOut, status_code=201)
-async def create_bom_component(data: BomComponentCreate, db: AsyncSession = Depends(get_db)):
+async def create_bom_component(
+    data: BomComponentCreate,
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "create"),
+):
     svc = BomService(db)
     return await svc.create_bom_component(data)
 
 
 @router.put("/bom-components/{entity_id}", response_model=BomComponentOut)
-async def update_bom_component(entity_id: uuid.UUID, data: BomComponentUpdate, db: AsyncSession = Depends(get_db)):
+async def update_bom_component(
+    entity_id: uuid.UUID,
+    data: BomComponentUpdate,
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "edit"),
+):
     svc = BomService(db)
     return await svc.update_bom_component(entity_id, data)
 
 
 @router.delete("/bom-components/{entity_id}", status_code=204)
-async def delete_bom_component(entity_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def delete_bom_component(
+    entity_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _priv=check_privilege("bom", "edit"),
+):
     svc = BomService(db)
     await svc.delete_bom_component(entity_id)

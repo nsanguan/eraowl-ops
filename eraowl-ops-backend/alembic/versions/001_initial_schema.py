@@ -22,6 +22,28 @@ def upgrade() -> None:
     op.execute("CREATE SCHEMA IF NOT EXISTS admin")
 
     # =========================================================================
+    # mdm schema — addresses (created first: mdm.sites references it via FK)
+    # =========================================================================
+
+    op.create_table(
+        "addresses",
+        sa.Column("address_id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column("address_line1", sa.String(255), nullable=True),
+        sa.Column("address_line2", sa.String(255), nullable=True),
+        sa.Column("city", sa.String(100), nullable=True),
+        sa.Column("state_province", sa.String(100), nullable=True),
+        sa.Column("postal_code", sa.String(20), nullable=True),
+        sa.Column("country_code", sa.String(10), nullable=True),
+        sa.Column("latitude", sa.Float(), nullable=True),
+        sa.Column("longitude", sa.Float(), nullable=True),
+        sa.Column("is_active", sa.Boolean(), server_default=sa.text("true")),
+        sa.Column("is_deleted", sa.Boolean(), server_default=sa.text("false")),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        schema="mdm",
+    )
+
+    # =========================================================================
     # mdm schema — org_structure
     # =========================================================================
 
@@ -110,24 +132,6 @@ def upgrade() -> None:
     # =========================================================================
     # mdm schema — party
     # =========================================================================
-
-    op.create_table(
-        "addresses",
-        sa.Column("address_id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("address_line1", sa.String(255), nullable=True),
-        sa.Column("address_line2", sa.String(255), nullable=True),
-        sa.Column("city", sa.String(100), nullable=True),
-        sa.Column("state_province", sa.String(100), nullable=True),
-        sa.Column("postal_code", sa.String(20), nullable=True),
-        sa.Column("country_code", sa.String(10), nullable=True),
-        sa.Column("latitude", sa.Float(), nullable=True),
-        sa.Column("longitude", sa.Float(), nullable=True),
-        sa.Column("is_active", sa.Boolean(), server_default=sa.text("true")),
-        sa.Column("is_deleted", sa.Boolean(), server_default=sa.text("false")),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
-        schema="mdm",
-    )
 
     op.create_table(
         "parties",
@@ -530,7 +534,6 @@ def downgrade() -> None:
     op.drop_table("party_site_uses", schema="mdm")
     op.drop_table("party_sites", schema="mdm")
     op.drop_table("parties", schema="mdm")
-    op.drop_table("addresses", schema="mdm")
 
     # =========================================================================
     # mdm schema — org_structure
@@ -542,6 +545,9 @@ def downgrade() -> None:
     op.drop_table("business_units", schema="mdm")
     op.drop_table("companies", schema="mdm")
     op.drop_table("corporates", schema="mdm")
+
+    # addresses dropped last: mdm.sites references it via FK
+    op.drop_table("addresses", schema="mdm")
 
     # =========================================================================
     # Schemas

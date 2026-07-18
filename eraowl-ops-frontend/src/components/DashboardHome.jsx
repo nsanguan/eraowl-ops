@@ -1,11 +1,15 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useAuthStore from '../store/authStore'
 import { FUNCTIONAL_AREAS, MODULE_REGISTRY } from '../config/moduleRegistry'
+import PersonalizeWrapper from '../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../store/usePersonalizeStore'
 
 export default function DashboardHome() {
   const navigate = useNavigate()
   const privileges = useAuthStore((s) => s.privileges)
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+  useEffect(() => { loadPersonalization('dashboard.home') }, [loadPersonalization])
 
   const accessibleModules = useMemo(() => {
     if (!privileges || privileges.length === 0) return []
@@ -25,10 +29,12 @@ export default function DashboardHome() {
 
   return (
     <div className="p-6 space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-950 dark:text-slate-50">EraOwl-OPS</h1>
-        <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">AI-powered ERP platform — select a module to get started</p>
-      </div>
+      <PersonalizeWrapper componentId="header:dashboard">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-950 dark:text-slate-50">EraOwl-OPS</h1>
+          <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">AI-powered ERP platform — select a module to get started</p>
+        </div>
+      </PersonalizeWrapper>
 
       {Object.keys(groupedAreas).length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">

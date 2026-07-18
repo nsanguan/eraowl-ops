@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CoreAdmin | User Personalization</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "background": "#f8f9ff",
+                    "surface-container-highest": "#d4e4fc",
+                    "secondary-fixed": "#d3e4ff",
+                    "on-error": "#ffffff",
+                    "surface-container": "#e5eeff",
+                    "surface": "#f8f9ff",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "on-background": "#0d1c2e",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#43474e",
+                    "on-surface": "#0d1c2e",
+                    "on-tertiary-fixed-variant": "#41474e",
+                    "on-primary-fixed": "#001b3c",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#ccdbf4",
+                    "inverse-on-surface": "#eaf1ff",
+                    "outline": "#74777f",
+                    "surface-container-low": "#eff4ff",
+                    "on-primary-container": "#86a0cd",
+                    "inverse-surface": "#223144",
+                    "surface-tint": "#455f88",
+                    "secondary": "#1960a3",
+                    "tertiary": "#1b2127",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary-fixed": "#001c38",
+                    "tertiary-fixed": "#dde3eb",
+                    "primary": "#002045",
+                    "on-tertiary-container": "#989fa6",
+                    "surface-container-high": "#dce9ff",
+                    "tertiary-fixed-dim": "#c1c7cf",
+                    "secondary-container": "#7db6ff",
+                    "on-secondary-container": "#00477f",
+                    "on-secondary-fixed-variant": "#004881",
+                    "inverse-primary": "#adc7f7",
+                    "secondary-fixed-dim": "#a2c9ff",
+                    "primary-fixed": "#d6e3ff",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#d4e4fc",
+                    "outline-variant": "#c4c6cf",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed": "#161c22",
+                    "tertiary-container": "#30363c",
+                    "primary-fixed-dim": "#adc7f7",
+                    "primary-container": "#1a365d",
+                    "on-secondary": "#ffffff",
+                    "accent-personalization": "#6366F1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "md": "16px",
+                    "panel-width": "320px",
+                    "gutter": "16px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "xs": "4px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "mono-label": ["JetBrains Mono"],
+                    "headline-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "mono-label": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        
+        .personalization-dashed {
+            border: 2px dashed #6366F1;
+            position: relative;
+        }
+
+        .drag-handle {
+            width: 16px;
+            height: 16px;
+            background-image: radial-gradient(circle, #6366F1 1.5px, transparent 1.5px);
+            background-size: 4px 4px;
+            cursor: grab;
+        }
+
+        /* Subtle grid background for edit mode */
+        .edit-mode-grid {
+            background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .edit-indicator {
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { border-color: rgba(99, 102, 241, 0.4); }
+            50% { border-color: rgba(99, 102, 241, 1); }
+            100% { border-color: rgba(99, 102, 241, 0.4); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-hidden">
+<!-- Left SideNavBar (The Anchor) -->
+<aside class="w-panel-width h-full fixed left-0 top-0 bg-primary flex flex-col p-md border-r border-outline-variant shadow-sm z-50">
+<div class="mb-xl px-sm">
+<h1 class="font-display-lg text-display-lg text-on-primary">CoreAdmin</h1>
+<p class="font-body-sm text-on-primary opacity-70">Enterprise Resource Planning</p>
+</div>
+<nav class="flex-1 space-y-xs">
+<!-- Administration (Active context: Administration/Users) -->
+<a class="flex items-center gap-md p-md rounded-lg text-on-primary bg-secondary font-bold scale-95 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Administration</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-lg text-on-primary-fixed-variant opacity-80 hover:bg-secondary-fixed-dim transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-body-md text-body-md">Users</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-lg text-on-primary-fixed-variant opacity-80 hover:bg-secondary-fixed-dim transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span class="font-body-md text-body-md">Roles</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-lg text-on-primary-fixed-variant opacity-80 hover:bg-secondary-fixed-dim transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-body-md text-body-md">Permissions</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-lg text-on-primary-fixed-variant opacity-80 hover:bg-secondary-fixed-dim transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="font-body-md text-body-md">System Logs</span>
+</a>
+</nav>
+<div class="mt-auto p-md bg-primary-container rounded-xl flex items-center gap-md">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A clean, professional headshot of a corporate executive against a neutral, high-key studio background. The lighting is soft and even, highlighting an authoritative yet approachable persona, fitting for an enterprise resource planning software interface. The overall aesthetic is minimalist and modern." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_Q3SV91YvDE1OwghYnaJWYc-X00ApYZgXcNzvU0u_KLFFns26ebE7G90d2L3Bg4fY47xDUmxs54d1AooyL6qRzWvHQVpPYwxNjjplSGZ7VBZCnqIyvpUu4c2ziaXkOeuMBExhGMSKun_dTKpAIK4GmyeCGAydfZeD7gRSlmyERPHgSrCn5T06gnmOuwwYF2fCwTDs9zSK7-wMCn-udtHyx2Vdh5yMbb0GOQFS-YBVS3hhd_ufne1NuA"/>
+<div>
+<p class="font-body-md text-body-md text-on-primary font-bold">Admin User</p>
+<p class="font-body-sm text-body-sm text-on-primary opacity-60">System Controller</p>
+</div>
+</div>
+</aside>
+<!-- TopAppBar (The Header) -->
+<header class="fixed top-0 right-0 left-[320px] h-16 bg-surface flex justify-between items-center px-lg border-b border-outline-variant z-40">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md font-extrabold text-primary">ERP Admin Console</span>
+<div class="h-6 w-[1px] bg-outline-variant"></div>
+<nav class="flex gap-md">
+<a class="font-headline-sm text-headline-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="font-headline-sm text-headline-sm text-secondary border-b-2 border-secondary pb-1" href="#">Personalization</a>
+<a class="font-headline-sm text-headline-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-surface-container-highest text-on-surface-variant px-md py-sm rounded-lg font-bold hover:bg-surface-variant transition-colors">Discard Changes</button>
+<button class="bg-secondary text-on-secondary px-lg py-sm rounded-lg font-bold shadow-sm hover:opacity-90 active:scale-95 transition-all">Save Changes</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-[320px] mr-[320px] mt-16 p-xl min-h-[calc(100vh-64px)] edit-mode-grid transition-all">
+<div class="max-w-4xl mx-auto space-y-lg">
+<!-- Page Title Area -->
+<div class="flex justify-between items-end mb-xl">
+<div>
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">Active Configuration</span>
+<h2 class="font-display-lg text-display-lg text-primary">User Profile Editor</h2>
+</div>
+<div class="flex items-center gap-sm bg-accent-personalization/10 text-accent-personalization px-md py-sm rounded-full border border-accent-personalization/20">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+<span class="font-mono-label text-mono-label">Personalization Mode Active</span>
+</div>
+</div>
+<!-- Bento Layout for Profile Form -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Profile Image Card -->
+<div class="col-span-4 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm personalization-dashed edit-indicator group">
+<div class="absolute -top-3 -right-3 w-6 h-6 bg-accent-personalization rounded shadow flex items-center justify-center text-white cursor-move z-10">
+<div class="drag-handle opacity-60"></div>
+</div>
+<div class="flex flex-col items-center gap-md">
+<img class="w-32 h-32 rounded-full border-4 border-surface-container shadow-inner" data-alt="A professional user profile avatar in a minimalist circular frame. The background is a soft blue gradient, and the character representation is clean and vector-style, suitable for a high-density enterprise dashboard. The lighting is crisp and the aesthetic is focused on clarity and professionalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXK5a4XZGsnLzXAsM-K5u2BIav2U7wsDXF8hPtfsX8Ll_7LnazQSEOFiYYZ-fI7MMiFIvjHON2Na9_AHB3IavfEFyxRQpkB7Dc7tMvdHwwtwep_U4KkJzjjeLrQfCfC_EtvOp-CK7wcFNCPUHlp6Qie4bi63KaPLwLsHfxLPJuc17ja4Ma_qwbDUFrqwJoulwvN3XIlHPZGEw8IWjmo9C139Jr5Ajx-1NVjUuGLk9kxXlqbNjwtAZdwQ"/>
+<button class="font-label-caps text-label-caps text-accent-personalization border border-accent-personalization px-md py-xs rounded hover:bg-accent-personalization/5 transition-all">Update Avatar</button>
+</div>
+</div>
+<!-- Main Info Card -->
+<div class="col-span-8 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm space-y-md personalization-dashed edit-indicator">
+<div class="absolute -top-3 -right-3 w-6 h-6 bg-accent-personalization rounded shadow flex items-center justify-center text-white cursor-move z-10">
+<div class="drag-handle opacity-60"></div>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Full Name</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-sm font-body-md text-body-md focus:ring-2 focus:ring-secondary outline-none" type="text" value="Alexander Sterling"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Email Address</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-sm font-body-md text-body-md focus:ring-2 focus:ring-secondary outline-none" type="email" value="a.sterling@eraowl-ops.com"/>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Primary Role</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-sm font-body-md text-body-md focus:ring-2 focus:ring-secondary outline-none appearance-none">
+<option>System Administrator</option>
+<option>Security Engineer</option>
+<option>Compliance Officer</option>
+</select>
+</div>
+</div>
+<!-- Bio / Description Section -->
+<div class="col-span-12 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm personalization-dashed edit-indicator">
+<div class="absolute -top-3 -right-3 w-6 h-6 bg-accent-personalization rounded shadow flex items-center justify-center text-white cursor-move z-10">
+<div class="drag-handle opacity-60"></div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Personal Bio &amp; Work Preferences</label>
+<textarea class="w-full h-32 bg-surface-container-low border border-outline-variant rounded-lg p-sm font-body-md text-body-md focus:ring-2 focus:ring-secondary outline-none resize-none">Managing core infrastructure deployments and user access protocols. Focused on automating ERP workflows through the EraOwl-OPS module suite.</textarea>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- NavigationDrawer (Personalization Panel) -->
+<aside class="fixed right-0 top-0 h-full w-panel-width bg-surface-container-lowest border-l-4 border-secondary shadow-lg z-50 flex flex-col p-md translate-x-0 transition-transform duration-300 ease-in-out">
+<div class="mb-xl">
+<span class="font-label-caps text-label-caps uppercase tracking-widest text-secondary">Editor Tools</span>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Personalization Panel</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Edit Workspace Layout</p>
+</div>
+<div class="flex-1 space-y-xl overflow-y-auto">
+<!-- Dynamic Color Selection -->
+<div class="space-y-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="palette">palette</span>
+<span class="font-mono-label text-mono-label uppercase font-bold">Theme Colors</span>
+</div>
+<div class="grid grid-cols-5 gap-sm">
+<button class="w-10 h-10 rounded-full bg-[#002045] border-2 border-secondary ring-2 ring-offset-2 ring-secondary/20"></button>
+<button class="w-10 h-10 rounded-full bg-[#1960a3] border-2 border-transparent hover:border-outline transition-all"></button>
+<button class="w-10 h-10 rounded-full bg-[#6366F1] border-2 border-transparent hover:border-outline transition-all"></button>
+<button class="w-10 h-10 rounded-full bg-[#30363c] border-2 border-transparent hover:border-outline transition-all"></button>
+<button class="w-10 h-10 rounded-full bg-[#ba1a1a] border-2 border-transparent hover:border-outline transition-all"></button>
+</div>
+<div class="flex items-center gap-sm bg-surface-container p-sm rounded-lg border border-outline-variant">
+<span class="font-mono-label text-mono-label">#002045</span>
+<div class="ml-auto w-4 h-4 bg-primary rounded-sm"></div>
+</div>
+</div>
+<!-- Font Selection -->
+<div class="space-y-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="font_download">font_download</span>
+<span class="font-mono-label text-mono-label uppercase font-bold">Typography</span>
+</div>
+<div class="space-y-sm">
+<button class="w-full text-left p-sm bg-surface-container border border-secondary text-secondary rounded-lg font-body-md text-body-md flex justify-between items-center">
+                        Inter (Sans)
+                        <span class="material-symbols-outlined text-sm" data-icon="check">check</span>
+</button>
+<button class="w-full text-left p-sm bg-surface-container-lowest border border-outline-variant text-on-surface-variant rounded-lg font-body-md text-body-md hover:bg-surface-container-high transition-all">
+                        JetBrains Mono
+                    </button>
+<button class="w-full text-left p-sm bg-surface-container-lowest border border-outline-variant text-on-surface-variant rounded-lg font-body-md text-body-md hover:bg-surface-container-high transition-all">
+                        Roboto Slab
+                    </button>
+</div>
+</div>
+<!-- Spacing Sliders -->
+<div class="space-y-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="grid_view">grid_view</span>
+<span class="font-mono-label text-mono-label uppercase font-bold">Field Density</span>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between text-[10px] font-bold text-on-surface-variant uppercase">
+<span>Compact</span>
+<span>Relaxed</span>
+</div>
+<input class="w-full accent-secondary h-1 bg-surface-container-high rounded-full appearance-none cursor-pointer" type="range"/>
+<div class="flex justify-between items-center bg-surface-container p-sm rounded-lg">
+<span class="font-mono-label text-mono-label">Gutter: 24px</span>
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="info">info</span>
+</div>
+</div>
+</div>
+<!-- Layout Toggle -->
+<div class="space-y-md">
+<div class="flex items-center justify-between p-sm bg-surface-container rounded-lg border border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="restart_alt">restart_alt</span>
+<span class="font-mono-label text-mono-label uppercase font-bold">Reset Layout</span>
+</div>
+<button class="text-error font-label-caps text-label-caps">EXECUTE</button>
+</div>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant">
+<button class="w-full bg-accent-personalization text-white py-md rounded-lg font-bold shadow-lg flex items-center justify-center gap-md hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="published_with_changes">published_with_changes</span>
+                APPLY GLOBAL
+            </button>
+</div>
+</aside>
+<!-- Overlay hint for edit mode -->
+<div class="fixed bottom-lg left-[344px] bg-primary text-on-primary px-lg py-md rounded-full shadow-2xl flex items-center gap-md z-40 border border-secondary animate-bounce">
+<span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
+<span class="font-body-md text-body-md font-bold">Drag components to rearrange your workspace</span>
+</div>
+<script>
+        // Simple drag feedback simulation
+        const draggables = document.querySelectorAll('.personalization-dashed');
+        draggables.forEach(item => {
+            item.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.drag-handle')) {
+                    item.style.opacity = '0.7';
+                    item.style.cursor = 'grabbing';
+                }
+            });
+            item.addEventListener('mouseup', () => {
+                item.style.opacity = '1';
+                item.style.cursor = 'default';
+            });
+        });
+
+        // Theme Switch Logic Simulation
+        const colorButtons = document.querySelectorAll('.grid-cols-5 button');
+        colorButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                colorButtons.forEach(b => b.classList.remove('ring-2', 'ring-offset-2', 'ring-secondary/20', 'border-secondary'));
+                btn.classList.add('ring-2', 'ring-offset-2', 'ring-secondary/20', 'border-secondary');
+            });
+        });
+    </script>
+</body></html>

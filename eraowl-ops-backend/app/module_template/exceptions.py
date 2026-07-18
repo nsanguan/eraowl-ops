@@ -1,4 +1,4 @@
-from app.core.exceptions import NotFoundError, ConflictError
+from app.core.exceptions import NotFoundError
 
 
 class YourModuleNotFoundError(NotFoundError):

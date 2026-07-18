@@ -1,9 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../../../api/client'
+import PersonalizeWrapper from '../../../shared-ui-kit/components/ui/PersonalizeWrapper'
+import usePersonalizeStore from '../../../store/usePersonalizeStore'
 
 const TYPE_ICONS = { call: 'call', meeting: 'groups', email: 'mail', task: 'task', follow_up: 'redo' }
 
 export default function ActivitiesPage() {
+  const loadPersonalization = usePersonalizeStore((s) => s.loadPersonalization)
+  useEffect(() => { loadPersonalization('collaboration.activities') }, [loadPersonalization])
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -34,15 +38,17 @@ export default function ActivitiesPage() {
 
   return (
     <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Activities</h1>
-          <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Track and manage activities across the system</p>
+      <PersonalizeWrapper componentId="header:activities">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900! dark:text-white!">Activities</h1>
+            <p className="text-sm text-slate-500! dark:text-slate-300! mt-1">Track and manage activities across the system</p>
+          </div>
+          <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">add</span> Schedule Activity
+          </button>
         </div>
-        <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px]">add</span> Schedule Activity
-        </button>
-      </div>
+      </PersonalizeWrapper>
 
       <div className="space-y-2">
         {items.map((item) => (

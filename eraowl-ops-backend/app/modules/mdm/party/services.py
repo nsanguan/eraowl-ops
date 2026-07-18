@@ -249,8 +249,6 @@ class PartyService:
 
     # ── TCA Composite ──
     async def create_composite_party(self, data) -> Party:
-        from app.modules.mdm.party.schemas import CompositePartyCreate
-        from sqlalchemy import text
 
         party = Party(
             party_number=data.party_number,
@@ -458,7 +456,6 @@ class PartyService:
                     },
                 })
 
-            addr_label = f"{addr.address_line1}, {addr.city}" if addr else "No address"
             site_nodes.append({
                 "node_id": f"site-{ps.party_site_id}",
                 "node_type": "site_item",

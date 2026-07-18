@@ -245,6 +245,7 @@
   --color-muted-foreground: var(--on-surface-variant);
   --color-accent: var(--surface-container);
   --color-accent-foreground: var(--on-surface);
+  --color-accent-personalization: #6366F1;
   --color-destructive: var(--error);
   --color-destructive-foreground: var(--on-error);
   --color-border: var(--outline-variant);
@@ -331,4 +332,141 @@ body { background: var(--background); color: var(--on-surface); font-family: var
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--surface-container-lowest); }
 ::-webkit-scrollbar-thumb { background: var(--outline-variant); border-radius: 4px; }
+
+/* ── Personalization editor chrome (per requirements/personalize-design-v1.html) ── */
+.pz-dashed {
+  border: 2px dashed var(--color-accent-personalization, #6366F1);
+  position: relative;
+}
+
+.personalization-active {
+  border: 2px dashed var(--color-accent-personalization, #6366F1);
+  position: relative;
+}
+.pz-edit-indicator {
+  animation: pz-pulse-border 2s infinite;
+}
+@keyframes pz-pulse-border {
+  0% { border-color: rgba(99, 102, 241, 0.4); }
+  50% { border-color: rgba(99, 102, 241, 1); }
+  100% { border-color: rgba(99, 102, 241, 0.4); }
+}
+.pz-edit-grid {
+  background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.pz-drag-handle {
+  width: 16px;
+  height: 16px;
+  background-image: radial-gradient(circle, #6366F1 1.5px, transparent 1.5px);
+  background-size: 4px 4px;
+  cursor: grab;
+}
+.pz-corner-chip {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  background: var(--color-accent-personalization, #6366F1);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  z-index: 10;
+}
+
+/* v2: drag handle revealed on hover (group-hover) */
+.pz-group { position: relative; }
+.pz-drag-handle-hover {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--color-accent-personalization, #6366F1);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 12;
+  cursor: grab;
+}
+.pz-group:hover .pz-drag-handle-hover { opacity: 1; }
+
+/* v2: thin indigo scrollbar */
+.pz-thin-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+.pz-thin-scroll::-webkit-scrollbar-thumb { background: #adc7f7; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--outline); }
+
+/* ── Left Nav show/hide toggle ── */
+.eods-snav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 15rem;
+  z-index: 100;
+  transition: transform 0.22s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.eods-snav--collapsed {
+  transform: translateX(-100%);
+}
+
+/* Toggle switch (nav show/hide) */
+.nav-toggle-switch {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 210;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  background: var(--surface-container-high, #e7e8e9);
+  border: 1px solid var(--outline-variant, #c1c6d7);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  user-select: none;
+  transition: left 0.22s ease, background 0.15s ease;
+}
+.nav-toggle-switch__track {
+  position: relative;
+  width: 38px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--outline-variant, #c1c6d7);
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+.nav-toggle-switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.18s ease;
+}
+.nav-toggle-switch[data-on="true"] .nav-toggle-switch__track {
+  background: var(--primary, #2563eb);
+}
+.nav-toggle-switch[data-on="true"] .nav-toggle-switch__thumb {
+  transform: translateX(18px);
+}
+.nav-toggle-switch__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--on-surface-variant, #414754);
+  line-height: 1;
+}

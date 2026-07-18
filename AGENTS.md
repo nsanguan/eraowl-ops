@@ -72,7 +72,7 @@ Location: `app/shared/module_base/`
 - `mixins.py`: `UUIDPKMixin`, `AuditMixin`, `SoftDeleteMixin`, `ObjectVersionMixin`
 
 ### Database
-- 6 PostgreSQL schemas: `admin`, `org_structure`, `party`, `item`, `bom`, `po`
+- 5 PostgreSQL schemas: `admin`, `mdm`, `bom`, `po`, `collab`
 - Each module's models specify `__table_args__ = {"schema": "..."}`
 - Single Alembic migration chain (all schemas in one history)
 - DB connection: external at `202.71.1.13:5435`, configured via `DATABASE_URL` env var

@@ -18,9 +18,9 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text, func
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlmodel import Column, Field, SQLModel
+from sqlmodel import Field, SQLModel
 
 
 class UUIDPKMixin(SQLModel):

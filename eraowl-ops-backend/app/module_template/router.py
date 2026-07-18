@@ -1,8 +1,4 @@
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.database import get_db
-from app.shared.module_base.crud import BaseCRUDService
-from app.shared.module_base.generic import BaseGenericService
+from fastapi import APIRouter
 
 router = APIRouter()
 

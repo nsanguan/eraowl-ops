@@ -11,7 +11,6 @@ from app.modules.po.dto.schemas import (
     CreatePoShipmentItem,
     UpdatePoCompositeRequest,
     UpdatePoDistributionItem,
-    UpdatePoLineItem,
     UpdatePoShipmentItem,
 )
 from app.modules.po.models import (
@@ -50,7 +49,7 @@ class PoCompositeService:
         )
         lines = lines_result.scalars().all()
 
-        line_ids = [l.po_line_id for l in lines]
+        line_ids = [line.po_line_id for line in lines]
         shipments = []
         if line_ids:
             shipments_result = await self.db.execute(
@@ -153,8 +152,7 @@ class PoCompositeService:
             )
         ).scalars().all()
 
-        existing_line_ids = {l.po_line_id for l in existing_lines}
-        incoming_line_ids = {l.po_line_id for l in data.lines if l.po_line_id}
+        incoming_line_ids = {line.po_line_id for line in data.lines if line.po_line_id}
 
         for line in existing_lines:
             if line.po_line_id not in incoming_line_ids:
@@ -162,7 +160,7 @@ class PoCompositeService:
 
         for line_item in data.lines:
             if line_item.po_line_id:
-                line = next((l for l in existing_lines if l.po_line_id == line_item.po_line_id), None)
+                line = next((el for el in existing_lines if el.po_line_id == line_item.po_line_id), None)
                 if not line:
                     continue
                 for key, val in line_item.model_dump(exclude={"po_line_id", "shipments"}, exclude_unset=True).items():
@@ -179,7 +177,6 @@ class PoCompositeService:
             )
         ).scalars().all()
 
-        existing_rel_ids = {r.release_id for r in existing_releases}
         incoming_rel_ids = {r.release_id for r in data.releases if hasattr(r, "release_id") and r.release_id}
 
         for rel in existing_releases:
@@ -204,7 +201,6 @@ class PoCompositeService:
             )
         ).scalars().all()
 
-        existing_amd_ids = {a.amendment_id for a in existing_amendments}
         incoming_amd_ids = {a.amendment_id for a in data.amendments if hasattr(a, "amendment_id") and a.amendment_id}
 
         for amd in existing_amendments:
@@ -257,7 +253,6 @@ class PoCompositeService:
             )
         ).scalars().all()
 
-        existing_ship_ids = {s.po_shipment_id for s in existing_ships}
         incoming_ship_ids = {s.po_shipment_id for s in ship_items if s.po_shipment_id}
 
         for ship in existing_ships:
@@ -288,7 +283,6 @@ class PoCompositeService:
             )
         ).scalars().all()
 
-        existing_dist_ids = {d.distribution_id for d in existing_dists}
         incoming_dist_ids = {d.distribution_id for d in dist_items if d.distribution_id}
 
         for dist in existing_dists:
