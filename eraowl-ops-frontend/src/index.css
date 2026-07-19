@@ -355,6 +355,42 @@ body { background: var(--background); color: var(--on-surface); font-family: var
   background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
   background-size: 24px 24px;
 }
+
+/* ── Personalize edit-mode preview viewport ──
+   Pages are authored assuming they fill the full window (100vh,
+   calc(100vh - Npx), h-full chrome). When rendered inside the personalize
+   canvas they are nested in a scroll container, so those assumptions break
+   (grids too short, flex layouts overflow, page modals cover the panel).
+
+   Fix: the preview becomes a bounded viewport whose height equals the
+   available canvas area. Page-level full-height/flex layouts then resolve
+   against this box instead of the window, giving one consistent scroll
+   context across every editable page. */
+.pz-preview-viewport {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+/* Give full-height children (grids, flex layouts) a real height to fill. */
+.pz-preview-viewport > * {
+  flex: 0 0 auto;
+}
+.pz-preview-viewport > .flex,
+.pz-preview-viewport > [class*="h-[calc"] {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* Page-internal modals open as fixed inset-0 (z-50); scope them to the
+   preview box so they don't cover the Personalization Panel / header while
+   editing. Higher specificity (child combinator + class) beats the page's
+   own Tailwind z-50 utility. */
+.pz-preview-viewport > div.fixed.inset-0,
+.pz-preview-viewport div.fixed.inset-0 {
+  position: absolute !important;
+  z-index: 40 !important;
+  inset: 0;
+}
 .pz-drag-handle {
   width: 16px;
   height: 16px;

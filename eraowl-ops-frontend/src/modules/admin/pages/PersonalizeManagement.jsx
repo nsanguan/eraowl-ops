@@ -317,7 +317,7 @@ export default function PersonalizeManagement() {
               Choose a page to begin editing its layout.
             </div>
           ) : (
-            <div className={`${isDesignMode ? 'w-full' : 'max-w-2xl mx-auto'} space-y-4`}>
+            <div className={`${isDesignMode ? 'w-full pz-preview-viewport' : 'max-w-2xl mx-auto'} space-y-4`}>
               {/* Status badge + Save */}
               <div className="flex justify-between items-center">
                 {isDesignMode ? (
