@@ -9,6 +9,8 @@ import PropertyInspector from '../shared-ui-kit/components/ui/PropertyInspector'
 import { ErrorBoundary } from '../shared-ui-kit/components/layout/ErrorBoundary'
 import { getModulesByArea } from '../config/moduleRegistry'
 
+const MOBILE_BREAKPOINT = 768
+
 export default function Layout() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -21,7 +23,42 @@ export default function Layout() {
 
   const [activeArea, setActiveArea] = useState(null)
   const [commandBarOpen, setCommandBarOpen] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+
+  // Sidebar persistence: desktop collapse vs mobile drawer open state.
+  const [desktopCollapsed, setDesktopCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebar.collapsed')
+    return saved === null ? false : saved === 'true'
+  })
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`).matches
+  )
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const onChange = (e) => {
+      setIsMobile(e.matches)
+      if (!e.matches) setMobileOpen(false)
+    }
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  const sidebarOpen = isMobile ? mobileOpen : !desktopCollapsed
+
+  const toggleSidebar = useCallback(() => {
+    if (isMobile) {
+      setMobileOpen((v) => !v)
+    } else {
+      setDesktopCollapsed((v) => {
+        const next = !v
+        localStorage.setItem('sidebar.collapsed', String(next))
+        return next
+      })
+    }
+  }, [isMobile])
 
   // Whether the current user may use the in-context personalization editor
   const canPersonalize = useMemo(
@@ -109,11 +146,26 @@ export default function Layout() {
         user={user}
         userInitials={userInitials}
         collapsed={!sidebarOpen}
+        isMobile={isMobile}
+        mobileOpen={mobileOpen}
+        onNavigate={() => isMobile && setMobileOpen(false)}
       />
 
-      <div className={`flex-1 flex flex-col ${sidebarOpen ? 'ml-60' : 'ml-0'}`}>
+      {/* Mobile drawer backdrop */}
+      {isMobile && mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-[90]"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <div className={`flex-1 flex flex-col ${sidebarOpen ? 'md:ml-60' : 'md:ml-0'}`}>
         <Header
           onNavigate={handleNavigate}
+          onToggleSidebar={toggleSidebar}
+          sidebarOpen={sidebarOpen}
+          isMobile={isMobile}
           userLabel={user?.username ?? 'User'}
           userInitials={userInitials}
           onOpenCommandBar={() => setCommandBarOpen(true)}
@@ -154,22 +206,6 @@ export default function Layout() {
         >
           {isDesignMode ? '✕' : '🎨'}
         </button>
-
-        {/* Sidebar show/hide toggle switch */}
-        <div
-          className="nav-toggle-switch"
-          data-on={sidebarOpen}
-          onClick={() => setSidebarOpen((v) => !v)}
-          title={sidebarOpen ? 'Hide navigation menu' : 'Show navigation menu'}
-          style={{ left: sidebarOpen ? 16 : 16 }}
-        >
-          <span className="nav-toggle-switch__track">
-            <span className="nav-toggle-switch__thumb" />
-          </span>
-          <span className="nav-toggle-switch__label">
-            {sidebarOpen ? 'Menu' : 'Show Menu'}
-          </span>
-        </div>
       </div>
 
       {/* The /admin/personalize page renders its own full editor panel

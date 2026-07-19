@@ -420,6 +420,20 @@ body { background: var(--background); color: var(--on-surface); font-family: var
   transform: translateX(-100%);
 }
 
+/* Mobile: sidebar becomes an off-canvas drawer above the backdrop */
+@media (max-width: 767px) {
+  .eods-snav {
+    z-index: 100;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.35);
+  }
+  .eods-snav--mobile-closed {
+    transform: translateX(-100%);
+  }
+  .eods-snav--mobile-open {
+    transform: translateX(0);
+  }
+}
+
 /* Toggle switch (nav show/hide) */
 .nav-toggle-switch {
   position: fixed;

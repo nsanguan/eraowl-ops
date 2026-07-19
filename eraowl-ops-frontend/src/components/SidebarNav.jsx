@@ -8,6 +8,9 @@ export default function SidebarNav({
   user,
   userInitials,
   collapsed = false,
+  isMobile = false,
+  mobileOpen = false,
+  onNavigate,
 }) {
   const location = useLocation()
   const areaKeys = Object.keys(groupedModules)
@@ -17,8 +20,17 @@ export default function SidebarNav({
 
   const userRoles = user?.roles?.map((r) => r.role_name).join(', ') || 'User'
 
+  const navClass = [
+    'eods-snav',
+    collapsed && !isMobile ? 'eods-snav--collapsed' : '',
+    isMobile && mobileOpen ? 'eods-snav--mobile-open' : '',
+    isMobile && !mobileOpen ? 'eods-snav--mobile-closed' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <aside className={`eods-snav${collapsed ? ' eods-snav--collapsed' : ''}`}>
+    <aside className={navClass}>
       <div className="eods-snav__header">
         <div className="eods-snav__brand">
           <div className="eods-snav__logo">EO</div>
@@ -93,6 +105,7 @@ export default function SidebarNav({
                 <Link
                   key={mod.id}
                   to={mod.path}
+                  onClick={onNavigate}
                   className={`eods-snav__link ${isActive ? 'eods-snav__link--active' : ''}`}
                 >
                   <span className="eods-snav__link-icon">

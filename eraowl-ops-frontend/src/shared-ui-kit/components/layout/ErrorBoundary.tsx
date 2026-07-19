@@ -34,9 +34,14 @@ export class ErrorBoundary extends Component<Props, State> {
             <span className="material-symbols-outlined !text-[48px]">warning</span>
           </div>
           <h1 className="text-2xl font-bold mb-2 text-slate-900! dark:text-white!">Something went wrong</h1>
-          <p className="text-slate-500! dark:text-slate-300! max-w-md mb-8">
+          <p className="text-slate-500! dark:text-slate-300! max-w-md mb-4">
             {this.state.error?.message || 'An unexpected error occurred while rendering this component.'}
           </p>
+          {this.state.error?.stack && (
+            <pre className="text-left text-[11px] text-error max-w-2xl w-full max-h-48 overflow-auto bg-error/5 p-3 rounded-lg mb-6 whitespace-pre-wrap">
+              {this.state.error.stack}
+            </pre>
+          )}
           <button
             onClick={() => window.location.reload()}
             className="px-6 py-2.5 bg-primary text-primary-foreground font-semibold rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-lg"

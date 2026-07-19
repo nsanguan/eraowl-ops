@@ -10,6 +10,9 @@ export default function Header({
   isDesignMode = false,
   onToggleDesignMode,
   canPersonalize = false,
+  onToggleSidebar,
+  sidebarOpen = true,
+  isMobile = false,
 }) {
   const [helpOpen, setHelpOpen] = useState(false)
   const [theme, setTheme] = useState(() =>
@@ -41,8 +44,18 @@ export default function Header({
   }
 
   return (
-    <header className="fixed top-0 right-0 left-60 h-14 bg-surface-container border-b border-outline-variant flex items-center justify-between px-5 z-30">
-      <div className="flex items-center flex-1 max-w-md">
+    <header className={`fixed top-0 right-0 h-14 bg-surface-container border-b border-outline-variant flex items-center justify-between px-5 z-30 left-0 md:left-60 ${sidebarOpen ? 'md:left-60' : 'md:left-0'}`}>
+      <div className="flex items-center flex-1 max-w-md gap-2">
+        <button
+          onClick={onToggleSidebar}
+          className="flex items-center justify-center w-9 h-9 -ml-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors"
+          title={sidebarOpen ? 'Collapse menu' : 'Open menu'}
+          aria-label={sidebarOpen ? 'Collapse navigation menu' : 'Open navigation menu'}
+        >
+          <span className="material-symbols-outlined text-[22px]">
+            {sidebarOpen ? 'menu_open' : 'menu'}
+          </span>
+        </button>
         <button
           onClick={onOpenCommandBar}
           className="flex items-center gap-2.5 px-3 py-2 rounded-xl border border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-colors text-left flex-1"
