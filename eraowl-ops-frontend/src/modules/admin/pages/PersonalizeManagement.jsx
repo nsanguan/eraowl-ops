@@ -164,6 +164,10 @@ export default function PersonalizeManagement() {
   const [gutter, setGutter] = useState(16)
   const [radius, setRadius] = useState(8)
   const [hex, setHex] = useState('#002045')
+  // When a page is being edited (design mode + selection) we collapse the left
+  // page list so the edit canvas gets the full width. A small "Pages" button
+  // re-opens it for switching pages.
+  const [listOpen, setListOpen] = useState(true)
 
   const refreshPages = useCallback(async (q) => setPages(await listTemplates(q || undefined)), [listTemplates])
   useEffect(() => { refreshPages('') }, [refreshPages])
@@ -196,6 +200,14 @@ export default function PersonalizeManagement() {
     setStatus({ ok: true, msg: 'Reverted to base template.' })
   }
 
+  // Entering design mode collapses the left page list for a full-width canvas;
+  // exiting re-opens it. A "Pages" button lets the user re-open mid-edit.
+  const handleToggleDesign = () => {
+    const next = !isDesignMode
+    toggleDesignMode()
+    setListOpen(next ? false : true)
+  }
+
   // ── Editor Tools handlers ──
   const setColor = (c) => { setHex(c); if (activeComponentId) updateComponentStyles(activeComponentId, { fontColor: c }) }
   const setFont = (stack) => activeComponentId && updateComponentStyles(activeComponentId, { fontFamily: stack })
@@ -226,6 +238,7 @@ export default function PersonalizeManagement() {
       {/* ── Body row: page list | editor | panel ── */}
       <div className="flex flex-1 min-h-0 gap-4">
       {/* ── Left: page list (functional) ── */}
+      {listOpen && (
       <aside className="w-80 shrink-0 rounded-xl border border-outline-variant! bg-surface-container-lowest! p-3 flex flex-col">
         <div className="flex-1 overflow-y-auto space-y-1 pz-thin-scroll">
           {pages.map((p) => (
@@ -244,6 +257,7 @@ export default function PersonalizeManagement() {
           {pages.length === 0 && <p className="text-xs text-on-surface-variant!/60 italic px-1">No pages found.</p>}
         </div>
       </aside>
+      )}
 
       {/* ── Center: WYSIWYG editor ── */}
       {/* When the right Personalization Panel is open (design mode + a page
@@ -256,6 +270,16 @@ export default function PersonalizeManagement() {
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-primary!">settings_applications</span>
             <h1 className="text-2xl font-bold text-primary!">ERP Personalize</h1>
+            {!listOpen && selected && (
+              <button
+                onClick={() => setListOpen(true)}
+                className="ml-2 flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-surface-container-high! text-on-surface-variant! hover:text-primary! hover:bg-surface-container-highest!"
+                title="Show page list"
+              >
+                <span className="material-symbols-outlined text-[16px]">view_list</span>
+                Pages
+              </button>
+            )}
           </div>
           {isDesignMode && selected && (
             <div className="flex items-center gap-2">
@@ -294,7 +318,7 @@ export default function PersonalizeManagement() {
                     LAYOUT EDIT MODE
                   </span>
                 ) : <span />}
-                <button onClick={toggleDesignMode}
+                <button onClick={handleToggleDesign}
                   className="bg-primary! text-white! text-sm font-semibold px-4 py-2 rounded-lg shadow-sm active:scale-95">
                   {isDesignMode ? 'Exit Edit' : 'Edit Layout'}
                 </button>
