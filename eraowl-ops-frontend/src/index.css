@@ -405,9 +405,12 @@ body { background: var(--background); color: var(--on-surface); font-family: var
 ::-webkit-scrollbar-thumb:hover { background: var(--outline); }
 
 /* ── Left Nav show/hide toggle ── */
-.eods-snav {
+/* Override EODS .eods-snav base (which sets top:0) so the nav starts below
+   the full-width header instead of behind it. Higher specificity (aside + class)
+   to beat the design-system rule that comes later in the cascade. */
+aside.eods-snav {
   position: fixed;
-  top: 0;
+  top: 3rem;
   left: 0;
   bottom: 0;
   width: 15rem;
@@ -415,7 +418,6 @@ body { background: var(--background); color: var(--on-surface); font-family: var
   transition: transform 0.22s ease;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-top: 3rem;
   background: var(--surface-container-lowest, #f8fafc);
   border-right: 1px solid var(--outline-variant, #c1c6d7);
 }
