@@ -108,9 +108,9 @@ export default function PropertyInspector({
       style={{
         position: 'fixed',
         right: 0,
-        top: '3.5rem',
+        top: '3rem',
         width: '300px',
-        height: 'calc(100vh - 3.5rem)',
+        height: 'calc(100vh - 3rem)',
         background: '#1e293b',
         borderLeft: '1px solid #334155',
         color: '#e2e8f0',

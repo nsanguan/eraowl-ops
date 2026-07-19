@@ -220,18 +220,18 @@ export default function PersonalizeManagement() {
   return (
     <div className="flex flex-col h-full gap-4">
       {/* ── Top: branding + Personalizable Pages search ── */}
-      <div className="flex items-center justify-between gap-4 rounded-xl border border-outline-variant! bg-primary! px-4 py-3">
+      <div className="flex items-center justify-between gap-4 rounded-xl border border-outline-variant! bg-primary! px-4 py-1.5">
         <div>
-          <h1 className="font-bold text-lg text-on-primary! leading-tight">CoreAdmin</h1>
-          <p className="text-xs text-on-primary! opacity-70">Enterprise Resource Planning</p>
+          <h1 className="font-bold text-[16px]! leading-tight text-on-primary!">CoreAdmin</h1>
+          <p className="text-[10px] text-on-primary! opacity-70">Enterprise Resource Planning</p>
         </div>
         <div className="flex items-center gap-2 flex-1 max-w-md ml-auto">
-          <span className="text-sm font-semibold text-on-primary! whitespace-nowrap">Personalizable Pages</span>
+          <span className="text-xs font-semibold text-on-primary! whitespace-nowrap">Personalizable Pages</span>
           <input
             value={search}
             onChange={handleSearch}
             placeholder="Search pages…"
-            className="w-full px-3 py-1.5 text-sm rounded-lg bg-primary-container! text-on-primary! border border-outline-variant! placeholder:text-on-primary!/50"
+            className="w-full px-3 py-1 text-xs rounded-lg bg-primary-container! text-on-primary! border border-outline-variant! placeholder:text-on-primary!/50"
           />
         </div>
       </div>
@@ -269,8 +269,8 @@ export default function PersonalizeManagement() {
         {/* Top app bar (v2) */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary!">settings_applications</span>
-            <h1 className="text-2xl font-bold text-primary!">ERP Personalize</h1>
+            <span className="material-symbols-outlined text-primary! text-[20px]">settings_applications</span>
+            <h1 className="text-[18px]! font-bold text-primary!">ERP Personalize</h1>
             {!listOpen && selected && (
               <button
                 onClick={() => setListOpen(true)}
@@ -380,7 +380,7 @@ export default function PersonalizeManagement() {
 
       {/* ── Right: Editor Tools drawer (v2) ── */}
       {isDesignMode && selected && (
-        <aside className="fixed right-0 top-14 h-[calc(100vh-3.5rem)] w-80 bg-surface-container-lowest! border-l-4 border-secondary! shadow-lg z-50 flex flex-col p-4 overflow-y-auto pz-thin-scroll">
+        <aside className="fixed right-0 top-12 h-[calc(100vh-3rem)] w-80 bg-surface-container-lowest! border-l-4 border-secondary! shadow-lg z-50 flex flex-col p-4 overflow-y-auto pz-thin-scroll">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-bold text-secondary!">Personalization Panel</h3>
           </div>
