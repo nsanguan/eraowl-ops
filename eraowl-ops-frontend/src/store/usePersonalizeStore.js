@@ -300,6 +300,7 @@ const usePersonalizeStore = create((set, get) => ({
   savePersonalization: async (pageKey, targetUserId, targetRoleId, opts = {}) => {
     const { pageSchema, baseSchema } = get()
     const asDelta = opts.asDelta !== false
+    const name = opts.name || null
     const payload = asDelta && baseSchema ? get().computeDelta(baseSchema, pageSchema) : pageSchema
     try {
       const { data } = await api.put('/admin/ui-personalize/save', {
@@ -308,6 +309,7 @@ const usePersonalizeStore = create((set, get) => ({
         target_role_id: targetRoleId || null,
         override_json: payload,
         as_delta: asDelta,
+        name,
       })
       return data
     } catch (err) {
@@ -329,13 +331,14 @@ const usePersonalizeStore = create((set, get) => ({
   },
 
   /** Persist global theme tokens (Theme Roller) for a target user/role. */
-  saveTheme: async (targetUserId, targetRoleId) => {
+  saveTheme: async (targetUserId, targetRoleId, name = null) => {
     const { themeTokens } = get()
     try {
       const { data } = await api.put('/admin/ui-personalize/theme', {
         target_user_id: targetUserId || null,
         target_role_id: targetRoleId || null,
         tokens: themeTokens,
+        name,
       })
       return data
     } catch (err) {

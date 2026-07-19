@@ -157,12 +157,14 @@ class UiPersonalizationSaveRequest(BaseModel):
     target_role_id: Optional[uuid.UUID] = None
     override_json: dict
     as_delta: bool = True
+    name: Optional[str] = None
 
 
 class UiThemeSaveRequest(BaseModel):
     target_user_id: Optional[uuid.UUID] = None
     target_role_id: Optional[uuid.UUID] = None
     tokens: Optional[dict] = None
+    name: Optional[str] = None
 
 
 class UiStandardTemplateOut(BaseModel):
@@ -179,6 +181,7 @@ class UiStandardTemplateOut(BaseModel):
 class UserUiPersonalizationOut(BaseModel):
     id: uuid.UUID
     page_key: str
+    name: Optional[str] = None
     user_id: Optional[uuid.UUID] = None
     role_id: Optional[uuid.UUID] = None
     override_json: dict

@@ -318,6 +318,7 @@ class PersonalizeService:
         override_json: dict,
         actor_user_id: uuid.UUID | None,
         as_delta: bool = False,
+        name: str | None = None,
     ) -> dict:
         """Upsert a personalisation override and write an audit log.
 
@@ -359,6 +360,8 @@ class PersonalizeService:
             old_value = existing.override_json
             existing.override_json = override_json
             existing.updated_at = datetime.now(timezone.utc)
+            if name is not None:
+                existing.name = name
             entity_id = existing.id
         else:
             entry = UserUiPersonalization(
@@ -366,6 +369,7 @@ class PersonalizeService:
                 user_id=target_user_id,
                 role_id=target_role_id,
                 override_json=override_json,
+                name=name,
             )
             self.db.add(entry)
             await self.db.flush()
@@ -418,6 +422,7 @@ class PersonalizeService:
         target_role_id: uuid.UUID | None,
         tokens: dict | None,
         actor_user_id: uuid.UUID | None,
+        name: str | None = None,
     ) -> dict:
         if not target_user_id and not target_role_id:
             raise ValueError("At least one of target_user_id or target_role_id must be set")
@@ -439,9 +444,11 @@ class PersonalizeService:
             old_value = existing.tokens
             existing.tokens = tokens or {}
             existing.updated_at = datetime.now(timezone.utc)
+            if name is not None:
+                existing.name = name
             entity_id = existing.id
         else:
-            entry = UiTheme(user_id=target_user_id, role_id=target_role_id, tokens=tokens or {})
+            entry = UiTheme(user_id=target_user_id, role_id=target_role_id, tokens=tokens or {}, name=name)
             self.db.add(entry)
             await self.db.flush()
             entity_id = entry.id

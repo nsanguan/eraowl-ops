@@ -561,6 +561,7 @@ async def ui_personalize_save(
         override_json=data.override_json,
         actor_user_id=user.user_id,
         as_delta=data.as_delta,
+        name=data.name,
     )
     # Return updated full merged layout
     role_ids = await svc.get_user_role_ids(user.user_id)
@@ -626,6 +627,7 @@ async def ui_personalize_theme_save(
         target_role_id=data.target_role_id,
         tokens=data.tokens,
         actor_user_id=user.user_id,
+        name=data.name,
     )
     role_ids = await svc.get_user_role_ids(user.user_id)
     merged = await svc.load_theme(user.user_id, role_ids)

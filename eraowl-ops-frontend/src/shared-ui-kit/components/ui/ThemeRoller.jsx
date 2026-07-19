@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import usePersonalizeStore from '../../../store/usePersonalizeStore'
 
 /**
@@ -25,11 +25,12 @@ export const THEME_PRESETS = [
   { id: 'rose', label: 'Rose', tokens: { primary: '#be123c', primaryContainer: '#e11d48', surface: '#fff1f2', background: '#fff1f2', font: "'Inter', sans-serif", radius: 16, spacing: 18 } },
 ]
 
-export default function ThemeRoller({ targetRoleId, targetUserId }) {
+export default function ThemeRoller({ targetRoleId, targetUserId, name }) {
   const themeTokens = usePersonalizeStore((s) => s.themeTokens)
   const applyThemeTokens = usePersonalizeStore((s) => s.applyThemeTokens)
   const resetThemeTokens = usePersonalizeStore((s) => s.resetThemeTokens)
   const saveTheme = usePersonalizeStore((s) => s.saveTheme)
+  const [status, setStatus] = useState(null)
 
   // Preview live as tokens change
   useEffect(() => {
@@ -45,6 +46,11 @@ export default function ThemeRoller({ targetRoleId, targetUserId }) {
       <p className="text-[11px] text-outline leading-relaxed">
         APEX-style Theme Roller — customize global colors, typography and shape. Changes apply live and can be saved per role or user.
       </p>
+      {status && (
+        <div className={`px-3 py-1.5 rounded-lg text-sm ${status.ok ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'}`}>
+          {status.msg}
+        </div>
+      )}
 
       <div>
         <div className="text-[10px] font-semibold uppercase tracking-wider text-outline mb-1.5">Presets</div>
@@ -92,7 +98,10 @@ export default function ThemeRoller({ targetRoleId, targetUserId }) {
         <button onClick={() => resetThemeTokens()} className="flex-1 px-3 py-2 text-xs font-semibold bg-surface-container-highest text-on-surface rounded-lg hover:bg-surface-variant">
           Reset
         </button>
-        <button onClick={() => saveTheme(targetUserId, targetRoleId)} className="flex-1 px-3 py-2 text-xs font-semibold bg-primary text-primary-foreground rounded-lg hover:opacity-90">
+        <button onClick={async () => {
+          const res = await saveTheme(targetUserId, targetRoleId, name)
+          setStatus(res ? { ok: true, msg: 'Theme saved.' } : { ok: false, msg: 'Theme save failed.' })
+        }} className="flex-1 px-3 py-2 text-xs font-semibold bg-primary text-primary-foreground rounded-lg hover:opacity-90">
           Save Theme
         </button>
       </div>

@@ -164,6 +164,7 @@ export default function PersonalizeManagement() {
   const [gutter, setGutter] = useState(16)
   const [radius, setRadius] = useState(8)
   const [hex, setHex] = useState('#002045')
+  const [personalizeName, setPersonalizeName] = useState('')
   // When a page is being edited (design mode + selection) we collapse the left
   // page list so the edit canvas gets the full width. A small "Pages" button
   // re-opens it for switching pages.
@@ -191,7 +192,7 @@ export default function PersonalizeManagement() {
     // the backend's "at least one target" rule is satisfied.
     const currentUserId = useAuthStore.getState().user?.user_id || null
     const targetUserId = targetRoleId ? null : currentUserId
-    const res = await savePersonalization(selected, targetUserId, targetRoleId || null, { asDelta: true })
+    const res = await savePersonalization(selected, targetUserId, targetRoleId || null, { asDelta: true, name: personalizeName.trim() || null })
     setStatus(res ? { ok: true, msg: 'Saved personalization.' } : { ok: false, msg: 'Save failed.' })
   }
   const handleReset = async () => {
@@ -282,7 +283,14 @@ export default function PersonalizeManagement() {
             )}
           </div>
           {isDesignMode && selected && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-end">
+              <input
+                value={personalizeName}
+                onChange={(e) => setPersonalizeName(e.target.value)}
+                placeholder="Personalization Name"
+                className="px-2 py-1 text-sm rounded-lg border border-outline-variant! bg-surface-container-low! text-on-surface! w-44"
+                title="Name for this saved personalization"
+              />
               <select
                 value={targetRoleId}
                 onChange={(e) => setTargetRoleId(e.target.value)}
@@ -390,7 +398,11 @@ export default function PersonalizeManagement() {
           </nav>
 
           {tab === 'theme' && (
-            <ThemeRoller targetRoleId={targetRoleId || null} targetUserId={null} />
+            <ThemeRoller
+              targetRoleId={targetRoleId || null}
+              targetUserId={useAuthStore.getState().user?.user_id || null}
+              name={personalizeName.trim() || null}
+            />
           )}
 
           {tab === 'layout' && (

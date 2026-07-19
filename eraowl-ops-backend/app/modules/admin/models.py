@@ -159,6 +159,10 @@ class UserUiPersonalization(SQLModel, table=True):
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     )
     page_key: str = Field(sa_column=Column(String(255), nullable=False, index=True))
+    name: Optional[str] = Field(
+        default=None,
+        sa_column=Column(String(255), nullable=True),
+    )
     user_id: Optional[uuid.UUID] = Field(
         default=None,
         sa_column=Column(UUID(as_uuid=True), ForeignKey("admin.users.user_id", ondelete="CASCADE"), nullable=True),
@@ -200,6 +204,10 @@ class UiTheme(SQLModel, table=True):
     role_id: Optional[uuid.UUID] = Field(
         default=None,
         sa_column=Column(UUID(as_uuid=True), ForeignKey("admin.roles.role_id", ondelete="CASCADE"), nullable=True),
+    )
+    name: Optional[str] = Field(
+        default=None,
+        sa_column=Column(String(255), nullable=True),
     )
     tokens: dict = Field(
         default_factory=dict, sa_column=Column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
