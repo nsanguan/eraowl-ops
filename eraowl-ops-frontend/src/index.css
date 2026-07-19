@@ -415,6 +415,7 @@ body { background: var(--background); color: var(--on-surface); font-family: var
   transition: transform 0.22s ease;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-top: 3rem;
 }
 .eods-snav--collapsed {
   transform: translateX(-100%);

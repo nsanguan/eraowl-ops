@@ -44,11 +44,24 @@ export default function Header({
   }
 
   return (
-    <header className={`fixed top-0 right-0 h-12 bg-surface-container border-b border-outline-variant flex items-center justify-between px-4 z-30 left-0 md:left-60 ${sidebarOpen ? 'md:left-60' : 'md:left-0'}`}>
-      <div className="flex items-center flex-1 max-w-md gap-2">
+    <header className="fixed top-0 left-0 right-0 h-12 bg-surface-container border-b border-outline-variant flex items-center justify-between px-4 z-30">
+      <div className="flex items-center gap-3 min-w-0">
+        {/* Brand: circular logo + product name, far left of the top bar */}
+        <button
+          onClick={() => onNavigate?.('/')}
+          className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
+          title="EraOwl-OPS Home"
+        >
+          <span className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs shadow-sm">EO</span>
+          <span className="leading-tight hidden sm:block">
+            <span className="block text-[13px] font-bold text-on-surface">EraOwl-OPS</span>
+            <span className="block text-[9px] text-outline">AI ERP</span>
+          </span>
+        </button>
+
         <button
           onClick={onToggleSidebar}
-          className="flex items-center justify-center w-8 h-8 -ml-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors"
+          className="flex items-center justify-center w-8 h-8 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors"
           title={sidebarOpen ? 'Collapse menu' : 'Open menu'}
           aria-label={sidebarOpen ? 'Collapse navigation menu' : 'Open navigation menu'}
         >
@@ -58,7 +71,7 @@ export default function Header({
         </button>
         <button
           onClick={onOpenCommandBar}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-colors text-left flex-1"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-colors text-left flex-1 min-w-0 max-w-md"
           title="Search (⌘K)"
         >
           <span className="material-symbols-outlined text-outline text-[18px]">

@@ -31,16 +31,6 @@ export default function SidebarNav({
 
   return (
     <aside className={navClass}>
-      <div className="eods-snav__header">
-        <div className="eods-snav__brand">
-          <div className="eods-snav__logo">EO</div>
-          <div className="eods-snav__brand-text">
-            <div className="eods-snav__brand-title">EraOwl-OPS</div>
-            <div className="eods-snav__brand-subtitle">AI ERP</div>
-          </div>
-        </div>
-      </div>
-
       <div className="eods-snav__switcher">
         <div className="eods-modsw">
           <button
